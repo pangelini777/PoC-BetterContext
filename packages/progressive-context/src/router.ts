@@ -89,12 +89,13 @@ export function routingStateFor(
   };
 }
 
-function ruleQuestion(summary: string): { type: "noul"; instructions: string; criteria: { true: string; false: string } } {
+function ruleQuestion(summary: string, impliedBy: string[]): { type: "noul"; instructions: string; criteria: { true: string; false: string } } {
+  const hint = impliedBy.length > 0 ? ` Note: this rule is a declared dependency of ${impliedBy.join(", ")}; if the current phase involves those, answer yes.` : "";
   return {
     type: "noul",
-    instructions: `Is this rule needed now to constrain or guide correct execution of the current phase or immediate next action? Rule summary: ${summary}`,
+    instructions: `Is this rule needed now to constrain or guide correct execution of the current phase or immediate next action? Rule summary: ${summary}.${hint}`,
     criteria: {
-      true: "The rule constrains or guides the current phase or immediate next action.",
+      true: "The rule constrains or guides the current phase or immediate next action, including as a dependency of active work.",
       false: "The rule is irrelevant to the current phase or would add only stale context.",
     },
   };
@@ -124,7 +125,9 @@ export class SystemOneBackend implements ScoreBackend {
 
     // Pass 1: one Noul per rule + skill broad Choice + gating Nouls, single request.
     const questions: Record<string, { type: "noul"; instructions: string; criteria?: { true?: string; false?: string } } | { type: "choice"; instructions: string; criteria: Record<string, string> }> = {};
-    for (const r of rules) questions[`rule::${r.id}`] = ruleQuestion(r.summary);
+    const impliedBy = new Map<string, string[]>();
+    for (const r of rules) impliedBy.set(r.id, rules.filter((o) => o.dependsOn.includes(r.id)).map((o) => o.id));
+    for (const r of rules) questions[`rule::${r.id}`] = ruleQuestion(r.summary, impliedBy.get(r.id) ?? []);
     const skillCriteria: Record<string, string> = {};
     for (const s of [...skills].sort((a, b) => (a.id < b.id ? -1 : 1))) skillCriteria[s.id] = s.summary;
     questions["which_skill"] = {
@@ -174,7 +177,11 @@ export class SystemOneBackend implements ScoreBackend {
     const gateScore = (g1.noul + g2.noul + (1 - g3.noul)) / 3;
     const gatedOut = gateScore < opts.gateThreshold;
     const ranked = Object.entries((choice as ChoiceAnswer).probabilities).sort(([, a], [, b]) => b - a);
-    const shortlist = gatedOut ? [] : ranked.slice(0, opts.topK).map(([id]) => id);
+    // shortlistMin: drop candidates below this absolute Choice mass before
+    // taking topK, so a flat distribution cannot smuggle weak candidates into
+    // stage-2 verification. Tested in test/router-gates.test.ts.
+    const eligible = ranked.filter(([, p]) => p >= opts.shortlistMin);
+    const shortlist = gatedOut ? [] : eligible.slice(0, opts.topK).map(([id]) => id);
     const stage1: SkillStage1Out = {
       choice: choice.choice,
       probabilities: (choice as ChoiceAnswer).probabilities,
@@ -225,10 +232,15 @@ export class SystemOneBackend implements ScoreBackend {
         fits[id] = f.noul;
       }
       const bestFit = Math.max(...shortlist.map((id) => fits[id]));
+      // Selection semantics: the absolute fit Noul decides (it answers "is
+      // this procedure good enough to load?"); the Choice breaks ties and
+      // orders near-equal fits. A Choice winner that fails its own fit gate
+      // is NOT selected — but unlike the old logic, the best-fitting
+      // candidate IS selected instead of selecting nothing.
       let selected: string | null = null;
       if (bestFit >= opts.fitsThreshold) {
-        const winner = c2.choice;
-        if (shortlist.includes(winner) && (fits[winner] ?? 0) >= opts.fitsThreshold) selected = winner;
+        const byFit = [...shortlist].sort((a, b) => fits[b] - fits[a] || (c2.probabilities[b] ?? 0) - (c2.probabilities[a] ?? 0));
+        selected = byFit[0];
       }
       stage2 = { choice: c2.choice, probabilities: c2.probabilities, fits, selected };
       selectedSkill = selected;

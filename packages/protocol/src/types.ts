@@ -47,6 +47,24 @@ export interface SemanticEvent {
   changedPaths?: string[];
 }
 
+export interface ThresholdConfig {
+  version: string;
+  notes: string;
+  rules: {
+    activate: number;
+    activateCritical: number;
+    retain: number;
+    unload: number;
+    unloadStreakRequired: number;
+  };
+  skills: {
+    topK: number;
+    gateThreshold: number;
+    fitsThreshold: number;
+    shortlistMin: number;
+  };
+}
+
 export interface RoutingState {
   sessionId: string;
   goal: string;
@@ -85,26 +103,8 @@ export interface ResourceTransition {
   score?: number;
   semanticEventId: string;
 }
-
-export interface ThresholdConfig {
-  version: string;
-  notes: string;
-  rules: {
-    activate: number;
-    activateCritical: number;
-    retain: number;
-    unload: number;
-    unloadStreakRequired: number;
-  };
-  skills: {
-    topK: number;
-    gateThreshold: number;
-    fitsThreshold: number;
-    shortlistMin: number;
-  };
-}
-
 export type Arm = "load_all" | "static_initial" | "progressive_jev" | "oracle_dynamic";
+
 
 export interface TelemetryRecord {
   runId: string;

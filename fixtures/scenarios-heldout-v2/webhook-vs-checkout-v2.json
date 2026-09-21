@@ -1,0 +1,14 @@
+{
+  "id": "webhook-vs-checkout-v2",
+  "description": "Held-out Stripe look-alike: fixing callback verification must select the webhook handler, not checkout-session.",
+  "events": [
+    {
+      "seq": 0,
+      "kind": "user_message",
+      "text": "Our payment callback accepts forged signatures and fulfills twice on redelivery. Verify signatures on the raw body and deduplicate by event id.",
+      "phase": "webhook",
+      "gold_rules": ["webhook-idempotency", "payments-card-data", "secrets-management", "logging-sensitive-data"],
+      "gold_skill": "stripe-webhook-handler"
+    }
+  ]
+}

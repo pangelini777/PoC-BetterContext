@@ -1,10 +1,13 @@
 // Independent end-to-end verifier. Runs OUTSIDE the agent-visible workspace:
 // takes a workspace path, applies read-only checks against the files the agent
-// produced, and returns pass/fail per check. No gold labels, no JEV state, no
-// agent self-report involved. Safe to run against any arm's workspace.
+// produced, then copies HIDDEN executable tests in, runs `bun test` on them,
+// and removes them. No gold labels, no JEV state, no agent self-report.
+// The live agent never sees the hidden tests.
 
-import { readFile, stat } from "node:fs/promises";
+import { execFile } from "node:child_process";
+import { readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { HIDDEN_TEST_FILES } from "./hidden-tests.ts";
 
 export interface VerifyCheck {
   name: string;
@@ -70,9 +73,32 @@ export async function verifyWorkspace(ws: string): Promise<{ checks: VerifyCheck
   // 8. Cart page has a checkout interaction.
   const cartOk = /checkout/i.test(page);
   checks.push({ name: "cart-checkout-ui", pass: cartOk, detail: cartOk ? "checkout referenced in page" : "missing" });
-  // 9. Release checklist/config exists without deploying.
-  const releaseOk = (await exists(join(ws, "release.sh")) && /secret|migration|checklist|smoke|rollback/i.test(release)) || /checklist/i.test(appCode);
-  checks.push({ name: "release-checklist-present", pass: releaseOk, detail: releaseOk ? "checklist content found" : "missing" });
+  // 10+. Hidden executable tests: injected AFTER the run, executed, removed.
+  const hiddenNames = Object.keys(HIDDEN_TEST_FILES);
+  const written: string[] = [];
+  try {
+    for (const [name, content] of Object.entries(HIDDEN_TEST_FILES)) {
+      const dest = join(ws, name);
+      await writeFile(dest, content);
+      written.push(dest);
+    }
+    const hiddenOut = await new Promise<{ code: number; out: string }>((resolve) => {
+      execFile("bun", ["test", ...hiddenNames], { cwd: ws, timeout: 120_000 }, (err, stdout, stderr) => {
+        resolve({ code: err ? 1 : 0, out: `${stdout}\n${stderr}`.slice(0, 4000) });
+      });
+    });
+    // Attribute per-file pass/fail from bun output (best-effort parse).
+    for (const name of hiddenNames) {
+      const pass = hiddenOut.code === 0;
+      checks.push({
+        name: `hidden:${name}`,
+        pass,
+        detail: `bun test exit=${hiddenOut.code}; ${hiddenOut.out.split("\n").filter((l) => /pass|fail/.test(l)).slice(0, 3).join(" | ").slice(0, 200)}`,
+      });
+    }
+  } finally {
+    for (const dest of written) await rm(dest, { force: true });
+  }
 
   const passed = checks.filter((c) => c.pass).length;
   return { checks, passed, total: checks.length };

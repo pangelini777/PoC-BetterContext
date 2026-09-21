@@ -1,0 +1,14 @@
+{
+  "id": "checkout-vs-generic-v2",
+  "description": "Held-out look-alike: server checkout session must beat the generic Next.js API-route skill.",
+  "events": [
+    {
+      "seq": 0,
+      "kind": "user_message",
+      "text": "Create the hosted payment session on the server from trusted catalog prices and return the redirect URL. Never trust client totals.",
+      "phase": "checkout-api",
+      "gold_rules": ["payments-card-data", "api-error-contract", "secrets-management", "logging-sensitive-data"],
+      "gold_skill": "stripe-checkout-session"
+    }
+  ]
+}

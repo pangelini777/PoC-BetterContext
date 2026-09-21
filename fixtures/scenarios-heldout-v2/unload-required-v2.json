@@ -1,0 +1,22 @@
+{
+  "id": "unload-required-v2",
+  "description": "Held-out unload: UI rules relevant first, then must dematerialize when work moves to migrations.",
+  "events": [
+    {
+      "seq": 0,
+      "kind": "user_message",
+      "text": "Make the checkout button keyboard-focusable with a visible focus ring and an accessible name.",
+      "phase": "ui",
+      "gold_rules": ["accessibility-ui", "brand-ui-copy"],
+      "gold_skill": "react-ui-component"
+    },
+    {
+      "seq": 1,
+      "kind": "observation",
+      "text": "Button shipped. Now add the contacted_at column migration with a staged backfill for existing orders.",
+      "phase": "migration",
+      "gold_rules": ["database-migration-safety", "privacy-personal-data"],
+      "gold_skill": "postgres-schema-migration"
+    }
+  ]
+}

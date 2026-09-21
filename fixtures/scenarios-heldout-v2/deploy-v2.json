@@ -1,0 +1,14 @@
+{
+  "id": "deploy-v2",
+  "description": "Held-out production preparation with iOS/ML distractors present in the catalog.",
+  "events": [
+    {
+      "seq": 0,
+      "kind": "user_message",
+      "text": "Prepare the production go-live plan for the web checkout: required secrets, migration ordering, health checks, rollback. Do not deploy anything.",
+      "phase": "deploy",
+      "gold_rules": ["production-change-control", "secrets-management", "payments-card-data"],
+      "gold_skill": "production-deploy-checklist"
+    }
+  ]
+}

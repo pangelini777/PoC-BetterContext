@@ -1,0 +1,16 @@
+{
+  "id": "readonly-db",
+  "description": "Look-alike database skill test: investigation must not load migration skill.",
+  "events": [
+    {
+      "seq": 0,
+      "kind": "user_message",
+      "text": "Investigate whether duplicate orders exist for the same customer email over the last day. Do not modify the schema or data.",
+      "phase": "investigation",
+      "gold_rules": [
+        "privacy-personal-data"
+      ],
+      "gold_skill": "postgres-readonly-query"
+    }
+  ]
+}

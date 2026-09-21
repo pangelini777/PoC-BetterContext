@@ -1,0 +1,14 @@
+{
+  "id": "docs-only-v2",
+  "description": "Held-out documentation-only task with no code changes.",
+  "events": [
+    {
+      "seq": 0,
+      "kind": "user_message",
+      "text": "Rewrite the public API reference for the refunds endpoint with correct status codes and redacted sample payloads. No implementation changes.",
+      "phase": "docs",
+      "gold_rules": ["public-docs-branding", "api-error-contract"],
+      "gold_skill": "openapi-contract-update"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "id": "public-api-docs",
+  "description": "Public docs/OpenAPI update.",
+  "events": [
+    {
+      "seq": 0,
+      "kind": "user_message",
+      "text": "Update the public OpenAPI documentation for the checkout endpoint to show its 400 and 502 error responses and use safe example data.",
+      "phase": "docs",
+      "gold_rules": [
+        "public-docs-branding",
+        "api-error-contract"
+      ],
+      "gold_skill": "openapi-contract-update"
+    }
+  ]
+}

@@ -31,7 +31,7 @@ resources:
     summary: "Authentication and session security rules for login, OAuth, cookies, tokens, redirects, and authorization checks."
     lifetime: phase
     critical: true
-    dependsOn: []
+    dependsOn: [secrets-management]
   rule.privacy-personal-data:
     kind: rule
     source: .apm/instructions/privacy-personal-data.instructions.md
@@ -45,7 +45,7 @@ resources:
     summary: "Payment integration boundary: keep raw card data out of the application and use provider-hosted/tokenized payment flows."
     lifetime: phase
     critical: true
-    dependsOn: [logging-sensitive-data]
+    dependsOn: [logging-sensitive-data, secrets-management]
   rule.database-migration-safety:
     kind: rule
     source: .apm/instructions/database-migration-safety.instructions.md
@@ -66,7 +66,7 @@ resources:
     summary: "Webhook verification, replay resistance, idempotent processing, ordering assumptions, and retry-safe side effects."
     lifetime: phase
     critical: false
-    dependsOn: [logging-sensitive-data]
+    dependsOn: [logging-sensitive-data, secrets-management]
   rule.secrets-management:
     kind: rule
     source: .apm/instructions/secrets-management.instructions.md

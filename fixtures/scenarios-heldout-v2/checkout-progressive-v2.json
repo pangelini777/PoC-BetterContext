@@ -1,0 +1,62 @@
+{
+  "id": "checkout-progressive-v2",
+  "description": "Held-out multi-phase checkout flow with new wording and ordering: UI copy first, then checkout API, webhook, migration, verification, deploy, done. Forces loads and unloads including stripe look-alike switches.",
+  "events": [
+    {
+      "seq": 0,
+      "kind": "user_message",
+      "text": "Rewrite the cart checkout button copy so buyers understand they are heading to secure payment. Copy changes only, no backend.",
+      "phase": "ui-copy",
+      "gold_rules": ["brand-ui-copy", "accessibility-ui"],
+      "gold_skill": "brand-copy-review"
+    },
+    {
+      "seq": 1,
+      "kind": "observation",
+      "text": "Copy merged. Next: build the server endpoint that creates the hosted payment session from our catalog prices.",
+      "phase": "checkout-api",
+      "gold_rules": ["api-error-contract", "payments-card-data", "secrets-management", "logging-sensitive-data"],
+      "gold_skill": "stripe-checkout-session"
+    },
+    {
+      "seq": 2,
+      "kind": "observation",
+      "text": "Checkout endpoint live. Provider now sends completion callbacks; handle retries and repeated deliveries without double-charging.",
+      "phase": "webhook",
+      "gold_rules": ["webhook-idempotency", "payments-card-data", "secrets-management", "logging-sensitive-data"],
+      "gold_skill": "stripe-webhook-handler"
+    },
+    {
+      "seq": 3,
+      "kind": "observation",
+      "text": "Webhook stable. New requirement: store buyer contact fields with the order; extend the schema compatibly before the next deploy.",
+      "phase": "migration",
+      "gold_rules": ["database-migration-safety", "privacy-personal-data", "payments-card-data", "logging-sensitive-data"],
+      "gold_skill": "postgres-schema-migration"
+    },
+    {
+      "seq": 4,
+      "kind": "observation",
+      "text": "Schema extended. Write the regression plan: session creation errors, forged callback signatures, redelivered callbacks, leaked fields in logs.",
+      "phase": "verification",
+      "gold_rules": ["testing-quality-gates", "payments-card-data", "webhook-idempotency", "privacy-personal-data"],
+      "gold_skill": "test-plan-generator"
+    },
+    {
+      "seq": 5,
+      "kind": "observation",
+      "text": "Regression green. Assemble the go-live checklist: secrets, migration order, smoke probes, rollback. No deploy.",
+      "phase": "deploy",
+      "gold_rules": ["production-change-control", "secrets-management", "payments-card-data"],
+      "gold_skill": "production-deploy-checklist"
+    },
+    {
+      "seq": 6,
+      "kind": "completion",
+      "text": "Work finished and session is closing. No package content needed further.",
+      "phase": "done",
+      "gold_rules": [],
+      "gold_skill": null
+    }
+  ]
+}

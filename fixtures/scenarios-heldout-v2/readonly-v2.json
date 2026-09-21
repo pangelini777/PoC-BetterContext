@@ -1,0 +1,14 @@
+{
+  "id": "readonly-v2",
+  "description": "Held-out read-only investigation: must not select the migration skill.",
+  "events": [
+    {
+      "seq": 0,
+      "kind": "user_message",
+      "text": "Count how many accounts placed more than three orders this week. Selects only, no schema or data changes.",
+      "phase": "investigation",
+      "gold_rules": ["privacy-personal-data"],
+      "gold_skill": "postgres-readonly-query"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "no-skill-v2",
+  "description": "Held-out negative: general knowledge question, package must stay quiet.",
+  "events": [
+    {
+      "seq": 0,
+      "kind": "user_message",
+      "text": "Explain how debouncing differs from throttling, with a short example. No files should change.",
+      "phase": "explain",
+      "gold_rules": [],
+      "gold_skill": null
+    }
+  ]
+}

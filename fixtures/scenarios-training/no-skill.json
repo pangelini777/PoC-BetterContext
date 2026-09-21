@@ -1,0 +1,14 @@
+{
+  "id": "no-skill",
+  "description": "Negative example: package should stay quiet.",
+  "events": [
+    {
+      "seq": 0,
+      "kind": "user_message",
+      "text": "Explain lexical closures in JavaScript with a tiny example. Do not change any files.",
+      "phase": "explain",
+      "gold_rules": [],
+      "gold_skill": null
+    }
+  ]
+}

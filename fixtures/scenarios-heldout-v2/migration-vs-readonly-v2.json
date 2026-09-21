@@ -1,0 +1,14 @@
+{
+  "id": "migration-vs-readonly-v2",
+  "description": "Held-out database look-alike: adding a column must select migration skill, not read-only investigation.",
+  "events": [
+    {
+      "seq": 0,
+      "kind": "user_message",
+      "text": "Add a non-nullable contacted_at column to the orders table for populated rows, with a staged backfill and rollback notes.",
+      "phase": "migration",
+      "gold_rules": ["database-migration-safety", "privacy-personal-data", "logging-sensitive-data"],
+      "gold_skill": "postgres-schema-migration"
+    }
+  ]
+}

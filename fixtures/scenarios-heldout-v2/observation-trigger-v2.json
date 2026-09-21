@@ -1,0 +1,22 @@
+{
+  "id": "observation-trigger-v2",
+  "description": "Held-out observation trigger: rule becomes relevant only after a tool/file observation reveals a new domain (secrets in a Stripe observation).",
+  "events": [
+    {
+      "seq": 0,
+      "kind": "user_message",
+      "text": "Look at the checkout route and report what it does. Change nothing yet.",
+      "phase": "ui",
+      "gold_rules": ["accessibility-ui"],
+      "gold_skill": null
+    },
+    {
+      "seq": 1,
+      "kind": "observation",
+      "text": "Route inspection found hardcoded test secrets and raw provider payload logging inside the Stripe handler source.",
+      "phase": "checkout-api",
+      "gold_rules": ["secrets-management", "logging-sensitive-data", "payments-card-data"],
+      "gold_skill": null
+    }
+  ]
+}

@@ -1,8 +1,14 @@
-// APM isolation proof.
-// Plan specified `apm install --root <store>`; the installed APM CLI (0.9.4)
-// has NO --root flag (verified via `apm install --help`). Adaptation, recorded:
-//   1. copy fixtures/apm-package into an isolated temp store (equivalent of
-//      --root: package bytes live outside every live workspace);
+// APM integration proof (Workstream 5: precise claim).
+// The PoC consumes and validates a Microsoft APM-format package while keeping
+// the package bodies outside the live agent workspace and preventing
+// autonomous harness discovery. This is NOT a proof of isolated
+// `apm install`: the installed APM CLI (0.9.4) provides no `--root` flag
+// (verified via `apm install --help`), so that command is never executed.
+// Product-integration gap (documented, not a routing failure): a supported
+// real-APM install workflow with equivalent isolation is unavailable in the
+// installed CLI. What IS proven here:
+//   1. copy fixtures/apm-package into an isolated temp store (package bytes
+//      live outside every live workspace);
 //   2. run `apm compile --validate` + `apm compile --local-only --dry-run`
 //      inside the store to prove package validity with the real CLI;
 //   3. prove the live workspace contains no auto-discoverable copies;
