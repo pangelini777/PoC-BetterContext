@@ -1,10 +1,11 @@
 # JEV × APM Progressive Context PoC — Evidence Report
 
-> Status: PARTIAL EVIDENCE. Deterministic lifecycle, real dematerialization,
-> context-health, and routing-plumbing proofs are VERIFIED. Provider-backed
-> JEV routing and live paired trials are NOT RUN (no `TYPESAFE_API_KEY`, no
-> live agent model in this environment). Nothing below aggregates fail-open
-> or oracle results as provider-backed evidence.
+> Status: PROVIDER-BACKED SCRIPTED EVIDENCE + LIVE SMOKE RUNNING.
+> Deterministic lifecycle, real dematerialization, context-health, and
+> provider-backed JEV routing (jev-1.13.0) proofs are VERIFIED on scripted
+> scenarios. One paired live smoke trial (load_all vs progressive_jev,
+> agent model opencode/big-pickle) is RUNNING. Nothing below aggregates
+> fail-open or oracle results as provider-backed evidence.
 
 ## 1. Provenance and independence
 
@@ -12,27 +13,30 @@
   `04dd426` (core), `e7135de` (eval layer).
 - Provenance guard (`packages/progressive-context/src/provenance.ts`) rejects
   any resolved benchmark path containing `agentOpt` segments; enforced by
-  every eval entrypoint and covered by `test/provenance.test.ts`.
 - Contamination incident (recorded honestly): an early scripted run executed
   while a `.env` file copied from the sibling `agentOpt` checkout was present
   in this repo root. Bun auto-loads `.env`, so `TYPESAFE_API_KEY` was picked
   up from a sibling-sourced secret. That artifact is QUARANTINED at
   `evals/progressive-context/results/quarantined/CONTAMINATED-sibling-env-*`
-  and excluded from all evidence. The copy was deleted (`rm .env`); current
-  runs see `TYPESAFE_API_KEY=MISSING` and correctly use the fail-open path.
+  and excluded from all evidence. UPDATE: the user has since confirmed the
+  `.env` (including `TYPESAFE_API_KEY`) is a legitimate shared credential for
+  this PoC. The stale quarantine stays excluded (it was produced before the
+  fix and under unclear provenance); all provider-backed evidence below comes
+  from fresh runs with the confirmed key. The sibling JEV_* server vars in
+  `.env` are never consumed by this repo (verified: no source references).
 - No imports, symlinks, plugins, telemetry, workspaces, or results from
   `../agentOpt` are used. `grep -rn "agentOpt" packages/ evals/ test/` hits
   only the provenance guard and this report.
 
-## 2. External versions (scripted evidence run)
+## 2. External versions (provider-backed scripted run)
 
 | surface | version |
 |---|---|
 | Bun | 1.4.0 |
 | APM CLI | 0.9.4 (5c0976b) — **no `--root` flag** (adaptation documented in §3) |
 | OpenCode | 1.18.31, plugin API 1.18.31 (inspected, spike in §4) |
-| TypeSafe model | NOT CONTACTED (no key); provider-plumbing test uses canned `jev-1.13.0-test` |
-| Agent model | NOT RUN (upstream 403 `Model access is disabled` on `opencode/claude-haiku-4-5`) |
+| TypeSafe model | **jev-1.13.0** (live provider, 21 calls, inTok 42514 / outTok 8758, latency p50 514ms / p95 587ms) |
+| Agent model | opencode/big-pickle (user-directed; smoke pair running) |
 | Thresholds | `config/thresholds.json` (`thresholds-v1-untuned`, frozen, never tuned on gold) |
 | Catalog | 15 rules + 14 skills, hash recorded per artifact |
 
@@ -56,51 +60,49 @@ tool hooks — but **no provider-request construction hook** with a
 reconstruction guarantee. A sentinel injected via `chat.message` would persist
 in history. The benchmark-owned `ExplicitHarness` (same catalog/router/
 resolver/compiler, assembles each request, scrubs all historical overlay
-blocks, inserts exactly one current overlay) is therefore the AUTHORITATIVE
-unload/context-health path. OpenCode remains a secondary demo
-(`packages/opencode-adapter`, no selection logic).
+## 6. Scripted four-arm results (PROVIDER-BACKED JEV — jev-1.13.0)
 
-Artifact: `evals/progressive-context/results/scripted-2026-09-21T16-34-01-8ncz3z.json`
-(`providerBackend: fail_open(heuristic, TYPESAFE_API_KEY unset)`).
+Artifact: `evals/progressive-context/results/scripted-2026-09-21T16-48-16-3404n2.json`
+(`providerBackend: provider_backed`, all progressive records `provider_backed`, model `jev-1.13.0`).
 Validator: `bun run evals/progressive-context/validate-scripted.ts <artifact>`
-→ 9/13 PASS; routing-accuracy gates FAIL under the heuristic, as expected
-(heuristic ≠ JEV; failures are reported, not hidden):
+→ 10/13 PASS. Three routing-accuracy gates MISS on held-out gold; reported honestly, thresholds NOT retuned:
 
 | arm | P | R | critMiss | skillAcc | dynTok | staleTok | staleRatio | evidence |
 |---|---|---|---|---|---|---|---|---|
 | load_all | 0.169 | 0.846 | 0 | 0.000 | 79209 | 68659 | 0.867 | load_all |
-| static_initial | 0.641 | 0.664 | 7 | 0.615 | 10344 | 4786 | 0.463 | static_initial |
-| progressive_jev | 0.688 | 0.869 | 4 | 0.846 | 14166 | 5181 | 0.366 | **fail_open** |
+| static_initial | 0.558 | 0.558 | 7 | 0.385 | 7552 | 4442 | 0.588 | static_initial |
+| progressive_jev | 0.763 | 0.888 | 3 | 0.615 | 13688 | 5269 | 0.385 | **provider_backed** |
 | oracle_dynamic | 0.870 | 1.000 | 0 | 1.000 | 13435 | 2885 | 0.215 | oracle (upper bound) |
 
-Lifecycle proof (checkout-progressive, progressive arm): **16 materialization
-changes, 16 dematerialization changes** (≥3/≥2 required). Sentinel: **0
+Lifecycle proof (checkout-progressive, progressive arm): **15 materialization
+changes, 15 dematerialization changes** (≥3/≥2 required). Sentinel: **0
 failures** across all records. Distractors (iOS/ML) never materialize.
-Look-alikes: `readonly-db` → `postgres-readonly-query`, `stripe-webhook-bug`
-→ `stripe-webhook-handler` both correct. `no-skill` correctly quiet.
-Context health (fail-open): dynamic-token reduction vs load_all **0.82**
-(≥0.50), stale-token reduction **0.93** (≥0.40), progressive stale ratio
-beats static on checkout-progressive (0.386 < 0.564).
-Honest gaps (heuristic only): recall 0.869 (< 0.90), precision 0.688
-(< 0.75), 4 critical misses (phase-implied `secrets-management` without
-surface keywords; tie-break retaining the incumbent skill on an ambiguous
-test-plan event). These are documented fail-open limitations, NOT JEV
-evidence, and were NOT tuned away (thresholds frozen).
+`no-skill` correctly quiet. Context health: dynamic-token reduction vs
+load_all **0.83** (≥0.50), stale-token reduction **0.92** (≥0.40), progressive
+stale ratio beats static on checkout-progressive (0.427 < 0.833).
+Honest provider-backed gaps (frozen untuned thresholds): recall 0.888
+(< 0.90, gap 0.012), precision 0.763 (PASS), 3 critical misses — all
+`rule.secrets-management` at p=0.47 (oauth, checkout-api) where the event text
+implies Stripe/auth context without surface secret keywords; 5 skill misses —
+3 gated-out single-label scenarios where JEV ranked the right skill at p=1.0
+but the gate (< 0.55) rejected it (copy-only 0.28, oauth 0.52, readonly 0.47),
+plus checkout-api (nextjs-api-route fit 0.70 beats stripe-checkout-session fit
+0.50 on an observation text leading with "Next.js route handlers") and webhook
+seq3 (Choice winner stripe-webhook-handler 0.76 but its fit 0.54 < migration
+fit 0.78, so the winner failed its own fit gate and the resolver retained the
+incumbent). Prior fail-open artifact
+(`scripted-2026-09-21T16-34-01-8ncz3z.json`) is superseded, retained for audit.
 
-## 7. Live trials — NOT RUN
 
-- Smoke pair: BLOCKED. `opencode run --model opencode/claude-haiku-4-5`
-  returns 403 `Model access is disabled`; alternate model probe hung and was
-  cancelled. No live agent turns were executed, so per the plan no evidence
-  trials were started (correct sequencing: 0 smoke → 0 evidence trials).
-- Runner, identical-task prompt, arm-blinding, fresh-git workspaces, and the
-  independent verifier (`evals/progressive-context/independent/`) are
-  implemented and the verifier passes on the stub workspace in the expected
-  failing-open way (stub scores 3/9 — proves the verifier discriminates).
-- To run when credentials/model exist:
-  `AGENT_MODEL=opencode/<model> TYPESAFE_API_KEY=<key> bun run evals/progressive-context/run-live.ts --trials 1 --arms load_all,progressive_jev --alternate-order --model "$AGENT_MODEL"`,
-  then `--trials 3` only if the smoke pair shows provider-backed routing +
-  sentinel unload proof.
+## 7. Live trials — SMOKE RUNNING (big-pickle)
+
+- Agent model: **opencode/big-pickle** per user direction (`PROBE_OK` verified
+  2026-09-21; `claude-haiku-4-5` returns 403 upstream-disabled).
+- Smoke pair (`--trials=1 --arms load_all,progressive_jev --alternate-order`)
+  is RUNNING as background job `bg_2`; first arm workspace
+  `/tmp/jev-live-trial-1-load_all-*` initialized, agent turn in progress.
+- Gate for 3 paired evidence trials: smoke must show provider-backed JEV
+  telemetry + sentinel unload proof + independent evaluation on both arms.
 
 ## 8. Reproduction
 
@@ -120,8 +122,8 @@ bun run evals/progressive-context/validate-scripted.ts evals/progressive-context
 - Next-request absence proof: sentinel assertions per record + `test/sentinel.test.ts` on the authoritative harness.
 - Precision/recall, stale/missing ratios: §6 table + per-event metrics in artifact.
 - Dynamic tokens per arm: §6 table.
-- progressive vs static_initial: §6 (progressive wins on stale ratio, recall, skill accuracy in fail-open mode).
-- Live correctness: NOT RUN (blocked, §7).
-- JEV overhead: 0 live calls (no key); scripted provider usage shape proven by canned test (2 calls/event, usage persisted).
-- Trial eligibility: no live trials; scripted progressive records are all `fail_open`, oracle kept separate.
+- progressive vs static_initial: §6 (provider-backed progressive wins on stale ratio, recall, skill accuracy).
+- Live correctness: smoke running (§7).
+- JEV overhead: 21 calls / 42514 in / 8758 out tokens across 13 progressive events; p50 514ms / p95 587ms per event (2 calls: rules+stage1, stage2).
+- Trial eligibility: scripted progressive records all `provider_backed`; oracle kept separate; live gate per §7.
 - Provenance: §1 + guard + quarantine record.
