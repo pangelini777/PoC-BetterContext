@@ -49,7 +49,10 @@ export interface AgentTurnResult {
 async function agentTurn(model: string, opencodeBin: string, ws: string, prompt: string): Promise<AgentTurnResult> {
   const t0 = Date.now();
   const { promise, resolve } = Promise.withResolvers<{ code: number; out: string; timedOut: boolean }>();
-  execFile(opencodeBin, ["run", "--format", "json", "--dir", ws, "--model", model, prompt], {
+  // --auto: harness constant, identical across arms (single treatment variable
+  // is APM context policy). Without it, non-interactive `opencode run` blocks
+  // forever on permission prompts and no live evidence can be produced.
+  execFile(opencodeBin, ["run", "--format", "json", "--auto", "--dir", ws, "--model", model, prompt], {
     timeout: TURN_TIMEOUT_MS,
     maxBuffer: 40 * 1024 * 1024,
   }, (err, stdout, stderr) => {
@@ -136,8 +139,8 @@ async function runTrialArm(opts: {
     if (turn === 0) {
       stepInput = deriveEvent({ turn, changedPaths: [], newFiles: [], toolNames: [], toolArgsText: "", verificationRunning: false, verificationPassed: null, agentTextExcerpt: "" }, TASK_PROMPT);
     } else {
-      const last = turnRecords[turnRecords.length - 1] as { run: ParsedRun; changedPaths: string[]; newFiles: string[] };
-      const obs = observeFromRun(last.run);
+      const last = turnRecords[turnRecords.length - 1] as { parsed: ParsedRun; changedPaths: string[]; newFiles: string[] };
+      const obs = observeFromRun(last.parsed);
       const state: ObservedState = {
         turn,
         changedPaths: last.changedPaths,
@@ -186,6 +189,7 @@ async function runTrialArm(opts: {
 
     turnRecords.push({
       turn,
+      parsed: tres.run,
       eventPhase: stepInput.phase,
       eventKind: stepInput.kind,
       changedPaths,

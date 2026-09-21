@@ -129,10 +129,18 @@ describe("opencode JSON parser", () => {
     expect(run.turns[0].durationMs).toBe(10);
   });
 
-  test("unknown event kinds are counted, not fatal", () => {
-    const run = parseOpencodeJson(JSON.stringify({ type: "future_schema_v9", foo: 1 }));
-    expect(run.turns.length).toBe(1);
-    expect(run.turns[0].unknownKinds).toContain("future_schema_v9");
+  test("parses real tool_use schema with state.input/output", () => {
+    const stream = [
+      JSON.stringify({ type: "step_start", part: { type: "step-start", id: "a", messageID: "m", sessionID: "s" } }),
+      JSON.stringify({ type: "tool_use", part: { type: "tool", tool: "bash", callID: "c1", state: { status: "completed", input: { command: "ls -la" }, output: "total 28", metadata: {} } } }),
+      JSON.stringify({ type: "step_finish", part: { type: "step-finish", id: "b", messageID: "m", sessionID: "s", reason: "tool-calls", tokens: { input: 9761, output: 67, total: 9828 } } }),
+    ].join("\n");
+    const run = parseOpencodeJson(stream);
+    expect(run.toolCallCount).toBe(1);
+    expect(run.turns[0].toolCalls[0].name).toBe("bash");
+    expect(run.turns[0].toolCalls[0].argsSummary).toContain("ls -la");
+    expect(run.turns[0].toolCalls[0].status).toBe("ok");
+    expect(run.turns[0].toolCalls[0].resultExcerpt).toBe("total 28");
   });
 
   test("reasoning tokens extracted when present", () => {

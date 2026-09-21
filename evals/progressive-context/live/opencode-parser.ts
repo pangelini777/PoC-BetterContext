@@ -67,12 +67,23 @@ export function parseOpencodeJson(stdout: string): ParsedRun {
       const text = str(part["text"]);
       if (text) cur.assistantText += (cur.assistantText ? "\n" : "") + text;
     } else if (type === "tool_use" || type === "tool-call" || type === "tool_call") {
+      // Observed schema (opencode 1.18.31): part={type:"tool", tool, callID,
+      // state:{status:"completed"|"error"|..., input:{...}, output, metadata}}.
+      // Legacy/alternate shapes (part.args/input/arguments, separate
+      // tool_result events) are still accepted below.
       const part = (ev["part"] ?? ev) as Record<string, unknown>;
+      const state = (part["state"] ?? {}) as Record<string, unknown>;
+      const input = state["input"] ?? part["args"] ?? part["input"] ?? part["arguments"] ?? {};
+      const output = state["output"] ?? part["output"] ?? part["result"] ?? part["text"] ?? "";
+      const statusRaw = state["status"] ?? part["status"] ?? part["isError"];
+      const status = statusRaw === "completed" || statusRaw === false || statusRaw === "ok" ? "ok"
+        : statusRaw === "error" || statusRaw === true || statusRaw === "failed" ? "error"
+        : output !== "" ? "ok" : "unknown";
       cur.toolCalls.push({
-        name: str(part["tool"] ?? part["name"] ?? part["toolName"] ?? "unknown"),
-        argsSummary: JSON.stringify(part["args"] ?? part["input"] ?? part["arguments"] ?? {}).slice(0, 500),
-        status: "unknown",
-        resultExcerpt: "",
+        name: str(part["tool"] ?? part["name"] ?? part["toolName"] ?? state["tool"] ?? "unknown"),
+        argsSummary: JSON.stringify(input).slice(0, 500),
+        status,
+        resultExcerpt: str(output).slice(0, 500),
       });
     } else if (type === "tool_result" || type === "tool-result" || type === "tool_result_part") {
       const part = (ev["part"] ?? ev) as Record<string, unknown>;
