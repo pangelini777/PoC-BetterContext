@@ -1,11 +1,12 @@
 # JEV × APM Progressive Context PoC — Evidence Report
 
-> Status: PROVIDER-BACKED SCRIPTED EVIDENCE + LIVE SMOKE RUNNING.
-> Deterministic lifecycle, real dematerialization, context-health, and
-> provider-backed JEV routing (jev-1.13.0) proofs are VERIFIED on scripted
-> scenarios. One paired live smoke trial (load_all vs progressive_jev,
-> agent model opencode/big-pickle) is RUNNING. Nothing below aggregates
-> fail-open or oracle results as provider-backed evidence.
+> Status: HARDENED BENCHMARK, PROVIDER-BACKED SCRIPTED EVIDENCE (TRAINING +
+> FROZEN HELD-OUT-V2), LIVE SMOKE BLOCKED ON MODEL SERVER.
+> Single-run held-out-v2 with frozen config FAILS the strict routing gates
+> (recall 0.781, precision 0.605, 4 critical misses) — reported honestly,
+> no retuning. The local qwen3 model server is unreachable (TCP closed), so
+> the paired live smoke cannot run. Nothing below aggregates fail-open or
+> oracle results as provider-backed evidence.
 
 ## 1. Provenance and independence
 
@@ -93,16 +94,22 @@ fit 0.78, so the winner failed its own fit gate and the resolver retained the
 incumbent). Prior fail-open artifact
 (`scripted-2026-09-21T16-34-01-8ncz3z.json`) is superseded, retained for audit.
 
+## 7. Live trials — SMOKE BLOCKED (model server down, runner hardened)
 
-## 7. Live trials — SMOKE RUNNING (big-pickle)
-
-- Agent model: **opencode/big-pickle** per user direction (`PROBE_OK` verified
-  2026-09-21; `claude-haiku-4-5` returns 403 upstream-disabled).
-- Smoke pair (`--trials=1 --arms load_all,progressive_jev --alternate-order`)
-  is RUNNING as background job `bg_2`; first arm workspace
-  `/tmp/jev-live-trial-1-load_all-*` initialized, agent turn in progress.
+- Agent model: **local/qwen3** per user direction. Server `10.0.0.17:8080`
+  verified working earlier (`PROBE_OK` + `--auto` tool-write turn in ~22s),
+  now TCP closed (three `000` probes). Smoke runner (`bg_6`) wedged on a
+  permission-blocked turn (pre-`--auto` code) and was cancelled; rerun blocked
+  until the server is reachable.
+- Runner is now hardened: real `tool_use/part.state` JSON parsing, `--auto`
+  harness constant (identical across arms), event derivation from git diff +
+  tool activity (not keyword-scanning), per-turn token capture, hash-pinned
+  arm parity (task/base-commit/catalog/thresholds/model), next-request unload
+  proofs across ALL subsequent requests, hidden executable verification
+  injected post-run, and `classifyTrial` eligibility gates.
 - Gate for 3 paired evidence trials: smoke must show provider-backed JEV
-  telemetry + sentinel unload proof + independent evaluation on both arms.
+  telemetry + ≥1 materialization + ≥1 genuine dematerialization with
+  next-request absence + hidden verification on both arms + provenance pass.
 
 ## 8. Reproduction
 
