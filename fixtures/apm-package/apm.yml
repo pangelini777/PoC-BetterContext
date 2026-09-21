@@ -1,0 +1,6 @@
+name: acme-commerce-agent-policy
+version: "1.0.0"
+description: Synthetic commerce engineering rules and skills for JEV progressive-context evaluation
+license: MIT
+targets: [opencode]
+dependencies: {}

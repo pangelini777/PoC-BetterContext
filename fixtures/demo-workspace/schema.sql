@@ -1,0 +1,7 @@
+CREATE TABLE orders (
+  id TEXT PRIMARY KEY,
+  amount_cents INTEGER NOT NULL,
+  currency TEXT NOT NULL,
+  status TEXT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

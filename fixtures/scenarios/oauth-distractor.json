@@ -1,0 +1,17 @@
+{
+  "id": "oauth-distractor",
+  "description": "Auth task should not select payments skills.",
+  "events": [
+    {
+      "seq": 0,
+      "kind": "user_message",
+      "text": "Add Google OAuth login and reject untrusted redirect targets.",
+      "phase": "auth",
+      "gold_rules": [
+        "auth-session-security",
+        "secrets-management"
+      ],
+      "gold_skill": "oauth-login"
+    }
+  ]
+}

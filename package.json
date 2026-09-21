@@ -1,0 +1,23 @@
+{
+  "name": "jev-apm-progressive-poc",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "bun run typecheck && bun test",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "apm-isolation": "bun run evals/progressive-context/apm-isolation.ts",
+    "context-spike": "bun run evals/progressive-context/context-spike.ts",
+    "run-scripted": "bun run evals/progressive-context/run-scripted.ts",
+    "validate-scripted": "bun run evals/progressive-context/validate-scripted.ts",
+    "run-live": "bun run evals/progressive-context/run-live.ts"
+  },
+  "dependencies": {
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@types/node": "24.3.0",
+    "bun-types": "^1.4.2",
+    "typescript": "5.9.2"
+  }
+}

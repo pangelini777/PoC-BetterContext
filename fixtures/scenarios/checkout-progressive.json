@@ -1,0 +1,91 @@
+{
+  "id": "checkout-progressive",
+  "description": "Multi-phase checkout task designed to force multiple rule/skill loads and unloads.",
+  "events": [
+    {
+      "seq": 0,
+      "kind": "user_message",
+      "text": "Add a checkout button to the cart page that matches the site. Do not implement the backend yet.",
+      "phase": "ui",
+      "gold_rules": [
+        "accessibility-ui",
+        "brand-ui-copy"
+      ],
+      "gold_skill": "react-ui-component"
+    },
+    {
+      "seq": 1,
+      "kind": "observation",
+      "text": "Repository inspection shows Next.js route handlers, Stripe SDK, and no checkout-session endpoint. The next plan step is to implement the server checkout route.",
+      "phase": "checkout-api",
+      "gold_rules": [
+        "api-error-contract",
+        "payments-card-data",
+        "secrets-management",
+        "logging-sensitive-data"
+      ],
+      "gold_skill": "stripe-checkout-session"
+    },
+    {
+      "seq": 2,
+      "kind": "observation",
+      "text": "Product requirement discovered: persist shipping_email and shipping_address on orders; current schema has no such columns. Implement the schema change before wiring checkout metadata.",
+      "phase": "migration",
+      "gold_rules": [
+        "api-error-contract",
+        "payments-card-data",
+        "privacy-personal-data",
+        "database-migration-safety",
+        "logging-sensitive-data"
+      ],
+      "gold_skill": "postgres-schema-migration"
+    },
+    {
+      "seq": 3,
+      "kind": "observation",
+      "text": "Migration is complete. Now implement Stripe webhook handling for checkout completion, including duplicate deliveries.",
+      "phase": "webhook",
+      "gold_rules": [
+        "payments-card-data",
+        "privacy-personal-data",
+        "logging-sensitive-data",
+        "webhook-idempotency",
+        "secrets-management"
+      ],
+      "gold_skill": "stripe-webhook-handler"
+    },
+    {
+      "seq": 4,
+      "kind": "observation",
+      "text": "Implementation is complete. Build a focused regression test plan for checkout creation, invalid webhook signatures, duplicate webhook delivery, and personal-data logging.",
+      "phase": "verification",
+      "gold_rules": [
+        "payments-card-data",
+        "privacy-personal-data",
+        "webhook-idempotency",
+        "testing-quality-gates"
+      ],
+      "gold_skill": "test-plan-generator"
+    },
+    {
+      "seq": 5,
+      "kind": "observation",
+      "text": "All targeted tests pass. Prepare the production release checklist, including required Stripe secrets and migration ordering; do not deploy.",
+      "phase": "deploy",
+      "gold_rules": [
+        "secrets-management",
+        "production-change-control",
+        "payments-card-data"
+      ],
+      "gold_skill": "production-deploy-checklist"
+    },
+    {
+      "seq": 6,
+      "kind": "completion",
+      "text": "Task completed and session is finalizing. No dynamic package body is needed in the next context.",
+      "phase": "done",
+      "gold_rules": [],
+      "gold_skill": null
+    }
+  ]
+}

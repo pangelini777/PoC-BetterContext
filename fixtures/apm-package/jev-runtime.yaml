@@ -1,0 +1,209 @@
+version: 1
+package: acme-commerce-agent-policy
+defaults:
+  lifetime: phase
+  critical: false
+resources:
+  rule.accessibility-ui:
+    kind: rule
+    source: .apm/instructions/accessibility-ui.instructions.md
+    summary: "Accessibility requirements for user-facing web UI, forms, buttons, dialogs, focus handling, labels, and keyboard behavior."
+    lifetime: phase
+    critical: false
+    dependsOn: []
+  rule.brand-ui-copy:
+    kind: rule
+    source: .apm/instructions/brand-ui-copy.instructions.md
+    summary: "Brand and product-copy rules for customer-facing web UI, calls to action, labels, and transactional language."
+    lifetime: phase
+    critical: false
+    dependsOn: []
+  rule.api-error-contract:
+    kind: rule
+    source: .apm/instructions/api-error-contract.instructions.md
+    summary: "Contract for API validation, status codes, stable machine-readable errors, and safe client-facing failure responses."
+    lifetime: phase
+    critical: false
+    dependsOn: []
+  rule.auth-session-security:
+    kind: rule
+    source: .apm/instructions/auth-session-security.instructions.md
+    summary: "Authentication and session security rules for login, OAuth, cookies, tokens, redirects, and authorization checks."
+    lifetime: phase
+    critical: true
+    dependsOn: []
+  rule.privacy-personal-data:
+    kind: rule
+    source: .apm/instructions/privacy-personal-data.instructions.md
+    summary: "Privacy handling requirements for personal data such as names, email addresses, postal addresses, identifiers, exports, and deletion."
+    lifetime: task
+    critical: true
+    dependsOn: []
+  rule.payments-card-data:
+    kind: rule
+    source: .apm/instructions/payments-card-data.instructions.md
+    summary: "Payment integration boundary: keep raw card data out of the application and use provider-hosted/tokenized payment flows."
+    lifetime: phase
+    critical: true
+    dependsOn: [logging-sensitive-data]
+  rule.database-migration-safety:
+    kind: rule
+    source: .apm/instructions/database-migration-safety.instructions.md
+    summary: "Safety rules for schema migrations, destructive DDL, backfills, compatibility, rollback, and deploy ordering."
+    lifetime: phase
+    critical: false
+    dependsOn: []
+  rule.logging-sensitive-data:
+    kind: rule
+    source: .apm/instructions/logging-sensitive-data.instructions.md
+    summary: "Logging rules preventing secrets, tokens, personal data, payment payloads, and oversized provider responses from entering logs."
+    lifetime: phase
+    critical: false
+    dependsOn: []
+  rule.webhook-idempotency:
+    kind: rule
+    source: .apm/instructions/webhook-idempotency.instructions.md
+    summary: "Webhook verification, replay resistance, idempotent processing, ordering assumptions, and retry-safe side effects."
+    lifetime: phase
+    critical: false
+    dependsOn: [logging-sensitive-data]
+  rule.secrets-management:
+    kind: rule
+    source: .apm/instructions/secrets-management.instructions.md
+    summary: "Rules for API keys, webhook secrets, credentials, environment variables, example files, rotation, and repository safety."
+    lifetime: phase
+    critical: true
+    dependsOn: []
+  rule.production-change-control:
+    kind: rule
+    source: .apm/instructions/production-change-control.instructions.md
+    summary: "Production deployment and operational change controls: preflight checks, migrations, rollback, observability, and human confirmation."
+    lifetime: action
+    critical: false
+    dependsOn: [secrets-management]
+  rule.testing-quality-gates:
+    kind: rule
+    source: .apm/instructions/testing-quality-gates.instructions.md
+    summary: "Quality gates for implementation changes: targeted tests, failure-path coverage, regression protection, and meaningful verification evidence."
+    lifetime: phase
+    critical: false
+    dependsOn: []
+  rule.public-docs-branding:
+    kind: rule
+    source: .apm/instructions/public-docs-branding.instructions.md
+    summary: "Brand and accuracy requirements for public developer documentation, examples, changelogs, and API-facing prose."
+    lifetime: phase
+    critical: false
+    dependsOn: []
+  rule.mobile-ios-guidelines:
+    kind: rule
+    source: .apm/instructions/mobile-ios-guidelines.instructions.md
+    summary: "iOS-specific SwiftUI architecture, accessibility, navigation, and Apple platform conventions. Distractor for web tasks."
+    lifetime: phase
+    critical: false
+    dependsOn: []
+  rule.ml-model-governance:
+    kind: rule
+    source: .apm/instructions/ml-model-governance.instructions.md
+    summary: "Machine-learning evaluation and model-governance requirements. Distractor unless the task changes an ML model or AI decision pipeline."
+    lifetime: phase
+    critical: false
+    dependsOn: []
+  skill.react-ui-component:
+    kind: skill
+    source: .apm/skills/react-ui-component/SKILL.md
+    summary: "Build or modify a React/Next.js user-interface component, including interactive state, loading states, events, and tests."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.accessibility-audit:
+    kind: skill
+    source: .apm/skills/accessibility-audit/SKILL.md
+    summary: "Audit a changed web interaction for semantic HTML, keyboard access, focus behavior, accessible names, and status/error announcements."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.brand-copy-review:
+    kind: skill
+    source: .apm/skills/brand-copy-review/SKILL.md
+    summary: "Review or rewrite customer-facing product copy to match concise Acme Checkout voice and avoid unsupported or premature claims."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.nextjs-api-route:
+    kind: skill
+    source: .apm/skills/nextjs-api-route/SKILL.md
+    summary: "Implement or modify a Next.js route handler with request validation, typed responses, server-only dependencies, and focused tests."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.postgres-schema-migration:
+    kind: skill
+    source: .apm/skills/postgres-schema-migration/SKILL.md
+    summary: "Design and implement a PostgreSQL schema migration or backfill with compatibility, rollout, rollback/forward-fix, and verification."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.postgres-readonly-query:
+    kind: skill
+    source: .apm/skills/postgres-readonly-query/SKILL.md
+    summary: "Investigate PostgreSQL data or query behavior without changing schema: write safe read-only SQL and summarize findings."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.stripe-checkout-session:
+    kind: skill
+    source: .apm/skills/stripe-checkout-session/SKILL.md
+    summary: "Implement server-side Stripe Checkout Session creation using trusted price/order data, provider-hosted card collection, metadata, and safe errors."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.stripe-webhook-handler:
+    kind: skill
+    source: .apm/skills/stripe-webhook-handler/SKILL.md
+    summary: "Implement or fix a Stripe webhook endpoint with signature verification, raw-body handling, duplicate-event protection, and retry-safe side effects."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.oauth-login:
+    kind: skill
+    source: .apm/skills/oauth-login/SKILL.md
+    summary: "Implement an OAuth/OIDC login flow with trusted redirect handling, state/nonce validation, token/session hygiene, and authorization boundaries."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.test-plan-generator:
+    kind: skill
+    source: .apm/skills/test-plan-generator/SKILL.md
+    summary: "Create and execute a focused implementation test plan that discriminates the requested behavior and covers important failure/edge paths."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.production-deploy-checklist:
+    kind: skill
+    source: .apm/skills/production-deploy-checklist/SKILL.md
+    summary: "Prepare a production deployment checklist covering configuration, secrets, migrations, smoke checks, monitoring, rollback, and irreversible changes."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.openapi-contract-update:
+    kind: skill
+    source: .apm/skills/openapi-contract-update/SKILL.md
+    summary: "Update OpenAPI/public API documentation so paths, request/response schemas, status codes, examples, and implementation stay aligned."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.ios-swiftui-component:
+    kind: skill
+    source: .apm/skills/ios-swiftui-component/SKILL.md
+    summary: "Build a native iOS SwiftUI component or screen using Apple platform conventions, Dynamic Type, VoiceOver, and Swift concurrency."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.ml-evaluation:
+    kind: skill
+    source: .apm/skills/ml-evaluation/SKILL.md
+    summary: "Evaluate a machine-learning model change with reproducible datasets, pinned artifacts, slice metrics, and baseline comparison."
+    lifetime: turn
+    critical: false
+    dependsOn: []

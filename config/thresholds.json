@@ -1,0 +1,17 @@
+{
+  "version": "thresholds-v1-untuned",
+  "notes": "Seed thresholds from IMPLEMENTATION_PLAN.md sections 9-10. Untuned: never adjusted against held-out gold results.",
+  "rules": {
+    "activate": 0.65,
+    "activateCritical": 0.55,
+    "retain": 0.35,
+    "unload": 0.2,
+    "unloadStreakRequired": 2
+  },
+  "skills": {
+    "topK": 3,
+    "gateThreshold": 0.55,
+    "fitsThreshold": 0.55,
+    "shortlistMin": 0.3
+  }
+}

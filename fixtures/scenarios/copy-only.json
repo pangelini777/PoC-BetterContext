@@ -1,0 +1,16 @@
+{
+  "id": "copy-only",
+  "description": "Customer-facing copy with no backend or payment work.",
+  "events": [
+    {
+      "seq": 0,
+      "kind": "user_message",
+      "text": "Change the cart primary button label from \u201cBuy now\u201d to copy that makes it clear the user is proceeding to payment. No code behavior changes.",
+      "phase": "ui-copy",
+      "gold_rules": [
+        "brand-ui-copy"
+      ],
+      "gold_skill": "brand-copy-review"
+    }
+  ]
+}

@@ -1,0 +1,163 @@
+{
+  "bundle": "jev-apm-progressive-poc-standalone",
+  "rules": {
+    "count": 15,
+    "files": [
+      {
+        "path": "fixtures/apm-package/.apm/instructions/accessibility-ui.instructions.md",
+        "sha256": "2376352735b1189e0809dc5558af8d0f79590eb9ef18e3e826ce7574e5491a7d"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/instructions/api-error-contract.instructions.md",
+        "sha256": "f3879f29ac83ff9745dac62b58424b98921d94647bbf221591555749177befce"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/instructions/auth-session-security.instructions.md",
+        "sha256": "e917f3dc1c6580bdee82f7c5eed50846631e7e875f769ff9b65ae20df6867fa8"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/instructions/brand-ui-copy.instructions.md",
+        "sha256": "afa1ca70af5b60a87676632613571ab63673e5f7a1868ea329a2b3ea87e845f8"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/instructions/database-migration-safety.instructions.md",
+        "sha256": "9421205c52a8af9468979a6ab838977fc9a0916dd9f418cdacf1d3883e76f6b6"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/instructions/logging-sensitive-data.instructions.md",
+        "sha256": "a692e9ef66ffb2cceb12b948b23b307af3fc3e9b0b3be3cf362ce0c2dabef910"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/instructions/ml-model-governance.instructions.md",
+        "sha256": "84924246482ff7f0f1fd0ca4566fe3fce2d3fe95d14b3f33ad9e839aa991ebe4"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/instructions/mobile-ios-guidelines.instructions.md",
+        "sha256": "7bb2f5b747103c65b0764e335a89d9d0b8635835ca6d798c9ff71f32c9999701"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/instructions/payments-card-data.instructions.md",
+        "sha256": "07fc62af2fcd0e3dbe28d989e4457961b788246515a4cf5cc7e275a0ab97163f"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/instructions/privacy-personal-data.instructions.md",
+        "sha256": "4f34c60ec2f6b52f81abcb3645917714976159b138bd72d6f77b72763a552b2e"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/instructions/production-change-control.instructions.md",
+        "sha256": "870e6931c1fb5231d8c8aa2f974a10af78345a6ab8dcc13967cf2edd39d34b1e"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/instructions/public-docs-branding.instructions.md",
+        "sha256": "41df6906e289c4fa143805ee7107cb2a1c8628e88810b4f063bcf02e2e049fb6"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/instructions/secrets-management.instructions.md",
+        "sha256": "5d0e8fa447eeda9b30c43024e24a31f4a02c2228203a4d27762e0dbf5076b4f9"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/instructions/testing-quality-gates.instructions.md",
+        "sha256": "bc410f0d5a9fa4429792e3efde1f2b21d2fc65558aa2582a9367cc71f3aa88d1"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/instructions/webhook-idempotency.instructions.md",
+        "sha256": "05e574a0609edb8b87edf38c52e22722884eadef9cc4df0942d732b01b6ae44d"
+      }
+    ]
+  },
+  "skills": {
+    "count": 14,
+    "files": [
+      {
+        "path": "fixtures/apm-package/.apm/skills/accessibility-audit/SKILL.md",
+        "sha256": "28c3572d2ddc5c978f3dec0be00ddf5386ab67637c867d02ce0aa0e983937d31"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/skills/brand-copy-review/SKILL.md",
+        "sha256": "a48439e8f9e1b728a307f9a3ea24863723ccb4b7761dc02ddbdb72d8acccce47"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/skills/ios-swiftui-component/SKILL.md",
+        "sha256": "e0e58901455727f8badcc6c58347676e1742fc1095ffb6e0b8e8cb49bceda7ce"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/skills/ml-evaluation/SKILL.md",
+        "sha256": "5f0cea9d0922f1ea871b0cc433c077ef653b8489f846733755777fc6bb08d1ba"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/skills/nextjs-api-route/SKILL.md",
+        "sha256": "48825eb79a39e92fc64d9d5a2f5e7555c343484464539b6e5e95ecff7999f3bb"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/skills/oauth-login/SKILL.md",
+        "sha256": "0822727ffcd2f526f8d6cb97f9f5c920d942b864b8d3b3b177499bc0c5df7715"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/skills/openapi-contract-update/SKILL.md",
+        "sha256": "0fe072a58a78f8dad87910a7b83b858c46a96d2103aab4a173698dd291d9324f"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/skills/postgres-readonly-query/SKILL.md",
+        "sha256": "4a6cad2988566f770f13669cf9fe90906577b5eeb58d69c31ac569f42fbaf4a1"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/skills/postgres-schema-migration/SKILL.md",
+        "sha256": "80cac5073ca2531f0b51d98f395f3f6703185c7603f2c839871123b91f796019"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/skills/production-deploy-checklist/SKILL.md",
+        "sha256": "98409c0f5b0e42cfc3845e23293a64227889f346c6c04c1b123d80341454482a"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/skills/react-ui-component/SKILL.md",
+        "sha256": "97ed68a899bb596e761e7a805b6b495d1ceba045b1ee8b13c96b3e81006768b6"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/skills/stripe-checkout-session/SKILL.md",
+        "sha256": "4c314a6fbdcb7dda8f2bd1a16df1e63a5fec86ee4ad5cf6ad9472b28df6c02a8"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/skills/stripe-webhook-handler/SKILL.md",
+        "sha256": "44cbd48598d6134e5cea45f39a285f15000cd54b8b26d17b6d2b7c47512b38d9"
+      },
+      {
+        "path": "fixtures/apm-package/.apm/skills/test-plan-generator/SKILL.md",
+        "sha256": "6a8f4cb50ba155be874a05955d86f08f478d7f68ea6d272297edb606a27d699a"
+      }
+    ]
+  },
+  "scenarios": {
+    "count": 7,
+    "files": [
+      {
+        "path": "fixtures/scenarios/checkout-progressive.json",
+        "sha256": "cfbdd339ae46985ad2a33887ff0acf727836f2198a815829a4fc8a5ea2dad650"
+      },
+      {
+        "path": "fixtures/scenarios/copy-only.json",
+        "sha256": "3564c9f20daf8256934441e51d017ebd26bc32b8405c0598666e69799889545b"
+      },
+      {
+        "path": "fixtures/scenarios/no-skill.json",
+        "sha256": "f4bfa08620d5ced157512dc711e4a42f0a2f556468cb57791ec8cc982003b858"
+      },
+      {
+        "path": "fixtures/scenarios/oauth-distractor.json",
+        "sha256": "5547b8b540442308247e51d0208125e4b48d76f7945e66c4741ce92e65f46210"
+      },
+      {
+        "path": "fixtures/scenarios/public-api-docs.json",
+        "sha256": "2194c1955095a9e3419d146fb64c884e10864980c02572154369e91996dceae2"
+      },
+      {
+        "path": "fixtures/scenarios/readonly-db.json",
+        "sha256": "5efeab8b50cdeea92939b71dd5e00d1cf357ae1fd685c2473b18f3cfd3afbca5"
+      },
+      {
+        "path": "fixtures/scenarios/stripe-webhook-bug.json",
+        "sha256": "c43aff080ccca7796c83a7a2ae37abe263bb7a149e65721521dbb55eef7a289b"
+      }
+    ]
+  },
+  "demo_workspace_files": 11
+}

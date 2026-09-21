@@ -1,0 +1,19 @@
+{
+  "id": "stripe-webhook-bug",
+  "description": "Look-alike Stripe skill test: webhook handler must beat checkout-session skill.",
+  "events": [
+    {
+      "seq": 0,
+      "kind": "user_message",
+      "text": "Fix our Stripe webhook endpoint: invalid signatures are accepted and duplicate deliveries send two fulfillment jobs.",
+      "phase": "webhook",
+      "gold_rules": [
+        "payments-card-data",
+        "webhook-idempotency",
+        "secrets-management",
+        "logging-sensitive-data"
+      ],
+      "gold_skill": "stripe-webhook-handler"
+    }
+  ]
+}

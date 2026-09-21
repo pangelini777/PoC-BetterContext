@@ -1,0 +1,14 @@
+node_modules/
+apm_modules/
+.env
+.env.local
+*.db
+*.sqlite
+*.sqlite3
+dist/
+build/
+coverage/
+.tmp/
+tmp/
+results/private/
+.DS_Store
