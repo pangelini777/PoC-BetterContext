@@ -61,7 +61,6 @@ Primary artifacts: `evals/progressive-context/results/probe-2026-09-22T17-31-31-
   | run | arm | retrieval | avg ctx | tokens |
   |---|---|---|---|---|
   | probe-multi-2026-09-22T19-12 | all three | 10/10 × 3 | JEV 1,324 | JEV 133k |
-  | probe-multi-2026-09-22T15-18 | load-all | 34/48 (24/26 content, v1+v2+v3 tuning set) | 46,736 flat | 2.73M |
 
   ```mermaid
   flowchart TB
