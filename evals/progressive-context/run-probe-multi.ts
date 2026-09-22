@@ -191,7 +191,13 @@ async function hashDirectory(root: string, relative = ""): Promise<string> {
   return hash.digest("hex");
 }
 
-/** Deterministic retrieval pre-score (mirrors probe/grade.ts scoreRetrieval). */
+/**
+ * Preliminary per-turn pre-score, stored as probeResults[].retrieval.
+ * LEGACY shape (see run-probe.ts): whole-answer substring checks without
+ * Rules-line endorsement scoping. Authoritative retrieval comes from
+ * probe/grade-run.ts using embedded evaluator definitions. Do not cite raw
+ * retrieval as evidence.
+ */
 function scoreRetrievalLocal(probe: ProbeQuestion, answer: string): ProbeRetrieval {
   const text = (answer ?? "").toLowerCase();
   return {

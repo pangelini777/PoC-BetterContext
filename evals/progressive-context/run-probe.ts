@@ -272,7 +272,15 @@ function scanProbeContamination(toolCalls: { name: string; args: string }[], sto
   return [...new Set(reasons)];
 }
 
-/** Deterministic retrieval pre-score (mirrors probe/grade.ts scoreRetrieval). */
+/**
+ * Preliminary per-turn pre-score, stored as probeResults[].retrieval.
+ * LEGACY shape: whole-answer substring checks without the Rules-line
+ * endorsement scoping of probe/grade.ts scoreRetrieval. Authoritative
+ * retrieval is recomputed by probe/grade-run.ts from the stored answer text
+ * using the embedded evaluator definitions; dashboard Verification and
+ * grades files reflect the authoritative score, not this field. Kept for
+ * live sidecar progress display only. Do not cite raw retrieval as evidence.
+ */
 function scoreRetrievalLocal(probe: ProbeQuestion, answer: string): ProbeRetrieval {
   const text = (answer ?? "").toLowerCase();
   return {

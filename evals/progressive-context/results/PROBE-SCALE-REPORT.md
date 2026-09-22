@@ -23,39 +23,27 @@
   comes from ExplicitHarness and eligible live runs (see README §Unload proof).
 
 
-## 1. What was measured
+  ## 1. What was measured (historical tuning trajectory)
 
-Probe-question eval over three session modes × three context policies:
+  v1/v2/v3 runs below are TUNING/DIAGNOSTIC history (naming fixes, lifetime
+  tuning, grader calibration; early JEV arms allowed native APM discovery).
+  Do not cite them as clean proof — the headline is §0 (v4 held-out).
 
-- **Modes:** single-session (one continued `opencode run --session` chain),
-  multi-session (fresh `opencode run` per probe, byte-proof prompts),
-  hybrid (fresh sessions + runner-maintained auditable `.agents/jev-memory.md`).
-- **Arms:** `load_all_single` (full 46.7k overlay), `apm_discovery` (native
-  `.agents/` discovery, context unknown), `jev_single` (JEV-routed overlay).
-- **Probes:** v1 (10) + v2 (6) + v3 (10) = 26 content + 22 recall = 48/arm.
-  Fixtures frozen (`probe-v1-frozen`, `probe-v2-frozen`, `probe-v3-frozen`).
-- **Grading:** deterministic retrieval (Rules-line endorsement, substring rule
-  grade.ts `endorses`) + SystemOne Noul comprehension per expected rule +
-  Choice eviction fidelity + Choice distractor disposition + self-report scoring.
-
-## 2. Headline results (Spark, v3, renamed catalog)
-
-| run | mode | load-all retrieval | discovery retrieval | JEV retrieval | JEV avg ctx | JEV fidelity |
-|---|---|---|---|---|---|---|
-| probe-2026-09-22T11-09-56-o7n3fy | single | 47/48 | 47/48 | **48/48** | ~5.1k | 0.67 |
-| probe-multi-2026-09-22T14-45-16-fdnrx0 | hybrid JEV only | — | — | **25/26 content** | 476 + 3.6k mem | — |
-| probe-multi-2026-09-22T15-18-39-ublybq | multi load-all | **24/26 content** | — | — | 46.7k flat | null |
-| probe-2026-09-22T12-39-24-x48mdy | single JEV, tuned lifetimes | — | — | **46/48** | 3,901 | **0.96** |
+  | run (historical tuning) | mode | load-all | discovery | JEV | JEV avg ctx | fidelity |
+  |---|---|---|---|---|---|---|
+  | probe-2026-09-22T11-09-56-o7n3fy | single | 47/48 | 47/48 | **48/48** | ~5.1k | 0.67 |
+  | probe-multi-2026-09-22T14-45-16-fdnrx0 | hybrid JEV only | — | — | **25/26 content** | 476 + 3.6k mem | — |
+  | probe-multi-2026-09-22T15-18-39-ublybq | multi load-all | **24/26 content** | — | — | 46.7k flat | null |
+  | probe-2026-09-22T12-39-24-x48mdy | single JEV, tuned lifetimes | — | — | **46/48** | 3,901 | **0.96** |
 
 Noul comprehension 0.6–0.95 on all arms wherever graded; distractors
 `correctly-dismissed` (except noted recall-template artifact below).
 
-## 3. Findings
+  ## 3. Findings (tuning trajectory — how we got to v4)
 
-1. **Routing quality ties at Spark quality; cost differs 10×.** With clean
-   naming, all arms answer correctly (47–48/48). JEV does it at ~4–5k avg ctx
-   vs 46.7k flat; ~920k vs ~2.7M tokens per 48-probe arm.
-
+  1. **Routing quality ties at Spark quality; cost differs 10×.** With clean
+  naming, all arms answer correctly (47–48/48). JEV does it at ~4–5k avg ctx
+  vs 46.7k flat; ~920k vs ~2.7M tokens per 48-probe arm.
 > Update 2026-09-22: critical misses are now 0 on all arms. The single miss
 > was a fixture artifact (pq-webhook-idempotency listed rule.secrets-management
 > as expected while the question never asks about secrets); expectedIds trimmed
