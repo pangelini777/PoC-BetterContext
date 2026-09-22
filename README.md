@@ -56,12 +56,16 @@ Primary artifacts: `evals/progressive-context/results/probe-2026-09-22T17-31-31-
 
   | run | mode | load-all | discovery | JEV | ctx avg − | ctx tot − |
   |---|---|---|---|---|---|---|
-  | probe-2026-09-22T17-31 (headline) | single | 10/10, 46,736 ctx, 633k tok | 10/10, 1.37M tok | 10/10, 3,906 ctx, 257k tok | −92% | −92% |
-  | probe-2026-09-22T19-35 (replication, JEV-first) | single | 10/10, 46,736 ctx, 684k tok | 10/10, 907k tok | 10/10, 4,367 ctx, 235k tok | −91% | −91% |
-  | probe-2026-09-22T19-51 (stability 1/3) | single, JEV-only | — | — | 10/10, 4,041 ctx, 381k tok | −91% | −91% |
-  | probe-2026-09-22T19-58 (stability 2/3) | single, JEV-only | — | — | 10/10, 3,980 ctx, 219k tok | −91% | −91% |
-  | probe-2026-09-22T20-04 (stability 3/3) | single, JEV-only | — | — | 10/10, 4,145 ctx, 233k tok | −91% | −91% |
-  | probe-multi-2026-09-22T19-12 | **multi (fresh/probe)** | 10/10, 46,736 ctx, 580k tok | 10/10, 1.60M tok | 10/10, 1,324 ctx, 133k tok | −97% | −97% |
+  | probe-2026-09-22T17-31 (headline) | single | 10/10, 46,736 ctx, 633k tok | 10/10, 1.37M tok | 10/10, 3,906 ctx, 257k tok | −91.64% | −91.64% |
+  | probe-2026-09-22T19-35 (replication, JEV-first) | single | 10/10, 46,736 ctx, 684k tok | 10/10, 907k tok | 10/10, 4,367 ctx, 235k tok | −90.66% | −90.66% |
+  | probe-2026-09-22T19-51 (stability 1/3) | single, JEV-only | — | — | 10/10, 4,041 ctx, 381k tok | −91.35%* | −91.35%* |
+  | probe-2026-09-22T19-58 (stability 2/3) | single, JEV-only | — | — | 10/10, 3,980 ctx, 219k tok | −91.48%* | −91.48%* |
+  | probe-2026-09-22T20-04 (stability 3/3) | single, JEV-only | — | — | 10/10, 4,145 ctx, 233k tok | −91.13%* | −91.13%* |
+  | probe-multi-2026-09-22T19-12 | **multi (fresh/probe)** | 10/10, 46,736 ctx, 580k tok | 10/10, 1.60M tok | 10/10, 1,324 ctx, 133k tok | −97.17% | −97.17% |
+
+  Reductions computed from committed per-probe `contextTokens` sums
+  (1 − JEV/load-all). \*Stability rows have no same-run baseline; measured
+  against the 46,736 flat load-all catalog size.
   ```mermaid
   flowchart TB
       subgraph CTRL["Controller — owns the 94-resource APM store"]
