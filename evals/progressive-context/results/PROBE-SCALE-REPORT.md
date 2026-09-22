@@ -1,10 +1,27 @@
-# Probe eval at scale — results report
+  # Probe eval at scale — development history (tuning sets)
 
-> Date: 2026-09-22. Catalog: 36 rules + 58 skills = 94 resources, 46,736 tokens
-> (sidecar `110132d1`). Agent models: local/qwen3 (early), Spark
-> (opencode-go/muse-spark-1.3-contributor, all reported runs). Routing backend:
-> provider-backed SystemOne (jev-latest; smoke model jev-1.13.0). Dashboard:
-> `bun run dashboard` → http://127.0.0.1:4317.
+  > Catalog: 36 rules + 58 skills = 94 resources, 46,736 tokens.
+  > v1/v2/v3 probe sets are TUNING sets (used iteratively — not held-out).
+  > Headline result is the frozen v4 held-out comparison (§0 below).
+
+  ## 0. Headline: isolated v4 held-out (2026-09-22)
+
+  Artifact `probe-2026-09-22T17-31-31-8wmokx.json` (+ `.grades.json`), Spark,
+  provider-backed JEV. JEV workspaces contain no apm.yml/.apm/.agents/rules/
+  or .agents/skills/ (controller-only store); contamination gates clean.
+  Probe + evaluator definitions embedded with hashes; grading uses them.
+
+  | arm | retrieval | recall | misses | fidelity | avg ctx | tokens |
+  |---|---|---|---|---|---|---|
+  | load_all | 10/10 | 1.0 | 0 | — | 46,736 | 633k |
+  | apm_discovery | 10/10 | 1.0 | 0 | — | traced | 1.37M |
+  | jev (isolated) | 10/10 | 1.0 | 0 | 0.9997 | 3,906 | 257k |
+
+  JEV matched both baselines exactly on unseen probes while physically unable
+  to access non-materialized resources, at 8% of the context. The single-session
+  plugin provides behavioral eviction fidelity only — byte-proof unload evidence
+  comes from ExplicitHarness and eligible live runs (see README §Unload proof).
+
 
 ## 1. What was measured
 
