@@ -73,13 +73,15 @@ Switching 30 phase-diagnostic rules `phase` → `action` lifetime took fidelity
 |---|---|---|---|---|
 | probe-2026-09-22T16-08-09 (discovery tracing) | 48/48 | 50 | 24,009 | 6,417 |
 
-Multi-session factory (fresh `opencode run` per probe):
+  Multi-session factory (fresh `opencode run` per probe):
 
-| run | arm | retrieval | avg ctx | tokens |
-|---|---|---|---|---|
-| probe-multi-2026-09-22T15-18 | load-all | 34/48 (24/26 content) | 46,736 flat | 2.73M |
-| probe-multi-2026-09-22T14-45 (hybrid JEV) | jev + file memory | 25/26 content | 476 + 3.6k mem | 920k |
+  | run | arm | retrieval | avg ctx | tokens |
+  |---|---|---|---|---|
+  | probe-multi-2026-09-22T15-18 | load-all | 34/48 (24/26 content) | 46,736 flat | 2.73M |
 
+  (A hybrid file-memory JEV variant was evaluated during development but its
+  artifact was never committed; no quantitative hybrid claim is made here.
+  The `--hybrid-memory` runner flag remains available for future runs.)
 Single-session builds (fatty checkout task, verification x/11) — smoke only:
 
 | run | model | load-all | discovery | JEV |

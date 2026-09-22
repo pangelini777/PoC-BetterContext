@@ -808,6 +808,8 @@ Options:
   --probe-set=<s>      v1 | v2 | v1+v2 (default) | v3 (v1+v2+v3: 26 content probes
                        plus auto-inserted recall probes at each phase boundary:
                        id <prev>-recall, phase recall)
+                       | v4 — frozen held-out probe set (10 fresh probes, never
+                       tuned on; use for the headline comparison)
   --model=<m>          opencode model (default: $AGENT_MODEL or ${DEFAULT_MODEL})
   --opencode-bin=<p>   opencode binary (default: $OPENCODE_BIN or "opencode")
   --dry-run            set up workspaces + decisions/plugin files but skip the
