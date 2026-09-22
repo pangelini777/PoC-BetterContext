@@ -58,7 +58,7 @@ Primary artifacts: `evals/progressive-context/results/probe-2026-09-22T17-31-31-
   |---|---|---|---|---|
   | probe-2026-09-22T17-31 (headline) | single | 10/10 | 10/10 | 10/10, 3,906 ctx |
   | probe-2026-09-22T19-35 (replication, JEV-first) | single | 10/10 | 10/10 | 10/10 |
-  | probe-2026-09-22T19-51 / 19-58 / 20-04 (stability ×3) | single, JEV-only | — | — | 10/10 each, ~4k ctx |
+  | probe-2026-09-22T19-51 / 19-58 / 20-04 (stability ×3) | single, JEV-only | — | — | 10/10 each, ~4k ctx, 381k/219k/233k tok |
   | probe-multi-2026-09-22T19-12 | **multi (fresh/probe)** | 10/10 | 10/10 | 10/10, 1,324 ctx |
   ```mermaid
   flowchart TB
