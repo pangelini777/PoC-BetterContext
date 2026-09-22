@@ -64,45 +64,33 @@ Primary artifacts: `evals/progressive-context/results/probe-2026-09-22T17-31-31-
   | probe-multi-2026-09-22T15-18 | load-all | 34/48 (24/26 content, v1+v2+v3 tuning set) | 46,736 flat | 2.73M |
 
   ```mermaid
-  flowchart LR
-      subgraph CTRL["Controller (owns APM store)"]
-          CAT["94-resource catalog"]
-          JEV["JEV router + resolver"]
-          CMP["Overlay compiler"]
+  flowchart TB
+      subgraph CTRL["Controller — owns the 94-resource APM store"]
+          OBS["Observe: phase + tool/file activity"]
+          JEV["JEV router: score every rule/skill"]
+          RES["Resolver: activate / retain / DEMATERIALIZE"]
+          CMP["Compiler: inject selected bodies only"]
       end
-      subgraph WS["Agent workspace (one continued session)"]
-          PLG["JEV plugin"]
-          AGT["Agent"]
+      subgraph AGT["Agent (sees only the overlay)"]
+          ACT["Act on the task"]
       end
-      CAT --> JEV
-      JEV -->|"materialized bodies"| CMP
-      CMP -->|"fresh overlay per turn"| PLG
-      PLG -->|"scrub + inject"| AGT
-      AGT -->|"tool/file activity"| JEV
+      OBS --> JEV
+      JEV --> RES
+      RES -->|"materialized"| CMP
+      RES -->|"dematerialized: never compiled, never sent"| EVICT{"✕ evicted"}
+      CMP --> ACT
+      ACT --> OBS
   ```
 
-  ```mermaid
-  flowchart LR
-      subgraph CTRL["Controller (owns APM store)"]
-          CAT["94-resource catalog"]
-          JEV["JEV router + resolver"]
-          CMP["Harness-assembled prompt"]
-      end
-      subgraph S1["Probe 1 session"]
-          A1["Agent"]
-      end
-      subgraph S2["Probe 2 session"]
-          A2["Agent"]
-      end
-      subgraph SN["Probe N session"]
-          AN["Agent"]
-      end
-      CAT --> JEV
-      JEV -->|"one overlay per probe"| CMP
-      CMP --> A1
-      CMP --> A2
-      CMP --> AN
-  ```
+  Rules act in two places. **At routing time**, JEV scores every rule against
+  the current phase and the resolver activates, retains, or dematerializes —
+  dematerialized rules are never compiled and never reach any prompt. **At
+  prompt time**, the compiler injects exactly the materialized bodies (plus a
+  `[RULE]/[SKILL]` kind tag) into a single overlay block. Two session shapes
+  use this loop: *single-session* keeps one continued agent session with a
+  workspace plugin that scrubs stale overlays per turn (behavioral unload);
+  *multi-session* (factories) routes each probe in isolation with a
+  harness-assembled prompt and zero history (byte-proof by construction).
 
   ## Example System One call
 
