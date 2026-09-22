@@ -40,8 +40,11 @@ Primary artifacts: `evals/progressive-context/results/probe-2026-09-22T17-31-31-
 
   ## All benchmarks
 
-  Tuning trajectory (v1+v2+v3, 48 probes/arm, Spark) — how naming and lifetime
-  fixes converged all arms to perfect retrieval:
+  Agent model throughout: `opencode-go/muse-spark-1.3-contributor`
+  (provider-backed JEV `jev-latest` for routing/grading).
+
+  Tuning trajectory (v1+v2+v3, 48 probes/arm) — how naming and lifetime fixes
+  converged all arms to perfect retrieval:
 
   | run | load-all | discovery | JEV | JEV avg ctx |
   |---|---|---|---|---|
@@ -49,6 +52,8 @@ Primary artifacts: `evals/progressive-context/results/probe-2026-09-22T17-31-31-
   | probe-2026-09-22T12-39 (JEV lifetime tuning) | — | — | 47/48, 1.79M tok | 3,901 |
   | probe-2026-09-22T16-08 (discovery tracing) | — | 48/48, 50 files / 24k tok read | — | — |
 
+  Stability: three consecutive JEV-only v4 seeds, 10/10 each —
+  `probe-2026-09-22T19-51`, `19-58`, `20-04` (avg ctx ~4k, fidelity ~1.0).
   Factory runs (fresh session per probe, v4 held-out, Spark):
 
   | run | arm | retrieval | avg ctx | tokens |

@@ -1,0 +1,561 @@
+{
+  "artifact": "evals/progressive-context/results/probe-2026-09-22T19-58-48-37cruu.json",
+  "model": "jev-latest",
+  "gradedAt": "2026-09-22T20:10:59.632Z",
+  "usage": {
+    "input_tokens": 52520,
+    "output_tokens": 2365
+  },
+  "fallback": false,
+  "probeSetSource": "embedded",
+  "probeSetVersion": "probe-v4-heldout-frozen",
+  "probeSetHash": "6a0e02b85242c69e",
+  "evaluatorVersion": "v4",
+  "evaluatorHash": "5f27c997e9ac8c6c",
+  "warnings": [],
+  "arms": {
+    "jev_single": [
+      {
+        "probeId": "pq-rate-limit-deep",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.rate-limiting": 0.83
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-cache-invalidation",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.caching-policy": 0.87
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.rate-limiting": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.05,
+              "unrelated": 0.95,
+              "relies-on-evicted": 0
+            },
+            "confidence": 0.93
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-order-cancel",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.order-state-machine": 0.88,
+          "rule.inventory-reservation": 0.87
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.rate-limiting": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.93,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.07
+            },
+            "confidence": 0.89
+          },
+          "rule.caching-policy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.92,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.08
+            },
+            "confidence": 0.87
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-refund-partial",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.refund-chargeback": 0.85,
+          "rule.idempotency-keys": 0.85
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.rate-limiting": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.08,
+              "unrelated": 0.92,
+              "relies-on-evicted": 0
+            },
+            "confidence": 0.88
+          },
+          "rule.caching-policy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "unrelated": 0.93,
+              "consistent-but-independent": 0.07
+            },
+            "confidence": 0.89
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-tax-exempt",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.tax-calculation": 0.86
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.rate-limiting": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.09,
+              "unrelated": 0.91
+            },
+            "confidence": 0.87
+          },
+          "rule.caching-policy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.11,
+              "unrelated": 0.89
+            },
+            "confidence": 0.84
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-currency-rounding",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.multi-currency": 0.57
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.rate-limiting": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.15,
+              "relies-on-evicted": 0.01,
+              "unrelated": 0.84
+            },
+            "confidence": 0.76
+          },
+          "rule.caching-policy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.12,
+              "relies-on-evicted": 0,
+              "unrelated": 0.88
+            },
+            "confidence": 0.81
+          },
+          "rule.inventory-reservation": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.12,
+              "relies-on-evicted": 0,
+              "unrelated": 0.88
+            },
+            "confidence": 0.81
+          },
+          "rule.refund-chargeback": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.13,
+              "relies-on-evicted": 0,
+              "unrelated": 0.87
+            },
+            "confidence": 0.81
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-audit-export",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.audit-trails": 0.88
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.rate-limiting": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.21,
+              "unrelated": 0.79
+            },
+            "confidence": 0.68
+          },
+          "rule.caching-policy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "unrelated": 0.77,
+              "consistent-but-independent": 0.23
+            },
+            "confidence": 0.64
+          },
+          "rule.inventory-reservation": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.25,
+              "unrelated": 0.75
+            },
+            "confidence": 0.62
+          },
+          "rule.refund-chargeback": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.21,
+              "unrelated": 0.79
+            },
+            "confidence": 0.67
+          },
+          "rule.tax-calculation": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.21,
+              "unrelated": 0.79
+            },
+            "confidence": 0.67
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-flag-rollout",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.feature-flags": 0.8
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.rate-limiting": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.11,
+              "unrelated": 0.89,
+              "relies-on-evicted": 0
+            },
+            "confidence": 0.83
+          },
+          "rule.caching-policy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.12,
+              "unrelated": 0.88,
+              "relies-on-evicted": 0
+            },
+            "confidence": 0.82
+          },
+          "rule.inventory-reservation": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.12,
+              "unrelated": 0.88,
+              "relies-on-evicted": 0
+            },
+            "confidence": 0.81
+          },
+          "rule.refund-chargeback": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.13,
+              "unrelated": 0.87,
+              "relies-on-evicted": 0
+            },
+            "confidence": 0.8
+          },
+          "rule.tax-calculation": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.11,
+              "unrelated": 0.89,
+              "relies-on-evicted": 0
+            },
+            "confidence": 0.83
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-incident-sev",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.incident-response": 0.83
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.rate-limiting": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.12,
+              "relies-on-evicted": 0,
+              "unrelated": 0.88
+            },
+            "confidence": 0.81
+          },
+          "rule.caching-policy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.12,
+              "relies-on-evicted": 0,
+              "unrelated": 0.88
+            },
+            "confidence": 0.82
+          },
+          "rule.inventory-reservation": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.11,
+              "relies-on-evicted": 0,
+              "unrelated": 0.89
+            },
+            "confidence": 0.83
+          },
+          "rule.refund-chargeback": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.1,
+              "relies-on-evicted": 0,
+              "unrelated": 0.9
+            },
+            "confidence": 0.85
+          },
+          "rule.tax-calculation": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.14,
+              "relies-on-evicted": 0,
+              "unrelated": 0.86
+            },
+            "confidence": 0.78
+          },
+          "rule.canary-deploys": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.1,
+              "relies-on-evicted": 0,
+              "unrelated": 0.9
+            },
+            "confidence": 0.84
+          },
+          "rule.multi-currency": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.11,
+              "relies-on-evicted": 0,
+              "unrelated": 0.89
+            },
+            "confidence": 0.84
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-deploy-freeze",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.production-change-control": 0.55,
+          "rule.slo-error-budgets": 0.58
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.rate-limiting": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.9,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.1
+            },
+            "confidence": 0.85
+          },
+          "rule.caching-policy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.91,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.09
+            },
+            "confidence": 0.86
+          },
+          "rule.inventory-reservation": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.9,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.1
+            },
+            "confidence": 0.85
+          },
+          "rule.refund-chargeback": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.91,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.09
+            },
+            "confidence": 0.86
+          },
+          "rule.tax-calculation": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.92,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.08
+            },
+            "confidence": 0.87
+          },
+          "rule.canary-deploys": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.91,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.09
+            },
+            "confidence": 0.86
+          },
+          "rule.multi-currency": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.9,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.1
+            },
+            "confidence": 0.84
+          },
+          "rule.order-state-machine": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.93,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.07
+            },
+            "confidence": 0.89
+          },
+          "skill.command-incident": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.91,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.09
+            },
+            "confidence": 0.86
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      }
+    ]
+  },
+  "quality": {
+    "jev_single": {
+      "rulePrecision": null,
+      "ruleRecall": 1,
+      "criticalMisses": 0,
+      "skillAccuracy": null,
+      "staleTokens": 0,
+      "missingTokens": 0,
+      "staleRatio": null,
+      "evictionFidelity": 0.9997297297297297,
+      "selfReportAccuracy": null,
+      "discoveredIds": [],
+      "discoveredTokens": 0,
+      "discoveredFiles": {}
+    }
+  }
+}
