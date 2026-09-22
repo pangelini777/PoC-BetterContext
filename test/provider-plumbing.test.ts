@@ -20,17 +20,17 @@ function cannedFetch(): typeof fetch {
       } else if (q.type === "choice" && qid === "which_skill") {
         const options = Object.keys(q.criteria);
         const probs: Record<string, number> = {};
-        for (const o of options) probs[o] = o === "skill.stripe-webhook-handler" ? 0.7 : 0.3 / Math.max(1, options.length - 1);
+        for (const o of options) probs[o] = o === "skill.handle-webhook" ? 0.7 : 0.3 / Math.max(1, options.length - 1);
         const sum = Object.values(probs).reduce((a, b) => a + b, 0);
         for (const o of options) probs[o] /= sum;
-        answers[qid] = { type: "choice", choice: "skill.stripe-webhook-handler", probabilities: probs, confidence: 0.6 };
+        answers[qid] = { type: "choice", choice: "skill.handle-webhook", probabilities: probs, confidence: 0.6 };
       } else {
         answers[qid] = { type: "noul", noul: 0.8 };
       }
     }
     // Stage-2 shape: fits::* nouls.
     for (const qid of qids) {
-      if (qid.startsWith("fits::")) answers[qid] = { type: "noul", noul: qid.includes("webhook-handler") ? 0.9 : 0.1 };
+      if (qid.startsWith("fits::")) answers[qid] = { type: "noul", noul: qid.includes("handle-webhook") ? 0.9 : 0.1 };
     }
     return {
       ok: true,
@@ -83,7 +83,7 @@ describe("provider-backed routing plumbing", () => {
       expect(out.calls).toBe(2);
       expect(out.inputTokens).toBe(200);
       expect(out.ruleScores.get("rule.webhook-idempotency")?.probability).toBe(0.9);
-      expect(out.selectedSkill).toBe("skill.stripe-webhook-handler");
+      expect(out.selectedSkill).toBe("skill.handle-webhook");
     } finally {
       globalThis.fetch = original;
     }

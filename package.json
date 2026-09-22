@@ -10,7 +10,8 @@
     "context-spike": "bun run evals/progressive-context/context-spike.ts",
     "run-scripted": "bun run evals/progressive-context/run-scripted.ts",
     "validate-scripted": "bun run evals/progressive-context/validate-scripted.ts",
-    "run-live": "bun run evals/progressive-context/run-live.ts"
+    "run-live": "bun run evals/progressive-context/run-live.ts",
+    "dashboard": "bun run evals/progressive-context/dashboard/server.ts"
   },
   "dependencies": {
     "yaml": "^2.9.1"

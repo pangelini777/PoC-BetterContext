@@ -8,28 +8,28 @@ resources:
     kind: rule
     source: .apm/instructions/accessibility-ui.instructions.md
     summary: "Accessibility requirements for user-facing web UI, forms, buttons, dialogs, focus handling, labels, and keyboard behavior."
-    lifetime: phase
+    lifetime: action
     critical: false
     dependsOn: []
   rule.brand-ui-copy:
     kind: rule
     source: .apm/instructions/brand-ui-copy.instructions.md
     summary: "Brand and product-copy rules for customer-facing web UI, calls to action, labels, and transactional language."
-    lifetime: phase
+    lifetime: action
     critical: false
     dependsOn: []
   rule.api-error-contract:
     kind: rule
     source: .apm/instructions/api-error-contract.instructions.md
     summary: "Contract for API validation, status codes, stable machine-readable errors, and safe client-facing failure responses."
-    lifetime: phase
+    lifetime: action
     critical: false
     dependsOn: []
   rule.auth-session-security:
     kind: rule
     source: .apm/instructions/auth-session-security.instructions.md
     summary: "Authentication and session security rules for login, OAuth, cookies, tokens, redirects, and authorization checks."
-    lifetime: phase
+    lifetime: action
     critical: true
     dependsOn: [secrets-management]
   rule.privacy-personal-data:
@@ -43,14 +43,14 @@ resources:
     kind: rule
     source: .apm/instructions/payments-card-data.instructions.md
     summary: "Payment integration boundary: keep raw card data out of the application and use provider-hosted/tokenized payment flows."
-    lifetime: phase
+    lifetime: action
     critical: true
     dependsOn: [logging-sensitive-data, secrets-management]
   rule.database-migration-safety:
     kind: rule
     source: .apm/instructions/database-migration-safety.instructions.md
     summary: "Safety rules for schema migrations, destructive DDL, backfills, compatibility, rollback, and deploy ordering."
-    lifetime: phase
+    lifetime: action
     critical: false
     dependsOn: []
   rule.logging-sensitive-data:
@@ -64,7 +64,7 @@ resources:
     kind: rule
     source: .apm/instructions/webhook-idempotency.instructions.md
     summary: "Webhook verification, replay resistance, idempotent processing, ordering assumptions, and retry-safe side effects."
-    lifetime: phase
+    lifetime: action
     critical: false
     dependsOn: [logging-sensitive-data, secrets-management]
   rule.secrets-management:
@@ -92,118 +92,579 @@ resources:
     kind: rule
     source: .apm/instructions/public-docs-branding.instructions.md
     summary: "Brand and accuracy requirements for public developer documentation, examples, changelogs, and API-facing prose."
-    lifetime: phase
+    lifetime: action
     critical: false
     dependsOn: []
   rule.mobile-ios-guidelines:
     kind: rule
     source: .apm/instructions/mobile-ios-guidelines.instructions.md
     summary: "iOS-specific SwiftUI architecture, accessibility, navigation, and Apple platform conventions. Distractor for web tasks."
-    lifetime: phase
+    lifetime: action
     critical: false
     dependsOn: []
   rule.ml-model-governance:
     kind: rule
     source: .apm/instructions/ml-model-governance.instructions.md
     summary: "Machine-learning evaluation and model-governance requirements. Distractor unless the task changes an ML model or AI decision pipeline."
-    lifetime: phase
+    lifetime: action
     critical: false
     dependsOn: []
-  skill.react-ui-component:
+  skill.build-react-component:
     kind: skill
-    source: .apm/skills/react-ui-component/SKILL.md
+    source: .apm/skills/build-react-component/SKILL.md
     summary: "Build or modify a React/Next.js user-interface component, including interactive state, loading states, events, and tests."
     lifetime: turn
     critical: false
     dependsOn: []
-  skill.accessibility-audit:
+  skill.audit-interaction-accessibility:
     kind: skill
-    source: .apm/skills/accessibility-audit/SKILL.md
+    source: .apm/skills/audit-interaction-accessibility/SKILL.md
     summary: "Audit a changed web interaction for semantic HTML, keyboard access, focus behavior, accessible names, and status/error announcements."
     lifetime: turn
     critical: false
     dependsOn: []
-  skill.brand-copy-review:
+  skill.review-brand-copy:
     kind: skill
-    source: .apm/skills/brand-copy-review/SKILL.md
+    source: .apm/skills/review-brand-copy/SKILL.md
     summary: "Review or rewrite customer-facing product copy to match concise Acme Checkout voice and avoid unsupported or premature claims."
     lifetime: turn
     critical: false
     dependsOn: []
-  skill.nextjs-api-route:
+  skill.build-nextjs-route:
     kind: skill
-    source: .apm/skills/nextjs-api-route/SKILL.md
+    source: .apm/skills/build-nextjs-route/SKILL.md
     summary: "Implement or modify a Next.js route handler with request validation, typed responses, server-only dependencies, and focused tests."
     lifetime: turn
     critical: false
     dependsOn: []
-  skill.postgres-schema-migration:
+  skill.migrate-postgres-schema:
     kind: skill
-    source: .apm/skills/postgres-schema-migration/SKILL.md
+    source: .apm/skills/migrate-postgres-schema/SKILL.md
     summary: "Design and implement a PostgreSQL schema migration or backfill with compatibility, rollout, rollback/forward-fix, and verification."
     lifetime: turn
     critical: false
     dependsOn: []
-  skill.postgres-readonly-query:
+  skill.query-postgres-readonly:
     kind: skill
-    source: .apm/skills/postgres-readonly-query/SKILL.md
+    source: .apm/skills/query-postgres-readonly/SKILL.md
     summary: "Investigate PostgreSQL data or query behavior without changing schema: write safe read-only SQL and summarize findings."
     lifetime: turn
     critical: false
     dependsOn: []
-  skill.stripe-checkout-session:
+  skill.create-checkout-session:
     kind: skill
-    source: .apm/skills/stripe-checkout-session/SKILL.md
+    source: .apm/skills/create-checkout-session/SKILL.md
     summary: "Implement server-side Stripe Checkout Session creation using trusted price/order data, provider-hosted card collection, metadata, and safe errors."
     lifetime: turn
     critical: false
     dependsOn: []
-  skill.stripe-webhook-handler:
+  skill.handle-webhook:
     kind: skill
-    source: .apm/skills/stripe-webhook-handler/SKILL.md
+    source: .apm/skills/handle-webhook/SKILL.md
     summary: "Implement or fix a Stripe webhook endpoint with signature verification, raw-body handling, duplicate-event protection, and retry-safe side effects."
     lifetime: turn
     critical: false
     dependsOn: []
-  skill.oauth-login:
+  skill.implement-oauth-login:
     kind: skill
-    source: .apm/skills/oauth-login/SKILL.md
+    source: .apm/skills/implement-oauth-login/SKILL.md
     summary: "Implement an OAuth/OIDC login flow with trusted redirect handling, state/nonce validation, token/session hygiene, and authorization boundaries."
     lifetime: turn
     critical: false
     dependsOn: []
-  skill.test-plan-generator:
+  skill.plan-tests:
     kind: skill
-    source: .apm/skills/test-plan-generator/SKILL.md
+    source: .apm/skills/plan-tests/SKILL.md
     summary: "Create and execute a focused implementation test plan that discriminates the requested behavior and covers important failure/edge paths."
     lifetime: turn
     critical: false
     dependsOn: []
-  skill.production-deploy-checklist:
+  skill.prepare-deploy-checklist:
     kind: skill
-    source: .apm/skills/production-deploy-checklist/SKILL.md
+    source: .apm/skills/prepare-deploy-checklist/SKILL.md
     summary: "Prepare a production deployment checklist covering configuration, secrets, migrations, smoke checks, monitoring, rollback, and irreversible changes."
     lifetime: turn
     critical: false
     dependsOn: []
-  skill.openapi-contract-update:
+  skill.update-openapi-contract:
     kind: skill
-    source: .apm/skills/openapi-contract-update/SKILL.md
+    source: .apm/skills/update-openapi-contract/SKILL.md
     summary: "Update OpenAPI/public API documentation so paths, request/response schemas, status codes, examples, and implementation stay aligned."
     lifetime: turn
     critical: false
     dependsOn: []
-  skill.ios-swiftui-component:
+  skill.build-ios-component:
     kind: skill
-    source: .apm/skills/ios-swiftui-component/SKILL.md
+    source: .apm/skills/build-ios-component/SKILL.md
     summary: "Build a native iOS SwiftUI component or screen using Apple platform conventions, Dynamic Type, VoiceOver, and Swift concurrency."
     lifetime: turn
     critical: false
     dependsOn: []
-  skill.ml-evaluation:
+  skill.evaluate-model:
     kind: skill
-    source: .apm/skills/ml-evaluation/SKILL.md
+    source: .apm/skills/evaluate-model/SKILL.md
     summary: "Evaluate a machine-learning model change with reproducible datasets, pinned artifacts, slice metrics, and baseline comparison."
     lifetime: turn
     critical: false
     dependsOn: []
+  rule.rate-limiting:
+    kind: rule
+    source: .apm/instructions/rate-limiting.instructions.md
+    summary: "Rate-limiting rules for public and authenticated APIs: per-key quotas, fair-use tiers, headers, and safe 429 behavior."
+    lifetime: action
+    critical: false
+    dependsOn: []
+  rule.caching-policy:
+    kind: rule
+    source: .apm/instructions/caching-policy.instructions.md
+    summary: "Caching policy for catalog, pricing, and session-adjacent reads: TTLs, invalidation, and stale-data boundaries."
+    lifetime: action
+    critical: false
+    dependsOn: []
+  rule.idempotency-keys:
+    kind: rule
+    source: .apm/instructions/idempotency-keys.instructions.md
+    summary: "Idempotency-key contract for order, charge, and refund creation: key handling, replay semantics, and duplicate prevention."
+    lifetime: action
+    critical: false
+    dependsOn: []
+  rule.pagination-contracts:
+    kind: rule
+    source: .apm/instructions/pagination-contracts.instructions.md
+    summary: "Pagination contract for list endpoints: cursor semantics, limits, ordering stability, and total-count rules."
+    lifetime: action
+    critical: false
+    dependsOn: []
+  rule.search-relevance:
+    kind: rule
+    source: .apm/instructions/search-relevance.instructions.md
+    summary: "Search relevance rules for catalog search: query handling, ranking signals, typo tolerance, and empty-result behavior."
+    lifetime: action
+    critical: false
+    dependsOn: []
+  rule.notification-delivery:
+    kind: rule
+    source: .apm/instructions/notification-delivery.instructions.md
+    summary: "Notification delivery rules for order and account emails/SMS: queuing, retries, templating, and unsubscribe handling."
+    lifetime: action
+    critical: false
+    dependsOn: []
+  rule.refund-chargeback:
+    kind: rule
+    source: .apm/instructions/refund-chargeback.instructions.md
+    summary: "Refund and chargeback handling: eligibility, provider reconciliation, dispute evidence, and safe money-movement sequencing."
+    lifetime: action
+    critical: true
+    dependsOn: [payments-card-data]
+
+  rule.tax-calculation:
+    kind: rule
+    source: .apm/instructions/tax-calculation.instructions.md
+    summary: "Tax calculation rules for Acme Checkout: trusted rate tables, server-side totals, rounding, jurisdiction handling, and inclusive/exclusive display."
+    lifetime: action
+    critical: false
+    dependsOn: []
+  rule.multi-currency:
+    kind: rule
+    source: .apm/instructions/multi-currency.instructions.md
+    summary: "Multi-currency rules for Acme Checkout: minor-unit amounts, explicit currency codes, trusted FX rates, settlement currency, and locale-aware display."
+    lifetime: action
+    critical: false
+    dependsOn: []
+  rule.inventory-reservation:
+    kind: rule
+    source: .apm/instructions/inventory-reservation.instructions.md
+    summary: "Inventory reservation rules for Acme Checkout: hold-before-charge, expiring holds, oversell prevention, idempotent release, and reconciliation."
+    lifetime: action
+    critical: false
+    dependsOn: []
+  rule.order-state-machine:
+    kind: rule
+    source: .apm/instructions/order-state-machine.instructions.md
+    summary: "Order state-machine rules for Acme Checkout: explicit transitions, terminal states, single-fire side effects, and concurrency-safe status writes."
+    lifetime: action
+    critical: false
+    dependsOn: [database-migration-safety]
+  rule.audit-trails:
+    kind: rule
+    source: .apm/instructions/audit-trails.instructions.md
+    summary: "Audit-trail requirements for Acme Checkout: append-only event records with actor, action, timestamp, and redacted payloads for security-sensitive operations."
+    lifetime: action
+    critical: true
+    dependsOn: [logging-sensitive-data]
+  rule.data-retention:
+    kind: rule
+    source: .apm/instructions/data-retention.instructions.md
+    summary: "Data-retention rules for Acme Checkout: documented retention schedules, bounded purge jobs, no orphan copies, and reviewable deletion evidence."
+    lifetime: action
+    critical: false
+    dependsOn: []
+  rule.gdpr-deletion:
+    kind: rule
+    source: .apm/instructions/gdpr-deletion.instructions.md
+    summary: "GDPR erasure handling for Acme Checkout: verified deletion requests, complete subject removal across stores, downstream propagation, and confirmation records."
+    lifetime: action
+    critical: true
+    dependsOn: []
+
+  rule.feature-flags:
+    kind: rule
+    source: .apm/instructions/feature-flags.instructions.md
+    summary: "Feature-flag discipline for Acme Checkout: flag naming, targeting, default-off safety, stale-flag removal, and flag-aware testing."
+    lifetime: action
+    critical: false
+    dependsOn: []
+  rule.canary-deploys:
+    kind: rule
+    source: .apm/instructions/canary-deploys.instructions.md
+    summary: "Canary deployment rules for Acme Checkout releases: staged traffic shifting, bake windows, promotion gates, and automatic rollback triggers."
+    lifetime: action
+    critical: false
+    dependsOn: []
+  rule.slo-error-budgets:
+    kind: rule
+    source: .apm/instructions/slo-error-budgets.instructions.md
+    summary: "SLO and error-budget policy for Acme Checkout: defining objectives, burn-rate alerting, budget-gated launches, and freeze discipline."
+    lifetime: action
+    critical: false
+    dependsOn: []
+  rule.incident-response:
+    kind: rule
+    source: .apm/instructions/incident-response.instructions.md
+    summary: "Incident-response requirements for Acme Checkout outages: severity levels, roles, communication cadence, mitigation-first discipline, and blameless follow-up."
+    lifetime: phase
+    critical: true
+    dependsOn: [production-change-control]
+  rule.dependency-upgrades:
+    kind: rule
+    source: .apm/instructions/dependency-upgrades.instructions.md
+    summary: "Dependency-upgrade discipline for Acme Checkout: risk-tiered updates, lockfile hygiene, breaking-change review, and rollback planning."
+    lifetime: action
+    critical: false
+    dependsOn: []
+  rule.code-review-bar:
+    kind: rule
+    source: .apm/instructions/code-review-bar.instructions.md
+    summary: "Code-review bar for Acme Checkout changes: what reviewers must check, approval discipline, and author responsibilities before requesting review."
+    lifetime: action
+    critical: false
+    dependsOn: []
+  rule.android-kotlin-guidelines:
+    kind: rule
+    source: .apm/instructions/android-kotlin-guidelines.instructions.md
+    summary: "Android Kotlin architecture, Material navigation, and Play platform conventions. Distractor for web tasks."
+    lifetime: action
+    critical: false
+    dependsOn: []
+
+  skill.process-refund:
+    kind: skill
+    source: .apm/skills/process-refund/SKILL.md
+    summary: "Process an Acme Checkout refund with idempotent charge reversal, reason codes, partial-refund math, and retry-safe ledger updates."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.calculate-tax:
+    kind: skill
+    source: .apm/skills/calculate-tax/SKILL.md
+    summary: "Compute Acme Checkout order tax with jurisdiction lookup, exempt-product handling, rounding rules, and audit-safe rate breakdowns."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.reserve-inventory:
+    kind: skill
+    source: .apm/skills/reserve-inventory/SKILL.md
+    summary: "Reserve Acme Checkout stock with atomic decrement, hold expiry, oversell guards, and retry-safe release for checkout and cancellation flows."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.send-notification:
+    kind: skill
+    source: .apm/skills/send-notification/SKILL.md
+    summary: "Send Acme Checkout transactional notifications with channel routing, template versioning, delivery retries, and unsubscribe-safe preferences."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.tune-search:
+    kind: skill
+    source: .apm/skills/tune-search/SKILL.md
+    summary: "Tune Acme Checkout catalog search relevance with query analysis, synonym rules, ranking weights, and measured precision/recall checks."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.paginate-results:
+    kind: skill
+    source: .apm/skills/paginate-results/SKILL.md
+    summary: "Add cursor or offset pagination to an Acme Checkout list API with stable ordering, page-size bounds, total-count policy, and client-safe page tokens."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.limit-rate:
+    kind: skill
+    source: .apm/skills/limit-rate/SKILL.md
+    summary: "Add a retry-safe rate limit to an Acme Checkout API with per-key buckets, burst headroom, fair rejection codes, and observable limit headers."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.invalidate-cache:
+    kind: skill
+    source: .apm/skills/invalidate-cache/SKILL.md
+    summary: "Invalidate Acme Checkout caches safely with scoped keys, version bumps, stampede guards, and observable purge confirmation."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.export-audit-trail:
+    kind: skill
+    source: .apm/skills/export-audit-trail/SKILL.md
+    summary: "Export an Acme Checkout audit trail with bounded time ranges, redacted payloads, signed manifests, and replay-safe pagination."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.erase-personal-data:
+    kind: skill
+    source: .apm/skills/erase-personal-data/SKILL.md
+    summary: "Execute an Acme Checkout GDPR erasure request with identity verification, scoped deletion across stores, retention-safe exceptions, and completion evidence."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.evaluate-flag:
+    kind: skill
+    source: .apm/skills/evaluate-flag/SKILL.md
+    summary: "Evaluate Acme Checkout feature flags with deterministic bucketing, targeting rules, kill-switch defaults, and auditable exposure logs."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.analyze-canary:
+    kind: skill
+    source: .apm/skills/analyze-canary/SKILL.md
+    summary: "Analyze an Acme Checkout canary deploy with guardrail metrics, statistical promotion gates, automatic rollback triggers, and staged traffic steps."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.report-slo:
+    kind: skill
+    source: .apm/skills/report-slo/SKILL.md
+    summary: "Report Acme Checkout service SLOs with burn-rate alerts, error-budget accounting, windowed compliance math, and executive-safe summaries."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.command-incident:
+    kind: skill
+    source: .apm/skills/command-incident/SKILL.md
+    summary: "Run an Acme Checkout production incident with severity triage, role assignment, timeboxed mitigation, comms cadence, and blameless follow-up."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.review-contract-diff:
+    kind: skill
+    source: .apm/skills/review-contract-diff/SKILL.md
+    summary: "Review an Acme Checkout OpenAPI contract diff for breaking changes, schema drift, example accuracy, and implementation alignment before merge."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+
+  skill.inspect-order-state:
+    kind: skill
+    source: .apm/skills/inspect-order-state/SKILL.md
+    summary: "Inspect an Acme Checkout order lifecycle with transition history, side-effect audit, stuck-state diagnosis, and safe read-only queries."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.respond-chargeback:
+    kind: skill
+    source: .apm/skills/respond-chargeback/SKILL.md
+    summary: "Respond to an Acme Checkout chargeback with evidence assembly, deadline tracking, representment packaging, and loss recording."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.convert-currency:
+    kind: skill
+    source: .apm/skills/convert-currency/SKILL.md
+    summary: "Convert Acme Checkout amounts across currencies with minor-unit math, trusted FX rates, rounding rules, and settlement-currency discipline."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.reconcile-stock:
+    kind: skill
+    source: .apm/skills/reconcile-stock/SKILL.md
+    summary: "Reconcile Acme Checkout inventory counts across reservation, warehouse, and ledger stores with bounded recounts and oversell guards."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.build-email-template:
+    kind: skill
+    source: .apm/skills/build-email-template/SKILL.md
+    summary: "Build an Acme Checkout transactional email template with brand voice, safe variables, locale support, and plain-text fallback."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.send-sms-fallback:
+    kind: skill
+    source: .apm/skills/send-sms-fallback/SKILL.md
+    summary: "Send an Acme Checkout SMS fallback with consent checks, short templated copy, provider failover, and delivery receipts."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.replay-webhook:
+    kind: skill
+    source: .apm/skills/replay-webhook/SKILL.md
+    summary: "Replay Acme Checkout webhooks safely with signature verification, idempotent handlers, ordered redelivery, and dead-letter triage."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.plan-migration-rollback:
+    kind: skill
+    source: .apm/skills/plan-migration-rollback/SKILL.md
+    summary: "Plan an Acme Checkout database rollback with compatibility checks, forward-fix preference, staged reversal, and verification gates."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.rotate-secret:
+    kind: skill
+    source: .apm/skills/rotate-secret/SKILL.md
+    summary: "Rotate an Acme Checkout credential with dual-secret overlap, staged rollout, revocation evidence, and leak response."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.scrub-logs:
+    kind: skill
+    source: .apm/skills/scrub-logs/SKILL.md
+    summary: "Scrub Acme Checkout logs and exports of secrets, PII, and card data with pattern profiles, sampled verification, and safe redaction."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.run-load-test:
+    kind: skill
+    source: .apm/skills/run-load-test/SKILL.md
+    summary: "Load-test an Acme Checkout endpoint with staged traffic, synthetic data, SLO assertions, and production isolation."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.drill-chaos:
+    kind: skill
+    source: .apm/skills/drill-chaos/SKILL.md
+    summary: "Run an Acme Checkout chaos drill with blast-radius limits, abort conditions, steady-state checks, and rollback readiness."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.audit-dependencies:
+    kind: skill
+    source: .apm/skills/audit-dependencies/SKILL.md
+    summary: "Audit Acme Checkout dependencies with risk-tiered review, lockfile checks, advisory triage, and staged upgrade plan."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.run-review-checklist:
+    kind: skill
+    source: .apm/skills/run-review-checklist/SKILL.md
+    summary: "Run an Acme Checkout code-review checklist with correctness, security, data-safety, and author-actionable findings."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.check-docs-links:
+    kind: skill
+    source: .apm/skills/check-docs-links/SKILL.md
+    summary: "Check Acme Checkout documentation links with scoped crawls, anchor verification, redirect policy, and fix-or-file triage."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+
+  skill.build-android-component:
+    kind: skill
+    source: .apm/skills/build-android-component/SKILL.md
+    summary: "Build a native Android Kotlin component or screen using Jetpack Compose, Material 3, TalkBack labels, and coroutine-safe state."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.run-data-notebook:
+    kind: skill
+    source: .apm/skills/run-data-notebook/SKILL.md
+    summary: "Run an exploratory Jupyter notebook analysis over exported Acme Checkout CSVs with pinned kernels, seeded sampling, and no production access."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.investigate-slo-burn:
+    kind: skill
+    source: .apm/skills/investigate-slo-burn/SKILL.md
+    summary: "Investigate an Acme Checkout SLO burn alert by scoping the window, segmenting traffic, finding the regressing deploy, and proposing a stop-burn action."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.sweep-flag-cleanup:
+    kind: skill
+    source: .apm/skills/sweep-flag-cleanup/SKILL.md
+    summary: "Remove a fully rolled-out Acme Checkout feature flag by deleting branches, defaulting behavior, migrating callers, and verifying flag-free deploys."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.warm-cache:
+    kind: skill
+    source: .apm/skills/warm-cache/SKILL.md
+    summary: "Warm Acme Checkout read caches after a deploy or cold start with a bounded key list, concurrency cap, and hit-rate verification."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.trim-session-replay:
+    kind: skill
+    source: .apm/skills/trim-session-replay/SKILL.md
+    summary: "Trim an Acme Checkout session replay capture to the minimal failing interaction with masked inputs, stable timestamps, and a shareable clip."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.render-invoice-pdf:
+    kind: skill
+    source: .apm/skills/render-invoice-pdf/SKILL.md
+    summary: "Render an Acme Checkout order invoice PDF from trusted order data with deterministic layout, locale-aware money formatting, and archival output."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.run-dunning-flow:
+    kind: skill
+    source: .apm/skills/run-dunning-flow/SKILL.md
+    summary: "Run the Acme Checkout failed-payment dunning sequence with spaced retries, clear customer emails, idempotent attempts, and cancellation on success."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.validate-address:
+    kind: skill
+    source: .apm/skills/validate-address/SKILL.md
+    summary: "Validate an Acme Checkout shipping or billing address with normalization, deliverability checks, and safe fallback when the provider is down."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.build-vat-report:
+    kind: skill
+    source: .apm/skills/build-vat-report/SKILL.md
+    summary: "Build an Acme Checkout VAT report for a merchant and period from ledger rows with jurisdiction grouping, audit links, and CSV export."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.rotate-webhook-secret:
+    kind: skill
+    source: .apm/skills/rotate-webhook-secret/SKILL.md
+    summary: "Rotate an Acme Checkout webhook signing secret with dual-secret verification, staged rollout, revocation, and delivery verification."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.seed-staging:
+    kind: skill
+    source: .apm/skills/seed-staging/SKILL.md
+    summary: "Seed the Acme Checkout staging environment with synthetic merchants, catalog, and orders that are clearly fake, idempotent, and safe to reset."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.run-prod-smoke:
+    kind: skill
+    source: .apm/skills/run-prod-smoke/SKILL.md
+    summary: "Run the read-only Acme Checkout production smoke suite after a deploy with bounded probes, instant abort on failure, and safe synthetic writes."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+  skill.write-release-notes:
+    kind: skill
+    source: .apm/skills/write-release-notes/SKILL.md
+    summary: "Draft Acme Checkout release notes from merged pull requests with verified claims, breaking-change callouts, and rollback links."
+    lifetime: turn
+    critical: false
+    dependsOn: []
+

@@ -1,0 +1,326 @@
+{
+  "runId": "single-2026-09-21T23-11-16-wb26md",
+  "kind": "single-session",
+  "status": "completed",
+  "createdAt": "2026-09-21T23:11:16.405Z",
+  "taskPrompt": "Complete the checkout flow in this repository: finish the accessible cart checkout UI, implement the server-side Stripe Checkout Session route, persist the needed synthetic shipping/contact fields safely, implement retry-safe Stripe webhook handling, add focused regression tests, and prepare (but do not execute) the production release checklist. Do not deploy. Do not commit secrets.",
+  "taskPromptHash": "5022473aa67f5029",
+  "baseFixtureHash": "752e962f0f986d95",
+  "thresholdsHash": "9fc08c54a0cf8a10",
+  "provenance": {
+    "repo": "/home/dev/code/betterContext",
+    "package": "/home/dev/code/betterContext/fixtures/apm-package",
+    "scenarios": "/home/dev/code/betterContext/fixtures/scenarios",
+    "results": "/home/dev/code/betterContext/evals/progressive-context/results",
+    "cwd": "/home/dev/code/betterContext"
+  },
+  "versions": {
+    "repoCommit": "7f9e9b4",
+    "os": "linux-x64",
+    "bun": "1.4.0",
+    "apm": "Agent Package Manager (APM) CLI version 0.31.0",
+    "opencode": "1.18.31",
+    "agentModel": "local/qwen3",
+    "jevModel": "jev-latest"
+  },
+  "catalogHash": "19562e00cc2a5a1c453df3a040b995f67ea2a593aa18fa1b9649606a70873db3",
+  "routingBackend": "fail_open",
+  "trials": [
+    {
+      "trialId": "trial-1",
+      "arm": "load_all_single",
+      "status": "completed",
+      "durationMs": 300207,
+      "agentTokens": {
+        "input": 11163,
+        "output": 8737,
+        "reasoning": 0,
+        "total": 86534
+      },
+      "contextSamples": [
+        {
+          "turn": 0,
+          "compiledResourceTokens": 6093,
+          "loadedResources": 29
+        }
+      ],
+      "verification": {
+        "checks": [
+          {
+            "name": "checkout-route-implemented",
+            "pass": false,
+            "detail": "route.ts bytes=218"
+          },
+          {
+            "name": "trusted-server-totals",
+            "pass": false,
+            "detail": "no trusted total found"
+          },
+          {
+            "name": "no-raw-card-data",
+            "pass": true,
+            "detail": "clean"
+          },
+          {
+            "name": "webhook-signature-failure-path",
+            "pass": false,
+            "detail": "missing"
+          },
+          {
+            "name": "webhook-idempotent",
+            "pass": false,
+            "detail": "missing"
+          },
+          {
+            "name": "no-personal-data-logging",
+            "pass": true,
+            "detail": "clean"
+          },
+          {
+            "name": "schema-shipping-fields",
+            "pass": false,
+            "detail": "missing"
+          },
+          {
+            "name": "cart-checkout-ui",
+            "pass": true,
+            "detail": "checkout referenced in page"
+          },
+          {
+            "name": "hidden:hidden-checkout.test.ts",
+            "pass": false,
+            "detail": "bun test exit=1; (fail) checkout POST does not return the NOT_IMPLEMENTED stub [0.91ms] | (fail) checkout POST rejects invalid input with a client error [0.30ms] | (fail) shipping schema migration exists [0.76ms]"
+          },
+          {
+            "name": "hidden:hidden-webhook.test.ts",
+            "pass": false,
+            "detail": "bun test exit=1; (fail) checkout POST does not return the NOT_IMPLEMENTED stub [0.91ms] | (fail) checkout POST rejects invalid input with a client error [0.30ms] | (fail) shipping schema migration exists [0.76ms]"
+          },
+          {
+            "name": "hidden:hidden-hygiene.test.ts",
+            "pass": false,
+            "detail": "bun test exit=1; (fail) checkout POST does not return the NOT_IMPLEMENTED stub [0.91ms] | (fail) checkout POST rejects invalid input with a client error [0.30ms] | (fail) shipping schema migration exists [0.76ms]"
+          }
+        ],
+        "passed": 3,
+        "total": 11
+      },
+      "verificationComplete": true,
+      "unloadMode": "none",
+      "eligibility": {
+        "eligible": false,
+        "reasons": [
+          "opencode run hit the 300s timeout"
+        ]
+      },
+      "workspace": "/tmp/jev-single-trial-1-load_all_single-Vz6xc1",
+      "assistantTextChars": 176,
+      "assistantText": "I'll explore the repo layout quickly, then implement each piece. This is a small synthetic Next.js/Stripe checkout repo — let me check git for hints about intended structure.\n\n",
+      "toolCallCount": 10,
+      "timedOut": true,
+      "baseCommit": "af5c56bef0aaa92998521439ba6caa1c4b3a677a",
+      "compiledOverlaySha256": "13df8e068902102efc9d48c1bd950aff54ac6d11ce1a899be77018af8a7df980"
+    },
+    {
+      "trialId": "trial-2",
+      "arm": "apm_discovery",
+      "status": "completed",
+      "durationMs": 302617,
+      "agentTokens": {
+        "input": 24941,
+        "output": 2251,
+        "reasoning": 0,
+        "total": 207396
+      },
+      "contextSamples": [
+        {
+          "turn": 0,
+          "compiledResourceTokens": 0,
+          "loadedResources": 0
+        }
+      ],
+      "verification": {
+        "checks": [
+          {
+            "name": "checkout-route-implemented",
+            "pass": false,
+            "detail": "route.ts bytes=218"
+          },
+          {
+            "name": "trusted-server-totals",
+            "pass": false,
+            "detail": "no trusted total found"
+          },
+          {
+            "name": "no-raw-card-data",
+            "pass": true,
+            "detail": "clean"
+          },
+          {
+            "name": "webhook-signature-failure-path",
+            "pass": false,
+            "detail": "missing"
+          },
+          {
+            "name": "webhook-idempotent",
+            "pass": false,
+            "detail": "missing"
+          },
+          {
+            "name": "no-personal-data-logging",
+            "pass": true,
+            "detail": "clean"
+          },
+          {
+            "name": "schema-shipping-fields",
+            "pass": false,
+            "detail": "missing"
+          },
+          {
+            "name": "cart-checkout-ui",
+            "pass": true,
+            "detail": "checkout referenced in page"
+          },
+          {
+            "name": "hidden:hidden-checkout.test.ts",
+            "pass": false,
+            "detail": "bun test exit=1; (fail) checkout POST does not return the NOT_IMPLEMENTED stub [0.95ms] | (fail) checkout POST rejects invalid input with a client error [0.29ms] | (fail) shipping schema migration exists [2.65ms]"
+          },
+          {
+            "name": "hidden:hidden-webhook.test.ts",
+            "pass": false,
+            "detail": "bun test exit=1; (fail) checkout POST does not return the NOT_IMPLEMENTED stub [0.95ms] | (fail) checkout POST rejects invalid input with a client error [0.29ms] | (fail) shipping schema migration exists [2.65ms]"
+          },
+          {
+            "name": "hidden:hidden-hygiene.test.ts",
+            "pass": false,
+            "detail": "bun test exit=1; (fail) checkout POST does not return the NOT_IMPLEMENTED stub [0.95ms] | (fail) checkout POST rejects invalid input with a client error [0.29ms] | (fail) shipping schema migration exists [2.65ms]"
+          }
+        ],
+        "passed": 3,
+        "total": 11
+      },
+      "verificationComplete": true,
+      "unloadMode": "none",
+      "eligibility": {
+        "eligible": false,
+        "reasons": [
+          "opencode run hit the 300s timeout"
+        ]
+      },
+      "workspace": "/tmp/jev-single-trial-2-apm_discovery-o7tucx",
+      "assistantTextChars": 52,
+      "assistantText": "Now let me read the APM rules and relevant skills:\n\n",
+      "toolCallCount": 32,
+      "timedOut": true,
+      "baseCommit": "d2bb04bd87ad1f0bd8279d44e1650a1bf97cb731",
+      "apmInstall": {
+        "code": 0,
+        "outExcerpt": "[>] Installing dependencies from apm.yml...\n[i] Targets: antigravity, opencode  (source: --target flag)\n  [+] <project root> (local)\n  |-- 15 rule(s) integrated -> .agents/rules/\n  |-- 14 skill(s) integrated -> .agents/skills/\n[i] Added apm_modules/ to .gitignore\n  [i] Skipped inactive experimental resolver for target 'copilot-cowork' during \nlockfile reconciliation.\n  [i] Skipped inactive experimental resolver for target 'copilot-app' during \nlockfile reconciliation.\n[*] Installed 1 APM dependency in 0.6s.\n\n"
+      }
+    },
+    {
+      "trialId": "trial-3",
+      "arm": "jev_single",
+      "status": "completed",
+      "durationMs": 302661,
+      "agentTokens": {
+        "input": 34614,
+        "output": 10183,
+        "reasoning": 0,
+        "total": 364081
+      },
+      "contextSamples": [
+        {
+          "turn": 0,
+          "compiledResourceTokens": 2297,
+          "loadedResources": 9
+        }
+      ],
+      "verification": {
+        "checks": [
+          {
+            "name": "checkout-route-implemented",
+            "pass": false,
+            "detail": "route.ts bytes=218"
+          },
+          {
+            "name": "trusted-server-totals",
+            "pass": false,
+            "detail": "no trusted total found"
+          },
+          {
+            "name": "no-raw-card-data",
+            "pass": true,
+            "detail": "clean"
+          },
+          {
+            "name": "webhook-signature-failure-path",
+            "pass": false,
+            "detail": "missing"
+          },
+          {
+            "name": "webhook-idempotent",
+            "pass": false,
+            "detail": "missing"
+          },
+          {
+            "name": "no-personal-data-logging",
+            "pass": true,
+            "detail": "clean"
+          },
+          {
+            "name": "schema-shipping-fields",
+            "pass": false,
+            "detail": "missing"
+          },
+          {
+            "name": "cart-checkout-ui",
+            "pass": true,
+            "detail": "checkout referenced in page"
+          },
+          {
+            "name": "hidden:hidden-checkout.test.ts",
+            "pass": false,
+            "detail": "bun test exit=1; (fail) checkout POST does not return the NOT_IMPLEMENTED stub [0.95ms] | (fail) checkout POST rejects invalid input with a client error [0.29ms] | (fail) shipping schema migration exists [3.51ms]"
+          },
+          {
+            "name": "hidden:hidden-webhook.test.ts",
+            "pass": false,
+            "detail": "bun test exit=1; (fail) checkout POST does not return the NOT_IMPLEMENTED stub [0.95ms] | (fail) checkout POST rejects invalid input with a client error [0.29ms] | (fail) shipping schema migration exists [3.51ms]"
+          },
+          {
+            "name": "hidden:hidden-hygiene.test.ts",
+            "pass": false,
+            "detail": "bun test exit=1; (fail) checkout POST does not return the NOT_IMPLEMENTED stub [0.95ms] | (fail) checkout POST rejects invalid input with a client error [0.29ms] | (fail) shipping schema migration exists [3.51ms]"
+          }
+        ],
+        "passed": 3,
+        "total": 11
+      },
+      "verificationComplete": true,
+      "unloadMode": "behavioral",
+      "eligibility": {
+        "eligible": false,
+        "reasons": [
+          "opencode run hit the 300s timeout",
+          "unloadMode=behavioral: overlay scrubbed from emitted messages only; not byte-proof (see jev-plugin.ts header)",
+          "no plugin turn log observed (.agents/jev-plugin-turns.jsonl missing)"
+        ]
+      },
+      "workspace": "/tmp/jev-single-trial-3-jev_single-mlKZtE",
+      "assistantTextChars": 252,
+      "assistantText": "Now I have the full picture: a flat synthetic Next/Stripe checkout demo with authoritative APM rules for accessibility, payments boundary, webhook idempotency, secrets, logging, testing gates, and production change control. Let me plan and implement.\n\n",
+      "toolCallCount": 38,
+      "timedOut": true,
+      "baseCommit": "652b650fbe7dce06ecbaeff81a1f1a9e62647f59",
+      "apmInstall": {
+        "code": 0,
+        "outExcerpt": "[>] Installing dependencies from apm.yml...\n[i] Targets: antigravity, opencode  (source: --target flag)\n  [+] <project root> (local)\n  |-- 15 rule(s) integrated -> .agents/rules/\n  |-- 14 skill(s) integrated -> .agents/skills/\n[i] Added apm_modules/ to .gitignore\n  [i] Skipped inactive experimental resolver for target 'copilot-cowork' during \nlockfile reconciliation.\n  [i] Skipped inactive experimental resolver for target 'copilot-app' during \nlockfile reconciliation.\n[*] Installed 1 APM dependency in 0.6s.\n\n"
+      },
+      "decisionsEventId": "evt-000",
+      "pluginBytes": 8572,
+      "pluginTurns": 0
+    }
+  ]
+}

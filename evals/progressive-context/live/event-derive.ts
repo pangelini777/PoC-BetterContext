@@ -27,6 +27,7 @@ const PATH_PHASES: { re: RegExp; phase: string }[] = [
   { re: /test|spec/i, phase: "verification" },
   { re: /cart|page\.tsx|component/i, phase: "ui" },
 ];
+const MAX_EVIDENCE_PATHS = 64;
 
 function phaseFromPaths(paths: string[]): string | null {
   for (const p of paths) {
@@ -51,10 +52,19 @@ export function deriveEvent(state: ObservedState, taskGoal: string): SessionStep
   if (state.turn === 0) {
     return { kind: "user_message", text: taskGoal, phase: "ui", changedPaths: [] };
   }
-  const changed = [...state.changedPaths].sort();
+  const allChanged = [...state.changedPaths].sort();
+  const changed = allChanged.slice(0, MAX_EVIDENCE_PATHS);
+  const allNew = [...state.newFiles].sort();
+  const newFiles = allNew.slice(0, MAX_EVIDENCE_PATHS);
   const evidence: string[] = [];
-  if (changed.length > 0) evidence.push(`changed: ${changed.join(", ")}`);
-  if (state.newFiles.length > 0) evidence.push(`new: ${[...state.newFiles].sort().join(", ")}`);
+  if (changed.length > 0) {
+    const omitted = allChanged.length - changed.length;
+    evidence.push(`changed: ${changed.join(", ")}${omitted > 0 ? ` (+${omitted} more paths omitted)` : ""}`);
+  }
+  if (newFiles.length > 0) {
+    const omitted = allNew.length - newFiles.length;
+    evidence.push(`new: ${newFiles.join(", ")}${omitted > 0 ? ` (+${omitted} more paths omitted)` : ""}`);
+  }
   if (state.toolNames.length > 0) evidence.push(`tools: ${[...new Set(state.toolNames)].sort().join(", ")}`);
   if (state.verificationRunning) {
     evidence.push(
@@ -65,7 +75,7 @@ export function deriveEvent(state: ObservedState, taskGoal: string): SessionStep
   }
   const phase =
     (state.verificationRunning ? "verification" : null) ??
-    phaseFromPaths(changed) ??
+    phaseFromPaths(allChanged) ??
     phaseFromTools(state.toolNames, state.toolArgsText) ??
     "build";
   const kind: SessionStepInput["kind"] =

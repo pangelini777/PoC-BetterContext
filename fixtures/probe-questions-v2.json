@@ -1,0 +1,73 @@
+{
+  "version": "probe-v2-frozen",
+  "extends": "probe-v1-frozen",
+  "notes": "Extension set for the 94-resource catalog. The 10 v1 probes stay frozen in probe-questions.json; these 6 cover new phases (refunds, inventory, GDPR, notifications) plus android/notebook distractors. Same grading contract: mustCite/mustQuote/mustNotCite endorsement-scoped to the Rules: line; materialization checks against runner-owned sets. Frozen 2026-09-22; do not retune against results.",
+  "probes": [
+    {
+      "id": "pq-refund-flow",
+      "phase": "refunds",
+      "question": "A customer requests a refund for order ord_test_1001 charged via Stripe. Which rules govern the refund and chargeback handling here? Name each rule id and state the required idempotency property.",
+      "expectedIds": ["rule.refund-chargeback"],
+      "expectedSkills": ["skill.refund-processor", "skill.chargeback-responder"],
+      "forbiddenIds": ["rule.android-kotlin-guidelines", "rule.ml-model-governance", "skill.android-kotlin-component", "skill.data-notebook-runner"],
+      "mustCite": ["rule.refund-chargeback"],
+      "mustQuote": ["idempoten"],
+      "mustNotCite": ["rule.android-kotlin-guidelines", "rule.ml-model-governance"]
+    },
+    {
+      "id": "pq-inventory-race",
+      "phase": "inventory",
+      "question": "Two checkouts race to reserve the last unit of SKU-ACME-WIDGET-001. Which rules govern inventory reservation? Name each rule id and the required reservation property.",
+      "expectedIds": ["rule.inventory-reservation"],
+      "expectedSkills": ["skill.inventory-reserver", "skill.stock-reconciler"],
+      "forbiddenIds": ["rule.android-kotlin-guidelines", "rule.ml-model-governance", "skill.android-kotlin-component"],
+      "mustCite": ["rule.inventory-reservation"],
+      "mustQuote": ["reserv"],
+      "mustNotCite": ["rule.android-kotlin-guidelines"]
+    },
+    {
+      "id": "pq-gdpr-delete",
+      "phase": "privacy",
+      "question": "Customer cust_test_2207 requests full deletion of their data including erin.test@example.com. Which rules govern this erasure? Name each rule id and one required deletion step.",
+      "expectedIds": ["rule.gdpr-deletion"],
+      "expectedSkills": ["skill.gdpr-eraser"],
+      "forbiddenIds": ["rule.android-kotlin-guidelines", "rule.ml-model-governance", "skill.android-kotlin-component"],
+      "mustCite": ["rule.gdpr-deletion"],
+      "mustQuote": ["delet", "eras"],
+      "mustNotCite": ["rule.android-kotlin-guidelines"]
+    },
+    {
+      "id": "pq-notification-retry",
+      "phase": "notifications",
+      "question": "The order-confirmation email bounced and SMS fallback is needed. Which rules govern notification delivery and retry? Name each rule id.",
+      "expectedIds": ["rule.notification-delivery"],
+      "expectedSkills": ["skill.notification-sender", "skill.sms-fallback-sender"],
+      "forbiddenIds": ["rule.android-kotlin-guidelines", "rule.ml-model-governance", "skill.android-kotlin-component"],
+      "mustCite": ["rule.notification-delivery"],
+      "mustQuote": [],
+      "mustNotCite": ["rule.android-kotlin-guidelines"]
+    },
+    {
+      "id": "pq-android",
+      "phase": "ui",
+      "question": "Which Kotlin Jetpack Compose navigation pattern should the web checkout flow use, and which rule specifies it?",
+      "expectedIds": [],
+      "expectedSkills": [],
+      "forbiddenIds": ["rule.android-kotlin-guidelines", "skill.android-kotlin-component"],
+      "mustCite": [],
+      "mustQuote": ["not applic", "no kotlin", "does not apply", "web checkout", "irrelevant"],
+      "mustNotCite": ["rule.android-kotlin-guidelines", "skill.android-kotlin-component"]
+    },
+    {
+      "id": "pq-notebook",
+      "phase": "verification",
+      "question": "Should we validate this checkout change by running the data-science notebook runner workflow? Answer yes or no first, then explain in one sentence.",
+      "expectedIds": [],
+      "expectedSkills": [],
+      "forbiddenIds": ["skill.data-notebook-runner"],
+      "mustCite": [],
+      "mustQuote": ["no"],
+      "mustNotCite": ["skill.data-notebook-runner"]
+    }
+  ]
+}

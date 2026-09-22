@@ -16,18 +16,15 @@ describe("lifecycle resolver", () => {
   test("activates above threshold, retains in middle band, unloads after streak", async () => {
     const cat = await loadCatalog("fixtures/apm-package");
     const r = new LifecycleResolver(cat.byId, await cfg());
-    const id = "rule.brand-ui-copy";
+    const id = "rule.brand-ui-copy"; // action lifetime: 1 low score evicts
     // Activate.
     let s = r.step(evt(0, "ui"), new Map([[id, { probability: 0.9, source: "system_one" as const }]]), null, "system_one");
     expect(s.activeAfter).toContain(id);
     // Middle band: retained, streak untouched.
     s = r.step(evt(1, "ui"), new Map([[id, { probability: 0.25, source: "system_one" as const }]]), null, "system_one");
     expect(s.activeAfter).toContain(id);
-    // Below unload: first strike retains (phase unchanged needs streak+1).
+    // Below unload: single strike evicts (action lifetime).
     s = r.step(evt(2, "ui"), new Map([[id, { probability: 0.05, source: "system_one" as const }]]), null, "system_one");
-    expect(s.activeAfter).toContain(id);
-    // Phase change + still low: still retained (streak 2 of required 2? phaseChanged lowers requirement).
-    s = r.step(evt(3, "other"), new Map([[id, { probability: 0.05, source: "system_one" as const }]]), null, "system_one");
     expect(s.activeAfter).not.toContain(id);
     expect(s.removed).toContain(id);
   });
@@ -66,12 +63,12 @@ describe("lifecycle resolver", () => {
   test("skill supersede dematerializes the previous skill", async () => {
     const cat = await loadCatalog("fixtures/apm-package");
     const r = new LifecycleResolver(cat.byId, await cfg());
-    let s = r.step(evt(0, "a"), new Map(), "skill.stripe-checkout-session", "system_one");
-    expect(s.activeAfter).toContain("skill.stripe-checkout-session");
-    s = r.step(evt(1, "b"), new Map(), "skill.stripe-webhook-handler", "system_one");
-    expect(s.activeAfter).toContain("skill.stripe-webhook-handler");
-    expect(s.activeAfter).not.toContain("skill.stripe-checkout-session");
-    expect(s.removed).toContain("skill.stripe-checkout-session");
+    let s = r.step(evt(0, "a"), new Map(), "skill.create-checkout-session", "system_one");
+    expect(s.activeAfter).toContain("skill.create-checkout-session");
+    s = r.step(evt(1, "b"), new Map(), "skill.handle-webhook", "system_one");
+    expect(s.activeAfter).toContain("skill.handle-webhook");
+    expect(s.activeAfter).not.toContain("skill.create-checkout-session");
+    expect(s.removed).toContain("skill.create-checkout-session");
   });
 
   test("task-lifetime rules resist unload streaks", async () => {

@@ -11,14 +11,14 @@
 // verification per trial. local/qwen3 is the default smoke model.
 
 import { createHash } from "node:crypto";
-import { cp, mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { cp, mkdir, mkdtemp, readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { execFile } from "node:child_process";
 import { loadCatalog, type Catalog } from "../../packages/apm-catalog/src/catalog.ts";
 import { HeuristicBackend, SystemOneBackend, type ScoreBackend } from "../../packages/progressive-context/src/router.ts";
 import { ProgressiveSession } from "../../packages/progressive-context/src/session.ts";
-import type { Arm, ThresholdConfig } from "../../packages/protocol/src/types.ts";
+import type { Arm, TelemetryRecord, ThresholdConfig } from "../../packages/protocol/src/types.ts";
 import { CONFIG_PATH, PKG_DIR, RESULTS_DIR, REPO_ROOT, checkProvenance, collectVersions } from "./lib.ts";
 import { verifyWorkspace } from "./independent/verify-workspace.ts";
 import { parseOpencodeJson, type ParsedRun } from "./live/opencode-parser.ts";
@@ -30,6 +30,45 @@ export const TASK_PROMPT = `Complete the checkout flow in this repository: finis
 export const DEFAULT_MODEL = "local/qwen3";
 const MAX_TURNS = 12;
 const TURN_TIMEOUT_MS = 300_000;
+const MAX_TOOL_CALLS_PER_TURN = 16;
+interface LiveTrialProgress {
+  trialId: string;
+  arm: Arm;
+  status: "running" | "completed";
+  turns: number;
+  durationMs: number;
+  agentTokens: { input: number; output: number; reasoning: number; total: number };
+  context: {
+    loadedResources: number;
+    compiledResourceTokens: number;
+    loadAllResourceTokens: number;
+  };
+  materializations: number;
+  dematerializations: number;
+  verification: null | { passed: number; total: number };
+  eligibility: null | { eligible: boolean; reasons: string[] };
+}
+
+interface LiveProgressSidecar {
+  schemaVersion: 1;
+  runId: string;
+  kind: "live-paired";
+  status: "running";
+  createdAt: string;
+  updatedAt: string;
+  model: string;
+  routingBackend: "provider_backed" | "fail_open";
+  taskPromptHash: string;
+  trials: LiveTrialProgress[];
+}
+
+async function writeLiveProgress(path: string, sidecar: LiveProgressSidecar): Promise<void> {
+  sidecar.updatedAt = new Date().toISOString();
+  const tempPath = `${path}.${process.pid}.tmp`;
+  await writeFile(tempPath, `${JSON.stringify(sidecar, null, 2)}\n`);
+  await rename(tempPath, path);
+}
+
 
 function sh(cmd: string, args: string[], cwd: string, timeoutMs = 30_000): Promise<{ code: number; out: string }> {
   const { promise, resolve } = Promise.withResolvers<{ code: number; out: string }>();
@@ -44,23 +83,106 @@ export interface AgentTurnResult {
   rawBytes: number;
   ms: number;
   timedOut: boolean;
+  budgetReached: boolean;
 }
 
 async function agentTurn(model: string, opencodeBin: string, ws: string, prompt: string): Promise<AgentTurnResult> {
   const t0 = Date.now();
-  const { promise, resolve } = Promise.withResolvers<{ code: number; out: string; timedOut: boolean }>();
-  // --auto: harness constant, identical across arms (single treatment variable
-  // is APM context policy). Without it, non-interactive `opencode run` blocks
-  // forever on permission prompts and no live evidence can be produced.
-  execFile(opencodeBin, ["run", "--format", "json", "--auto", "--dir", ws, "--model", model, prompt], {
-    timeout: TURN_TIMEOUT_MS,
-    maxBuffer: 40 * 1024 * 1024,
-  }, (err, stdout, stderr) => {
-    const killed = err !== null && String(err.message ?? err).includes("ETIMEDOUT");
-    resolve({ code: err ? 1 : 0, out: `${stdout}\n${stderr}`.slice(0, 200000), timedOut: killed });
-  });
-  const r = await promise;
-  return { run: parseOpencodeJson(r.out), rawBytes: r.out.length, ms: Date.now() - t0, timedOut: r.timedOut };
+  // Native Bun spawning is required here. Bun's Node-compatible execFile shim
+  // can leave `opencode run` stalled before it opens the provider connection.
+  // The prompt travels over stdin rather than argv so long multi-turn context
+  // cannot exceed the OS argument-size limit (E2BIG).
+  const child = Bun.spawn(
+    [opencodeBin, "run", "--dir", ws, "--model", model, "--auto", "--pure", "--format", "json"],
+    {
+      cwd: ws,
+      env: process.env,
+      stdin: "pipe",
+      stdout: "pipe",
+      stderr: "pipe",
+    },
+  );
+  child.stdin.write(prompt);
+  child.stdin.end();
+  let timedOut = false;
+  let budgetReached = false;
+  const completedCalls = new Set<string>();
+  const decoder = new TextDecoder();
+  let pending = "";
+  let stdout = "";
+
+  const stdoutPromise = (async (): Promise<void> => {
+    const reader = child.stdout.getReader();
+    while (true) {
+      const chunk = await reader.read();
+      if (chunk.done) break;
+      const text = decoder.decode(chunk.value, { stream: true });
+      stdout += text;
+      pending += text;
+      const lines = pending.split("\n");
+      pending = lines.pop() ?? "";
+      for (const line of lines) {
+        try {
+          const event = JSON.parse(line) as Record<string, unknown>;
+          if (event["type"] !== "tool_use") continue;
+          const part = (event["part"] ?? {}) as Record<string, unknown>;
+          const state = (part["state"] ?? {}) as Record<string, unknown>;
+          if (state["status"] !== "completed" && state["status"] !== "error") continue;
+          const callId = typeof part["callID"] === "string"
+            ? part["callID"]
+            : `${String(part["tool"] ?? "unknown")}:${completedCalls.size}`;
+          completedCalls.add(callId);
+          if (!budgetReached && completedCalls.size >= MAX_TOOL_CALLS_PER_TURN) {
+            budgetReached = true;
+            child.kill();
+          }
+        } catch {
+          // Parser records malformed output later; streaming control stays fail-open.
+        }
+      }
+    }
+    stdout += decoder.decode();
+  })();
+
+  const timer = setTimeout(() => {
+    timedOut = true;
+    child.kill();
+  }, TURN_TIMEOUT_MS);
+  let stderr = "";
+  try {
+    [, stderr] = await Promise.all([
+      stdoutPromise,
+      new Response(child.stderr).text(),
+      child.exited,
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
+  const out = `${stdout}\n${stderr}`.slice(0, 200000);
+  return {
+    run: parseOpencodeJson(out),
+    rawBytes: out.length,
+    ms: Date.now() - t0,
+    timedOut,
+    budgetReached,
+  };
+}
+
+async function hashDirectory(root: string, relative = ""): Promise<string> {
+  const hash = createHash("sha256");
+  const entries = await readdir(join(root, relative), { withFileTypes: true });
+  entries.sort((a, b) => a.name.localeCompare(b.name));
+  for (const entry of entries) {
+    const path = join(relative, entry.name);
+    if (entry.isDirectory()) {
+      hash.update(`d:${path}\0${await hashDirectory(root, path)}\0`);
+    } else if (entry.isFile()) {
+      hash.update(`f:${path}\0`);
+      hash.update(await readFile(join(root, path)));
+      hash.update("\0");
+    }
+  }
+  return hash.digest("hex");
 }
 
 async function gitFiles(ws: string): Promise<Set<string>> {
@@ -93,6 +215,7 @@ async function runTrialArm(opts: {
   backendLabel: "provider" | "failopen";
   loadAllTokens: number;
   demoDir: string;
+  reportProgress: (trial: LiveTrialProgress) => Promise<void>;
 }): Promise<Record<string, unknown>> {
   const ws = await mkdtemp(join(tmpdir(), `jev-live-${opts.trialId}-${opts.arm}-`));
   let provenanceOk = true;
@@ -125,13 +248,45 @@ async function runTrialArm(opts: {
 
   const t0 = Date.now();
   const turnRecords: unknown[] = [];
-  const routingRecords: unknown[] = [];
+  const routingRecords: TelemetryRecord[] = [];
   let cumulativeIn = 0;
   let cumulativeOut = 0;
   let cumulativeReasoning = 0;
   let cumulativeTotal = 0;
   let prevFiles = baseFiles;
   let verificationPassed: boolean | null = null;
+  const reportProgress = (
+    status: LiveTrialProgress["status"],
+    verification: LiveTrialProgress["verification"] = null,
+    eligibility: LiveTrialProgress["eligibility"] = null,
+    durationMs = Date.now() - t0,
+  ): Promise<void> => {
+    const current = routingRecords.at(-1);
+    if (!current) throw new Error("Cannot report live trial progress before routing");
+    return opts.reportProgress({
+      trialId: opts.trialId,
+      arm: opts.arm,
+      status,
+      turns: turnRecords.length,
+      durationMs,
+      agentTokens: {
+        input: cumulativeIn,
+        output: cumulativeOut,
+        reasoning: cumulativeReasoning,
+        total: cumulativeTotal,
+      },
+      context: {
+        loadedResources: current.materializedAfter.length,
+        compiledResourceTokens: current.compiledResourceTokens,
+        loadAllResourceTokens: current.loadAllResourceTokens,
+      },
+      materializations: routingRecords.reduce((sum, record) => sum + record.added.length, 0),
+      dematerializations: routingRecords.reduce((sum, record) => sum + record.removed.length, 0),
+      verification,
+      eligibility,
+    });
+  };
+
 
   for (let turn = 0; turn < MAX_TURNS; turn++) {
     // Derive the routing event from observed execution state (not keywords).
@@ -155,10 +310,17 @@ async function runTrialArm(opts: {
     }
     const rec = await sess.runEvent(stepInput);
     routingRecords.push(rec);
+    await reportProgress("running");
 
     const harness = sess.getHarness();
     const effective = harness.effectiveContext(harness.requestCount() - 1);
-    const agentPrompt = `${effective}\n\n<task>\n${TASK_PROMPT}\n</task>\n\nWork in the current directory. Apply file changes directly. Reply with a brief summary of what you changed and what remains.`;
+    const controllerPrompt = `<controller-turn index="${turn + 1}" max="${MAX_TURNS}">
+Work on exactly one coherent next phase of the task, using at most ${MAX_TOOL_CALLS_PER_TURN} tool calls.
+Inspect the current workspace first so you continue prior work rather than restart it.
+Do not merely describe planned work: make concrete progress in this phase.
+End your response with a line containing exactly CONTINUE if work remains, or exactly DONE only when the entire task is implemented and verified.
+</controller-turn>`;
+    const agentPrompt = `${effective}\n\n${controllerPrompt}\n\n<task>\n${TASK_PROMPT}\n</task>\n\nWork in the current directory. Apply file changes directly. Reply with a brief summary of what you changed and what remains.`;
     const tres = await agentTurn(opts.model, opts.opencodeBin, ws, agentPrompt);
     cumulativeIn += tres.run.inputTokens;
     cumulativeOut += tres.run.outputTokens;
@@ -204,11 +366,13 @@ async function runTrialArm(opts: {
       turnMs: tres.run.durationMs,
       wallMs: tres.ms,
       timedOut: tres.timedOut,
+      budgetReached: tres.budgetReached,
       done: tres.run.done,
     });
+    await reportProgress("running");
 
     const doneText = /^\s*DONE\b/i.test(tres.run.assistantText) || (tres.run.assistantText.includes("DONE") && turn >= 3);
-    if (doneText || tres.timedOut) break;
+    if (doneText || (tres.timedOut && tres.run.toolCallCount === 0 && changedPaths.length === 0)) break;
     void prevFiles;
   }
   const durationMs = Date.now() - t0;
@@ -227,7 +391,7 @@ async function runTrialArm(opts: {
   // body probe is absent from the LATER request's effective context.
   const harness = sess.getHarness();
   const unloadProofs: { resourceId: string; dematerializedAt: number; absentAt: number; pass: boolean }[] = [];
-  const recs = routingRecords as { removed: string[]; materializedAfter: string[] }[];
+  const recs = routingRecords;
   for (let i = 0; i < recs.length; i++) {
     for (const id of recs[i].removed) {
       const body = opts.cat.bodies.get(id) ?? "";
@@ -243,24 +407,31 @@ async function runTrialArm(opts: {
           break;
         }
       }
-      // A removal on the final event has no "next request" — record as vacuous.
-      unloadProofs.push({ resourceId: id, dematerializedAt: i, absentAt, pass: i + 1 >= harness.requestCount() ? true : pass });
+      // A final-event removal has no later request and therefore is not proof.
+      const hasLaterRequest = i + 1 < harness.requestCount();
+      unloadProofs.push({ resourceId: id, dematerializedAt: i, absentAt, pass: hasLaterRequest && pass && absentAt >= 0 });
     }
   }
   const sentinelFailures = unloadProofs.filter((p) => !p.pass).length +
-    (routingRecords as { sentinelAssertions: { pass: boolean }[] }[]).reduce((a, r) => a + r.sentinelAssertions.filter((s) => !s.pass).length, 0);
-  const materializations = (routingRecords as { added: string[] }[]).reduce((a, r) => a + r.added.length, 0);
-  const dematerializations = (routingRecords as { removed: string[] }[]).reduce((a, r) => a + r.removed.length, 0);
+    routingRecords.reduce((a, r) => a + r.sentinelAssertions.filter((s) => !s.pass).length, 0);
+  const materializations = routingRecords.reduce((a, r) => a + r.added.length, 0);
+  const dematerializations = routingRecords.reduce((a, r) => a + r.removed.length, 0);
 
   const eligibility = classifyTrial({
     arm: opts.arm,
-    records: routingRecords as never,
+    records: routingRecords,
     sentinelFailures,
     materializations,
     dematerializations,
     verificationComplete,
     provenanceOk,
   });
+  await reportProgress(
+    "completed",
+    { passed: verification.passed, total: verification.total },
+    eligibility,
+    durationMs,
+  );
 
   return {
     trialId: opts.trialId,
@@ -298,6 +469,7 @@ async function main(): Promise<void> {
   const model = args.find((a) => a.startsWith("--model="))?.slice(8) ?? process.env["AGENT_MODEL"] ?? DEFAULT_MODEL;
   const opencodeBin = args.find((a) => a.startsWith("--opencode-bin="))?.slice(15) ?? process.env["OPENCODE_BIN"] ?? "opencode";
   const runId = `live-${new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19)}-${Math.random().toString(36).slice(2, 8)}`;
+  const createdAt = new Date().toISOString();
   const provenance = checkProvenance();
   const versions = await collectVersions();
   versions["agentModel"] = model;
@@ -305,7 +477,7 @@ async function main(): Promise<void> {
   const cfg = JSON.parse(await readFile(CONFIG_PATH, "utf8")) as ThresholdConfig;
   const cfgHash = createHash("sha256").update(JSON.stringify(cfg)).digest("hex").slice(0, 16);
   const taskPromptHash = createHash("sha256").update(TASK_PROMPT).digest("hex").slice(0, 16);
-  const baseFixtureHash = createHash("sha256").update(JSON.stringify((await import("node:fs/promises")).readdir(REPO_ROOT + "/fixtures/demo-workspace"))).digest("hex").slice(0, 16);
+  const baseFixtureHash = (await hashDirectory(join(REPO_ROOT, "fixtures/demo-workspace"))).slice(0, 16);
   const apiKey = process.env["TYPESAFE_API_KEY"];
   const backend: ScoreBackend = apiKey
     ? new SystemOneBackend(apiKey, process.env["TYPESAFE_DEFAULT_MODEL"] ?? "jev-latest")
@@ -314,6 +486,29 @@ async function main(): Promise<void> {
   console.error(`[run-live] routing backend: ${backendLabel === "provider" ? "SystemOneBackend(provider)" : "HeuristicBackend(fail_open)"} model=${model}`);
   const loadAllTokens = [...cat.byId.values()].reduce((a, d) => a + d.estimatedTokens, 0);
   const demoDir = join(REPO_ROOT, "fixtures/demo-workspace");
+  const liveDir = join(RESULTS_DIR, ".live");
+  const livePath = join(liveDir, `${runId}.json`);
+  const liveTrials = new Map<string, LiveTrialProgress>();
+  const liveSidecar: LiveProgressSidecar = {
+    schemaVersion: 1,
+    runId,
+    kind: "live-paired",
+    status: "running",
+    createdAt,
+    updatedAt: createdAt,
+    model,
+    routingBackend: backendLabel === "provider" ? "provider_backed" : "fail_open",
+    taskPromptHash,
+    trials: [],
+  };
+  const reportProgress = async (trial: LiveTrialProgress): Promise<void> => {
+    liveTrials.set(`${trial.trialId}:${trial.arm}`, trial);
+    liveSidecar.trials = [...liveTrials.values()];
+    await writeLiveProgress(livePath, liveSidecar);
+  };
+  await mkdir(liveDir, { recursive: true });
+  await writeLiveProgress(livePath, liveSidecar);
+
 
   const trialResults: Record<string, unknown>[] = [];
   for (let t = 0; t < trials; t++) {
@@ -325,14 +520,14 @@ async function main(): Promise<void> {
       const r = await runTrialArm({
         arm, trialId, model, opencodeBin, runId,
         cat, cfg, cfgHash, taskPromptHash, baseFixtureHash,
-        backend, backendLabel, loadAllTokens, demoDir,
+        backend, backendLabel, loadAllTokens, demoDir, reportProgress,
       });
       trialResults.push({ ...r, armOrder: order });
     }
   }
 
   const artifact = {
-    runId, kind: "live-paired", createdAt: new Date().toISOString(),
+    runId, kind: "live-paired", createdAt,
     taskPrompt: TASK_PROMPT,
     taskPromptHash,
     baseFixtureHash,
@@ -345,6 +540,7 @@ async function main(): Promise<void> {
   await mkdir(RESULTS_DIR, { recursive: true });
   const outPath = join(RESULTS_DIR, `${runId}.json`);
   await writeFile(outPath, JSON.stringify(artifact, null, 2));
+  await rm(livePath);
   console.log(outPath);
   for (const t of trialResults) {
     if (t && typeof t === "object" && "trialId" in t && "arm" in t && "workspace" in t) {

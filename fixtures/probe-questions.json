@@ -1,0 +1,247 @@
+{
+  "version": "probe-v1-frozen",
+  "notes": "Frozen probe set for single-session routing eval. Each probe names the phase, the question asked verbatim, rule/skill ids expected to be materialized when answering, ids that MUST stay dematerialized, and deterministic answer patterns. Distractor probes (pq-ios, pq-ml) pass only when the forbidden ids stay absent AND the answer states non-applicability. Frozen 2026-09-22; do not retune against results.",
+  "probes": [
+    {
+      "id": "pq-payments-boundary",
+      "phase": "checkout-api",
+      "question": "You are about to write app/api/checkout/route.ts. Which payment boundary rules constrain this file? Name each rule id and quote one line that forbids handling raw card data.",
+      "expectedIds": [
+        "rule.payments-card-data"
+      ],
+      "expectedSkills": [
+        "skill.create-checkout-session"
+      ],
+      "forbiddenIds": [
+        "rule.mobile-ios-guidelines",
+        "rule.ml-model-governance",
+        "skill.build-ios-component",
+        "skill.evaluate-model"
+      ],
+      "mustCite": [
+        "rule.payments-card-data"
+      ],
+      "mustQuote": [
+        "never receive, persist, log"
+      ],
+      "mustNotCite": [
+        "rule.mobile-ios-guidelines",
+        "rule.ml-model-governance"
+      ]
+    },
+    {
+      "id": "pq-card-test-data",
+      "phase": "checkout-api",
+      "question": "Is the card number 4242 4242 4242 4242 acceptable anywhere in application source, tests, or logs in this repo? Answer yes or no first, then name the rule id that decides it.",
+      "expectedIds": [
+        "rule.payments-card-data"
+      ],
+      "expectedSkills": [],
+      "forbiddenIds": [
+        "rule.mobile-ios-guidelines",
+        "rule.ml-model-governance"
+      ],
+      "mustCite": [
+        "rule.payments-card-data"
+      ],
+      "mustQuote": [
+        "no"
+      ],
+      "mustNotCite": [
+        "rule.mobile-ios-guidelines"
+      ]
+    },
+    {
+      "id": "pq-webhook-idempotency",
+      "phase": "webhook",
+      "question": "Stripe will retry the webhook endpoint. Which rules govern duplicate delivery and signature verification here? Name each rule id and state how invalid signatures must be handled (reject before processing with an error status).",
+      "expectedIds": [
+        "rule.webhook-idempotency"
+      ],
+      "expectedSkills": [
+        "skill.handle-webhook"
+      ],
+      "forbiddenIds": [
+        "rule.mobile-ios-guidelines",
+        "rule.ml-model-governance",
+        "skill.build-ios-component"
+      ],
+      "mustCite": [
+        "rule.webhook-idempotency"
+      ],
+      "mustQuote": [
+        "reject",
+        "invalid signature",
+        "signature verification",
+        "verify"
+      ],
+      "mustNotCite": [
+        "rule.mobile-ios-guidelines",
+        "rule.ml-model-governance"
+      ]
+    },
+    {
+      "id": "pq-migration-safety",
+      "phase": "migration",
+      "question": "You must persist shipping_email and shipping_address. What does the migration-safety rule require before adding a required column to populated data? Name the rule id and one required staging step.",
+      "expectedIds": [
+        "rule.database-migration-safety"
+      ],
+      "expectedSkills": [
+        "skill.migrate-postgres-schema"
+      ],
+      "forbiddenIds": [
+        "rule.mobile-ios-guidelines",
+        "rule.ml-model-governance"
+      ],
+      "mustCite": [
+        "rule.database-migration-safety"
+      ],
+      "mustQuote": [
+        "nullable",
+        "backfill",
+        "default"
+      ],
+      "mustNotCite": [
+        "rule.mobile-ios-guidelines"
+      ]
+    },
+    {
+      "id": "pq-accessible-ui",
+      "phase": "ui",
+      "question": "The cart checkout button is currently a styled div with no label. Which UI rules does this violate? Name each rule id and the required fix in one sentence.",
+      "expectedIds": [
+        "rule.accessibility-ui"
+      ],
+      "expectedSkills": [
+        "skill.build-react-component",
+        "skill.audit-interaction-accessibility"
+      ],
+      "forbiddenIds": [
+        "rule.mobile-ios-guidelines",
+        "rule.ml-model-governance",
+        "skill.build-ios-component"
+      ],
+      "mustCite": [
+        "rule.accessibility-ui"
+      ],
+      "mustQuote": [
+        "button"
+      ],
+      "mustNotCite": [
+        "rule.mobile-ios-guidelines"
+      ]
+    },
+    {
+      "id": "pq-logging-privacy",
+      "phase": "webhook",
+      "question": "A teammate proposes console.log of the full webhook payload including email and address for debugging. Which rules forbid this? Name each rule id.",
+      "expectedIds": [
+        "rule.logging-sensitive-data",
+        "rule.privacy-personal-data"
+      ],
+      "expectedSkills": [],
+      "forbiddenIds": [
+        "rule.mobile-ios-guidelines",
+        "rule.ml-model-governance"
+      ],
+      "mustCite": [
+        "rule.logging-sensitive-data"
+      ],
+      "mustQuote": [],
+      "mustNotCite": [
+        "rule.mobile-ios-guidelines"
+      ]
+    },
+    {
+      "id": "pq-deploy-checklist",
+      "phase": "deploy",
+      "question": "Before the production release, what does the change-control rule require for the migration ordering and rollback plan? Name the rule id and state the migration-before-code requirement.",
+      "expectedIds": [
+        "rule.production-change-control"
+      ],
+      "expectedSkills": [
+        "skill.prepare-deploy-checklist"
+      ],
+      "forbiddenIds": [
+        "rule.mobile-ios-guidelines",
+        "rule.ml-model-governance"
+      ],
+      "mustCite": [
+        "rule.production-change-control"
+      ],
+      "mustQuote": [
+        "migration"
+      ],
+      "mustNotCite": [
+        "rule.mobile-ios-guidelines"
+      ]
+    },
+    {
+      "id": "pq-api-errors",
+      "phase": "checkout-api",
+      "question": "The checkout route must reject invalid input. Which error-contract rule governs the status code and error shape? Name the rule id and the required property of the error payload.",
+      "expectedIds": [
+        "rule.api-error-contract"
+      ],
+      "expectedSkills": [
+        "skill.build-nextjs-route"
+      ],
+      "forbiddenIds": [
+        "rule.mobile-ios-guidelines",
+        "rule.ml-model-governance"
+      ],
+      "mustCite": [
+        "rule.api-error-contract"
+      ],
+      "mustQuote": [
+        "status"
+      ],
+      "mustNotCite": [
+        "rule.mobile-ios-guidelines"
+      ]
+    },
+    {
+      "id": "pq-ios",
+      "phase": "ui",
+      "question": "Which iOS SwiftUI navigation pattern should the web checkout flow use, and which rule specifies it?",
+      "expectedIds": [],
+      "expectedSkills": [],
+      "forbiddenIds": [
+        "rule.mobile-ios-guidelines",
+        "skill.build-ios-component"
+      ],
+      "mustCite": [],
+      "mustQuote": [
+        "not applic",
+        "no ios",
+        "does not apply",
+        "web checkout",
+        "irrelevant"
+      ],
+      "mustNotCite": [
+        "rule.mobile-ios-guidelines",
+        "skill.build-ios-component"
+      ]
+    },
+    {
+      "id": "pq-ml",
+      "phase": "verification",
+      "question": "Should we evaluate this checkout change with slice metrics over a pinned model artifact per the ML governance rule? Answer yes or no first, then explain in one sentence.",
+      "expectedIds": [],
+      "expectedSkills": [],
+      "forbiddenIds": [
+        "rule.ml-model-governance",
+        "skill.evaluate-model"
+      ],
+      "mustCite": [],
+      "mustQuote": [
+        "no"
+      ],
+      "mustNotCite": [
+        "rule.ml-model-governance",
+        "skill.evaluate-model"
+      ]
+    }
+  ]
+}

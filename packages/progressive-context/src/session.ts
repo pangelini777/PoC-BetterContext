@@ -47,6 +47,7 @@ function stateHash(s: RoutingState): string {
 
 export class ProgressiveSession {
   private resolver: LifecycleResolver;
+  private loadAllActive: string[] = [];
   private harness = new ExplicitHarness(KERNEL);
   private seq = 0;
   private recent: SemanticEvent[] = [];
@@ -151,8 +152,7 @@ export class ProgressiveSession {
       added = transitions.map((t) => t.resourceId);
       retained = activeBefore.filter((id) => all.includes(id));
       removed = [];
-      // Keep resolver aligned (not authoritative for load_all).
-      this.resolver.reset();
+      this.loadAllActive = all;
     } else if (event.kind === "completion") {
       const retired = this.resolver.complete(event);
       transitions = retired;
@@ -236,6 +236,7 @@ export class ProgressiveSession {
   }
 
   private currentActive(): string[] {
+    if (this.opts.arm === "load_all") return [...this.loadAllActive];
     const snap = this.resolver.snapshot();
     return Object.entries(snap)
       .filter(([, v]) => v.status === "materialized" || v.status === "active")

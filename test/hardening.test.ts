@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { loadCatalog } from "../packages/apm-catalog/src/catalog.ts";
 import { MockBackend } from "../packages/progressive-context/src/router.ts";
 import { LifecycleResolver } from "../packages/progressive-context/src/resolver.ts";
+import { ProgressiveSession } from "../packages/progressive-context/src/session.ts";
 import { parseOpencodeJson } from "../evals/progressive-context/live/opencode-parser.ts";
 import { deriveEvent } from "../evals/progressive-context/live/event-derive.ts";
 import { classifyTrial } from "../evals/progressive-context/live/eligibility.ts";
@@ -111,6 +112,21 @@ describe("event derivation from execution evidence", () => {
     expect(e.kind).toBe("user_message");
     expect(e.text).toBe("TASK GOAL");
   });
+
+  test("large change sets are bounded without losing phase detection", () => {
+    const changedPaths = [
+      ...Array.from({ length: 100 }, (_, i) => `generated/${String(i).padStart(3, "0")}.js`),
+      "zzz/webhook-route.ts",
+    ];
+    const e = deriveEvent({
+      turn: 4, changedPaths, newFiles: changedPaths, toolNames: ["write"],
+      toolArgsText: "", verificationRunning: false, verificationPassed: null,
+      agentTextExcerpt: "",
+    }, "goal");
+    expect(e.phase).toBe("webhook");
+    expect(e.changedPaths).toHaveLength(64);
+    expect(e.text).toContain("(+37 more paths omitted)");
+  });
 });
 
 describe("opencode JSON parser", () => {
@@ -147,6 +163,31 @@ describe("opencode JSON parser", () => {
     const stream = JSON.stringify({ type: "step_finish", part: { type: "step-finish", reason: "stop", tokens: { input: 10, output: 5, reasoning: 50, total: 65 } } });
     const run = parseOpencodeJson(stream);
     expect(run.reasoningTokens).toBe(50);
+  });
+});
+
+describe("load-all lifecycle telemetry", () => {
+  test("resources materialize once and are retained on later events", async () => {
+    const cat = await loadCatalog("fixtures/apm-package");
+    const session = new ProgressiveSession({
+      runId: "load-all-test",
+      sessionId: "load-all-test",
+      arm: "load_all",
+      goal: "test",
+      catalogHash: cat.hash,
+      bodies: cat.bodies,
+      rules: cat.rules,
+      skills: cat.skills,
+      byId: cat.byId,
+      cfg: await cfg(),
+      backend: new MockBackend({}),
+      loadAllTokens: [...cat.byId.values()].reduce((sum, descriptor) => sum + descriptor.estimatedTokens, 0),
+    });
+    const first = await session.runEvent({ kind: "user_message", text: "start" });
+    const second = await session.runEvent({ kind: "observation", text: "continue" });
+    expect(first.added).toHaveLength(cat.byId.size);
+    expect(second.added).toEqual([]);
+    expect(second.retained).toHaveLength(cat.byId.size);
   });
 });
 

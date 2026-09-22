@@ -4,11 +4,11 @@ import { loadCatalog } from "../packages/apm-catalog/src/catalog.ts";
 const PKG = "fixtures/apm-package";
 
 describe("catalog", () => {
-  test("indexes exactly 15 rules and 14 skills", async () => {
+  test("indexes exactly 36 rules and 58 skills", async () => {
     const cat = await loadCatalog(PKG);
-    expect(cat.rules.length).toBe(15);
-    expect(cat.skills.length).toBe(14);
-    expect(cat.byId.size).toBe(29);
+    expect(cat.rules.length).toBe(36);
+    expect(cat.skills.length).toBe(58);
+    expect(cat.byId.size).toBe(94);
   });
 
   test("every resource has id, summary, sha, path, tokens, lifetime, deps", async () => {
@@ -29,10 +29,10 @@ describe("catalog", () => {
     for (const id of [
       "rule.mobile-ios-guidelines",
       "rule.ml-model-governance",
-      "skill.postgres-schema-migration",
-      "skill.postgres-readonly-query",
-      "skill.stripe-checkout-session",
-      "skill.stripe-webhook-handler",
+      "skill.migrate-postgres-schema",
+      "skill.query-postgres-readonly",
+      "skill.create-checkout-session",
+      "skill.handle-webhook",
     ]) {
       expect(cat.byId.has(id)).toBe(true);
     }

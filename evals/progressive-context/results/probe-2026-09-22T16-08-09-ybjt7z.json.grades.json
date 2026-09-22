@@ -1,0 +1,1403 @@
+{
+  "artifact": "evals/progressive-context/results/probe-2026-09-22T16-08-09-ybjt7z.json",
+  "model": "jev-latest",
+  "gradedAt": "2026-09-22T16:27:51.835Z",
+  "usage": {
+    "input_tokens": 54178,
+    "output_tokens": 1662
+  },
+  "arms": {
+    "apm_discovery": [
+      {
+        "probeId": "pq-payments-boundary",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.payments-card-data": 0.9
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-card-test-data",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.payments-card-data": 0.82
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-card-test-data-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.payments-card-data": 0.82
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.5,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-webhook-idempotency",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.webhook-idempotency": 0.59
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-webhook-idempotency-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.webhook-idempotency": 0.75
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.25,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-migration-safety",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.database-migration-safety": 0.95
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-migration-safety-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.database-migration-safety": 0.75
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.16666666666666666,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-accessible-ui",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.accessibility-ui": 0.92
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-accessible-ui-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.accessibility-ui": 0.66
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.125,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-logging-privacy",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.logging-sensitive-data": 0.89,
+          "rule.privacy-personal-data": 0.9
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-logging-privacy-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.logging-sensitive-data": 0.77,
+          "rule.privacy-personal-data": 0.78
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.18181818181818182,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-deploy-checklist",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.production-change-control": 0.88
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-deploy-checklist-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.production-change-control": 0.73
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.07692307692307693,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-api-errors",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.api-error-contract": 0.86
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-api-errors-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.api-error-contract": 0.74
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.06666666666666667,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-ios",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "correctly-dismissed",
+          "probabilities": {
+            "contradicts": 0,
+            "correctly-dismissed": 1,
+            "follows": 0
+          },
+          "confidence": 1
+        },
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-ios-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "follows",
+          "probabilities": {
+            "follows": 0.83,
+            "correctly-dismissed": 0.17,
+            "contradicts": 0
+          },
+          "confidence": 0.74
+        },
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-ml",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "correctly-dismissed",
+          "probabilities": {
+            "follows": 0,
+            "correctly-dismissed": 1,
+            "contradicts": 0
+          },
+          "confidence": 1
+        },
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-ml-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "follows",
+          "probabilities": {
+            "correctly-dismissed": 0.17,
+            "follows": 0.83,
+            "contradicts": 0
+          },
+          "confidence": 0.75
+        },
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-refund-flow",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.refund-chargeback": 0.52
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-refund-flow-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.refund-chargeback": 0.65
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.058823529411764705,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-inventory-race",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.inventory-reservation": 0.66
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-inventory-race-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.inventory-reservation": 0.67
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.05263157894736842,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-gdpr-delete",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.gdpr-deletion": 0.79
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-gdpr-delete-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.gdpr-deletion": 0.64
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.047619047619047616,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-notification-retry",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.notification-delivery": 0.59
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-notification-retry-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.notification-delivery": 0.67
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.041666666666666664,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-android",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "correctly-dismissed",
+          "probabilities": {
+            "follows": 0,
+            "correctly-dismissed": 1,
+            "contradicts": 0
+          },
+          "confidence": 1
+        },
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-android-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "follows",
+          "probabilities": {
+            "correctly-dismissed": 0.14,
+            "contradicts": 0,
+            "follows": 0.86
+          },
+          "confidence": 0.79
+        },
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-notebook",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "correctly-dismissed",
+          "probabilities": {
+            "follows": 0.01,
+            "correctly-dismissed": 0.96,
+            "contradicts": 0.03
+          },
+          "confidence": 0.93
+        },
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-notebook-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "follows",
+          "probabilities": {
+            "contradicts": 0,
+            "follows": 0.86,
+            "correctly-dismissed": 0.14
+          },
+          "confidence": 0.79
+        },
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-rate-limit",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.rate-limiting": 0.67
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-rate-limit-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.rate-limiting": 0.63
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.038461538461538464,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-caching",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.caching-policy": 0.77
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-caching-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.caching-policy": 0.59
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.03571428571428571,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-order-state",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.order-state-machine": 0.71
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-order-state-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.order-state-machine": 0.67
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.03333333333333333,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-audit",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.audit-trails": 0.81
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-audit-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.audit-trails": 0.65
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.03125,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-flags",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.feature-flags": 0.77
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-canary-slo",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.canary-deploys": 0.59,
+          "rule.slo-error-budgets": 0.6
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-canary-slo-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.canary-deploys": 0.62,
+          "rule.slo-error-budgets": 0.63
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.05405405405405406,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-tax",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.tax-calculation": 0.77
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-currency",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.multi-currency": 0.63
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-currency-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {
+          "rule.multi-currency": 0.62
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.024390243902439025,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-lookalike-readonly",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "correctly-dismissed",
+          "probabilities": {
+            "correctly-dismissed": 0.76,
+            "follows": 0.23,
+            "contradicts": 0.01
+          },
+          "confidence": 0.63
+        },
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-lookalike-readonly-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "follows",
+          "probabilities": {
+            "follows": 0.87,
+            "correctly-dismissed": 0.13,
+            "contradicts": 0
+          },
+          "confidence": 0.81
+        },
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-lookalike-checkout",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "follows",
+          "probabilities": {
+            "follows": 0.75,
+            "correctly-dismissed": 0.25,
+            "contradicts": 0
+          },
+          "confidence": 0.62
+        },
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      }
+    ]
+  },
+  "quality": {
+    "apm_discovery": {
+      "rulePrecision": null,
+      "ruleRecall": 1,
+      "criticalMisses": 0,
+      "skillAccuracy": null,
+      "staleTokens": 0,
+      "missingTokens": 0,
+      "staleRatio": null,
+      "evictionFidelity": null,
+      "selfReportAccuracy": 0.7727272727272727,
+      "discoveredIds": [
+        "rule.accessibility-ui",
+        "rule.android-kotlin-guidelines",
+        "rule.api-error-contract",
+        "rule.audit-trails",
+        "rule.caching-policy",
+        "rule.canary-deploys",
+        "rule.database-migration-safety",
+        "rule.feature-flags",
+        "rule.gdpr-deletion",
+        "rule.inventory-reservation",
+        "rule.logging-sensitive-data",
+        "rule.ml-model-governance",
+        "rule.mobile-ios-guidelines",
+        "rule.multi-currency",
+        "rule.notification-delivery",
+        "rule.order-state-machine",
+        "rule.payments-card-data",
+        "rule.privacy-personal-data",
+        "rule.production-change-control",
+        "rule.rate-limiting",
+        "rule.refund-chargeback",
+        "rule.slo-error-budgets",
+        "rule.tax-calculation",
+        "rule.webhook-idempotency",
+        "skill.analyze-canary",
+        "skill.audit-interaction-accessibility",
+        "skill.build-nextjs-route",
+        "skill.build-react-component",
+        "skill.calculate-tax",
+        "skill.convert-currency",
+        "skill.create-checkout-session",
+        "skill.erase-personal-data",
+        "skill.evaluate-flag",
+        "skill.export-audit-trail",
+        "skill.handle-webhook",
+        "skill.inspect-order-state",
+        "skill.invalidate-cache",
+        "skill.limit-rate",
+        "skill.migrate-postgres-schema",
+        "skill.prepare-deploy-checklist",
+        "skill.process-refund",
+        "skill.query-postgres-readonly",
+        "skill.replay-webhook",
+        "skill.reserve-inventory",
+        "skill.respond-chargeback",
+        "skill.run-data-notebook",
+        "skill.scrub-logs",
+        "skill.send-notification",
+        "skill.send-sms-fallback",
+        "skill.warm-cache"
+      ],
+      "discoveredTokens": 24009,
+      "discoveredFiles": {
+        "rule.payments-card-data": {
+          "probes": [
+            "pq-payments-boundary"
+          ],
+          "tokens": 281
+        },
+        "skill.create-checkout-session": {
+          "probes": [
+            "pq-payments-boundary"
+          ],
+          "tokens": 175
+        },
+        "rule.webhook-idempotency": {
+          "probes": [
+            "pq-webhook-idempotency"
+          ],
+          "tokens": 267
+        },
+        "skill.handle-webhook": {
+          "probes": [
+            "pq-webhook-idempotency"
+          ],
+          "tokens": 172
+        },
+        "skill.replay-webhook": {
+          "probes": [
+            "pq-webhook-idempotency"
+          ],
+          "tokens": 523
+        },
+        "rule.database-migration-safety": {
+          "probes": [
+            "pq-migration-safety"
+          ],
+          "tokens": 273
+        },
+        "skill.migrate-postgres-schema": {
+          "probes": [
+            "pq-migration-safety"
+          ],
+          "tokens": 188
+        },
+        "rule.accessibility-ui": {
+          "probes": [
+            "pq-accessible-ui"
+          ],
+          "tokens": 301
+        },
+        "skill.audit-interaction-accessibility": {
+          "probes": [
+            "pq-accessible-ui"
+          ],
+          "tokens": 175
+        },
+        "skill.build-react-component": {
+          "probes": [
+            "pq-accessible-ui"
+          ],
+          "tokens": 176
+        },
+        "rule.logging-sensitive-data": {
+          "probes": [
+            "pq-logging-privacy"
+          ],
+          "tokens": 258
+        },
+        "rule.privacy-personal-data": {
+          "probes": [
+            "pq-logging-privacy"
+          ],
+          "tokens": 267
+        },
+        "skill.scrub-logs": {
+          "probes": [
+            "pq-logging-privacy"
+          ],
+          "tokens": 575
+        },
+        "rule.production-change-control": {
+          "probes": [
+            "pq-deploy-checklist"
+          ],
+          "tokens": 263
+        },
+        "skill.prepare-deploy-checklist": {
+          "probes": [
+            "pq-deploy-checklist"
+          ],
+          "tokens": 167
+        },
+        "rule.api-error-contract": {
+          "probes": [
+            "pq-api-errors"
+          ],
+          "tokens": 265
+        },
+        "skill.build-nextjs-route": {
+          "probes": [
+            "pq-api-errors"
+          ],
+          "tokens": 166
+        },
+        "rule.mobile-ios-guidelines": {
+          "probes": [
+            "pq-ios"
+          ],
+          "tokens": 184
+        },
+        "rule.ml-model-governance": {
+          "probes": [
+            "pq-ml"
+          ],
+          "tokens": 192
+        },
+        "rule.refund-chargeback": {
+          "probes": [
+            "pq-refund-flow"
+          ],
+          "tokens": 828
+        },
+        "skill.process-refund": {
+          "probes": [
+            "pq-refund-flow"
+          ],
+          "tokens": 679
+        },
+        "skill.respond-chargeback": {
+          "probes": [
+            "pq-refund-flow"
+          ],
+          "tokens": 587
+        },
+        "rule.inventory-reservation": {
+          "probes": [
+            "pq-inventory-race"
+          ],
+          "tokens": 658
+        },
+        "skill.reserve-inventory": {
+          "probes": [
+            "pq-inventory-race"
+          ],
+          "tokens": 574
+        },
+        "rule.gdpr-deletion": {
+          "probes": [
+            "pq-gdpr-delete"
+          ],
+          "tokens": 635
+        },
+        "skill.erase-personal-data": {
+          "probes": [
+            "pq-gdpr-delete"
+          ],
+          "tokens": 611
+        },
+        "rule.notification-delivery": {
+          "probes": [
+            "pq-notification-retry"
+          ],
+          "tokens": 772
+        },
+        "skill.send-notification": {
+          "probes": [
+            "pq-notification-retry"
+          ],
+          "tokens": 599
+        },
+        "skill.send-sms-fallback": {
+          "probes": [
+            "pq-notification-retry"
+          ],
+          "tokens": 556
+        },
+        "rule.android-kotlin-guidelines": {
+          "probes": [
+            "pq-android"
+          ],
+          "tokens": 616
+        },
+        "skill.run-data-notebook": {
+          "probes": [
+            "pq-notebook"
+          ],
+          "tokens": 653
+        },
+        "rule.rate-limiting": {
+          "probes": [
+            "pq-rate-limit"
+          ],
+          "tokens": 767
+        },
+        "skill.limit-rate": {
+          "probes": [
+            "pq-rate-limit"
+          ],
+          "tokens": 716
+        },
+        "rule.caching-policy": {
+          "probes": [
+            "pq-caching"
+          ],
+          "tokens": 872
+        },
+        "skill.invalidate-cache": {
+          "probes": [
+            "pq-caching"
+          ],
+          "tokens": 582
+        },
+        "skill.warm-cache": {
+          "probes": [
+            "pq-caching"
+          ],
+          "tokens": 618
+        },
+        "rule.order-state-machine": {
+          "probes": [
+            "pq-order-state"
+          ],
+          "tokens": 649
+        },
+        "skill.inspect-order-state": {
+          "probes": [
+            "pq-order-state"
+          ],
+          "tokens": 549
+        },
+        "rule.audit-trails": {
+          "probes": [
+            "pq-audit"
+          ],
+          "tokens": 587
+        },
+        "skill.export-audit-trail": {
+          "probes": [
+            "pq-audit"
+          ],
+          "tokens": 611
+        },
+        "rule.feature-flags": {
+          "probes": [
+            "pq-flags"
+          ],
+          "tokens": 465
+        },
+        "skill.evaluate-flag": {
+          "probes": [
+            "pq-flags"
+          ],
+          "tokens": 567
+        },
+        "rule.canary-deploys": {
+          "probes": [
+            "pq-canary-slo"
+          ],
+          "tokens": 519
+        },
+        "rule.slo-error-budgets": {
+          "probes": [
+            "pq-canary-slo"
+          ],
+          "tokens": 586
+        },
+        "skill.analyze-canary": {
+          "probes": [
+            "pq-canary-slo"
+          ],
+          "tokens": 613
+        },
+        "rule.tax-calculation": {
+          "probes": [
+            "pq-tax"
+          ],
+          "tokens": 629
+        },
+        "skill.calculate-tax": {
+          "probes": [
+            "pq-tax"
+          ],
+          "tokens": 666
+        },
+        "rule.multi-currency": {
+          "probes": [
+            "pq-currency"
+          ],
+          "tokens": 654
+        },
+        "skill.convert-currency": {
+          "probes": [
+            "pq-currency"
+          ],
+          "tokens": 552
+        },
+        "skill.query-postgres-readonly": {
+          "probes": [
+            "pq-lookalike-readonly"
+          ],
+          "tokens": 171
+        }
+      }
+    }
+  }
+}

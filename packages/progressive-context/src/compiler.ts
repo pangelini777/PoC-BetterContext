@@ -58,8 +58,9 @@ export function compileOverlay(
     if (body === undefined) throw new Error(`compileOverlay: missing body for ${id}`);
     const kind = id.startsWith("skill.") ? "skill" : "rule";
     const short = id.slice(id.indexOf(".") + 1);
+    const kindTag = kind === "skill" ? "[SKILL — procedure, how to do it]" : "[RULE — constraint, what must hold]";
     resourceTokenEstimate += Math.max(1, Math.ceil(body.length / 4));
-    parts.push(`  <${kind} id="${id}" name="${short}" sha256="${sha256Hex(body)}">\n${body}\n  </${kind}>`);
+    parts.push(`  <${kind} id="${id}" name="${short}" sha256="${sha256Hex(body)}">\n  ${kindTag}\n${body}\n  </${kind}>`);
   }
   const dynamicOverlay =
     ids.length === 0

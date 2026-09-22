@@ -1,0 +1,4574 @@
+{
+  "artifact": "evals/progressive-context/results/probe-2026-09-22T09-49-26-a4xdvb.json",
+  "model": "jev-latest",
+  "gradedAt": "2026-09-22T10:41:11.480Z",
+  "usage": {
+    "input_tokens": 256117,
+    "output_tokens": 13987
+  },
+  "arms": {
+    "load_all_single": [
+      {
+        "probeId": "pq-payments-boundary",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {
+          "rule.payments-card-data": 0.95
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-card-test-data",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {
+          "rule.payments-card-data": 0.87
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-card-test-data-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.payments-card-data": 0.87
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 1,
+          "agreementWithRunner": 0.010638297872340425
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-webhook-idempotency",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {
+          "rule.webhook-idempotency": 0.61,
+          "rule.secrets-management": 0.61
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-webhook-idempotency-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.webhook-idempotency": 0.56,
+          "rule.secrets-management": 0.56
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0.5,
+          "precisionVsExpected": 0.5,
+          "agreementWithRunner": 0.02127659574468085
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-migration-safety",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {
+          "rule.database-migration-safety": 0.96
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-migration-safety-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.database-migration-safety": 0.83
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 1,
+          "agreementWithRunner": 0.010638297872340425
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-accessible-ui",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {
+          "rule.accessibility-ui": 0.88
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-accessible-ui-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.accessibility-ui": 0.73
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.5,
+          "agreementWithRunner": 0.02127659574468085
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-logging-privacy",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {
+          "rule.logging-sensitive-data": 0.65,
+          "rule.privacy-personal-data": 0.66
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-logging-privacy-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.logging-sensitive-data": 0.79,
+          "rule.privacy-personal-data": 0.77
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.6666666666666666,
+          "agreementWithRunner": 0.031914893617021274
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-deploy-checklist",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {
+          "rule.production-change-control": 0.84
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-deploy-checklist-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.production-change-control": 0.7
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.5,
+          "agreementWithRunner": 0.02127659574468085
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-api-errors",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {
+          "rule.api-error-contract": 0.87
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-api-errors-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.api-error-contract": 0.76
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.5,
+          "agreementWithRunner": 0.02127659574468085
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-ios",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "correctly-dismissed",
+          "probabilities": {
+            "follows": 0,
+            "contradicts": 0,
+            "correctly-dismissed": 1
+          },
+          "confidence": 1
+        },
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-ios-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "correctly-dismissed",
+          "probabilities": {
+            "follows": 0.01,
+            "contradicts": 0.01,
+            "correctly-dismissed": 0.98
+          },
+          "confidence": 0.98
+        },
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 1,
+          "agreementWithRunner": 0
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-ml",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "correctly-dismissed",
+          "probabilities": {
+            "correctly-dismissed": 1,
+            "follows": 0,
+            "contradicts": 0
+          },
+          "confidence": 1
+        },
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-ml-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "correctly-dismissed",
+          "probabilities": {
+            "correctly-dismissed": 0.99,
+            "follows": 0.01,
+            "contradicts": 0
+          },
+          "confidence": 0.97
+        },
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 1,
+          "agreementWithRunner": 0
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-refund-flow",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {
+          "rule.refund-chargeback": 0.67
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-refund-flow-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.refund-chargeback": 0.7
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.5,
+          "agreementWithRunner": 0.02127659574468085
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-inventory-race",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {
+          "rule.inventory-reservation": 0.65
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-inventory-race-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.inventory-reservation": 0.72
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.5,
+          "agreementWithRunner": 0.02127659574468085
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-gdpr-delete",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {
+          "rule.gdpr-deletion": 0.63
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-gdpr-delete-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.gdpr-deletion": 0.74
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.3333333333333333,
+          "agreementWithRunner": 0.031914893617021274
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-notification-retry",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {
+          "rule.notification-delivery": 0.55
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-notification-retry-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.notification-delivery": 0.68
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.3333333333333333,
+          "agreementWithRunner": 0.031914893617021274
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-android",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "correctly-dismissed",
+          "probabilities": {
+            "follows": 0.01,
+            "correctly-dismissed": 0.99,
+            "contradicts": 0
+          },
+          "confidence": 0.99
+        },
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-android-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "correctly-dismissed",
+          "probabilities": {
+            "follows": 0.01,
+            "contradicts": 0,
+            "correctly-dismissed": 0.99
+          },
+          "confidence": 0.98
+        },
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 1,
+          "agreementWithRunner": 0
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-notebook",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "correctly-dismissed",
+          "probabilities": {
+            "follows": 0,
+            "contradicts": 0,
+            "correctly-dismissed": 1
+          },
+          "confidence": 0.99
+        },
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-notebook-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "correctly-dismissed",
+          "probabilities": {
+            "follows": 0.02,
+            "correctly-dismissed": 0.98,
+            "contradicts": 0
+          },
+          "confidence": 0.97
+        },
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 1,
+          "agreementWithRunner": 0
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-rate-limit",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {
+          "rule.rate-limiting": 0.62
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-rate-limit-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.rate-limiting": 0.67
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.5,
+          "agreementWithRunner": 0.02127659574468085
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-caching",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {
+          "rule.caching-policy": 0.83
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-caching-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.caching-policy": 0.69
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.5,
+          "agreementWithRunner": 0.02127659574468085
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-order-state",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {
+          "rule.order-state-machine": 0.59
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-order-state-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.order-state-machine": 0.7
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.5,
+          "agreementWithRunner": 0.02127659574468085
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-audit",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {
+          "rule.audit-trails": 0.8
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-audit-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.audit-trails": 0.74
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 1,
+          "agreementWithRunner": 0.010638297872340425
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-flags",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {
+          "rule.feature-flags": 0.61
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-canary-slo",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {
+          "rule.canary-deploys": 0.52,
+          "rule.slo-error-budgets": 0.51
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-canary-slo-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.canary-deploys": 0.69,
+          "rule.slo-error-budgets": 0.68
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.6666666666666666,
+          "agreementWithRunner": 0.031914893617021274
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-tax",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {
+          "rule.tax-calculation": 0.76
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-currency",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {
+          "rule.multi-currency": 0.56
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-currency-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.multi-currency": 0.74
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.5,
+          "agreementWithRunner": 0.02127659574468085
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-lookalike-readonly",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "correctly-dismissed",
+          "probabilities": {
+            "correctly-dismissed": 0.71,
+            "contradicts": 0.01,
+            "follows": 0.28
+          },
+          "confidence": 0.56
+        },
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-lookalike-readonly-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "follows",
+          "probabilities": {
+            "follows": 0.86,
+            "correctly-dismissed": 0.14,
+            "contradicts": 0
+          },
+          "confidence": 0.78
+        },
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": 0.010638297872340425
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-lookalike-checkout",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": false,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "follows",
+          "probabilities": {
+            "follows": 0.75,
+            "correctly-dismissed": 0.24,
+            "contradicts": 0.01
+          },
+          "confidence": 0.62
+        },
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      }
+    ],
+    "apm_discovery": [
+      {
+        "probeId": "pq-payments-boundary",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.payments-card-data": 0.86
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-card-test-data",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.payments-card-data": 0.85
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-card-test-data-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.payments-card-data": 0.85
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-webhook-idempotency",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.webhook-idempotency": 0.39,
+          "rule.secrets-management": 0.38
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-webhook-idempotency-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.webhook-idempotency": 0.5,
+          "rule.secrets-management": 0.49
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-migration-safety",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.database-migration-safety": 0.94
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-migration-safety-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.database-migration-safety": 0.77
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-accessible-ui",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.accessibility-ui": 0.88
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-accessible-ui-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.accessibility-ui": 0.71
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-logging-privacy",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.logging-sensitive-data": 0.85,
+          "rule.privacy-personal-data": 0.85
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-logging-privacy-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.logging-sensitive-data": 0.78,
+          "rule.privacy-personal-data": 0.79
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-deploy-checklist",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.production-change-control": 0.79
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-deploy-checklist-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.production-change-control": 0.74
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-api-errors",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.api-error-contract": 0.86
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-api-errors-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.api-error-contract": 0.76
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-ios",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "correctly-dismissed",
+          "probabilities": {
+            "correctly-dismissed": 1,
+            "follows": 0,
+            "contradicts": 0
+          },
+          "confidence": 1
+        },
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-ios-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "follows",
+          "probabilities": {
+            "follows": 0.8,
+            "correctly-dismissed": 0.2,
+            "contradicts": 0
+          },
+          "confidence": 0.7
+        },
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-ml",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "correctly-dismissed",
+          "probabilities": {
+            "follows": 0,
+            "correctly-dismissed": 1,
+            "contradicts": 0
+          },
+          "confidence": 1
+        },
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-ml-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "follows",
+          "probabilities": {
+            "follows": 0.8,
+            "correctly-dismissed": 0.19,
+            "contradicts": 0.01
+          },
+          "confidence": 0.71
+        },
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-refund-flow",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.refund-chargeback": 0.61
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-refund-flow-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.refund-chargeback": 0.72
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-inventory-race",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.inventory-reservation": 0.5
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-inventory-race-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.inventory-reservation": 0.7
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-gdpr-delete",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.gdpr-deletion": 0.68
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-gdpr-delete-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.gdpr-deletion": 0.66
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-notification-retry",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.notification-delivery": 0.51
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-notification-retry-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.notification-delivery": 0.69
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-android",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "correctly-dismissed",
+          "probabilities": {
+            "correctly-dismissed": 0.99,
+            "follows": 0.01,
+            "contradicts": 0
+          },
+          "confidence": 0.99
+        },
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-android-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "follows",
+          "probabilities": {
+            "follows": 0.81,
+            "correctly-dismissed": 0.18,
+            "contradicts": 0.01
+          },
+          "confidence": 0.72
+        },
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-notebook",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "correctly-dismissed",
+          "probabilities": {
+            "follows": 0,
+            "correctly-dismissed": 1,
+            "contradicts": 0
+          },
+          "confidence": 0.99
+        },
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-notebook-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "follows",
+          "probabilities": {
+            "correctly-dismissed": 0.16,
+            "contradicts": 0,
+            "follows": 0.84
+          },
+          "confidence": 0.75
+        },
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-rate-limit",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.rate-limiting": 0.72
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-rate-limit-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.rate-limiting": 0.68
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-caching",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.caching-policy": 0.68
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-caching-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.caching-policy": 0.61
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-order-state",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.order-state-machine": 0.72
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-order-state-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.order-state-machine": 0.64
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-audit",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.audit-trails": 0.68
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-audit-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.audit-trails": 0.65
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-flags",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.feature-flags": 0.68
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-canary-slo",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.canary-deploys": 0.43,
+          "rule.slo-error-budgets": 0.43
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-canary-slo-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.canary-deploys": 0.62,
+          "rule.slo-error-budgets": 0.62
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-tax",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.tax-calculation": 0.75
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-currency",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.multi-currency": 0.55
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-currency-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": false
+        },
+        "noul": {
+          "rule.multi-currency": 0.62
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-lookalike-readonly",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "correctly-dismissed",
+          "probabilities": {
+            "follows": 0.17,
+            "correctly-dismissed": 0.82,
+            "contradicts": 0.01
+          },
+          "confidence": 0.73
+        },
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-lookalike-readonly-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "follows",
+          "probabilities": {
+            "correctly-dismissed": 0.15,
+            "contradicts": 0.01,
+            "follows": 0.84
+          },
+          "confidence": 0.76
+        },
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": null
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-lookalike-checkout",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": null,
+          "forbiddenAbsent": null,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "follows",
+          "probabilities": {
+            "follows": 0.79,
+            "correctly-dismissed": 0.2,
+            "contradicts": 0.01
+          },
+          "confidence": 0.68
+        },
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      }
+    ],
+    "jev_single": [
+      {
+        "probeId": "pq-payments-boundary",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.payments-card-data": 0.92
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-card-test-data",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.payments-card-data": 0.9
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-card-test-data-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.payments-card-data": 0.79
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.3333333333333333,
+          "agreementWithRunner": 1
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-webhook-idempotency",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": false,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.webhook-idempotency": 0.5,
+          "rule.secrets-management": 0.5
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-webhook-idempotency-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.webhook-idempotency": 0.75,
+          "rule.secrets-management": 0.75
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.4,
+          "agreementWithRunner": 1
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-migration-safety",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.database-migration-safety": 0.93
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-migration-safety-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.database-migration-safety": 0.75
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": 0.5555555555555556
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-accessible-ui",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.accessibility-ui": 0.89
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-accessible-ui-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.accessibility-ui": 0.53
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": 0.4166666666666667
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-logging-privacy",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.logging-sensitive-data": 0.44,
+          "rule.privacy-personal-data": 0.45
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-logging-privacy-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.logging-sensitive-data": 0.59,
+          "rule.privacy-personal-data": 0.59
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0.5,
+          "precisionVsExpected": 0.14285714285714285,
+          "agreementWithRunner": 0.4166666666666667
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-deploy-checklist",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.production-change-control": 0.61
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-deploy-checklist-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.production-change-control": 0.47
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": 0.38461538461538464
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-api-errors",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.api-error-contract": 0.86
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-api-errors-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {
+          "rule.api-error-contract": 0.7
+        },
+        "disposition": null,
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 1,
+          "precisionVsExpected": 0.1111111111111111,
+          "agreementWithRunner": 0.42857142857142855
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-ios",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "correctly-dismissed",
+          "probabilities": {
+            "correctly-dismissed": 1,
+            "contradicts": 0,
+            "follows": 0
+          },
+          "confidence": 1
+        },
+        "evictions": {},
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-ios-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "follows",
+          "probabilities": {
+            "correctly-dismissed": 0.14,
+            "contradicts": 0,
+            "follows": 0.86
+          },
+          "confidence": 0.78
+        },
+        "evictions": {},
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": 0.42857142857142855
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-ml",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "correctly-dismissed",
+          "probabilities": {
+            "correctly-dismissed": 1,
+            "follows": 0,
+            "contradicts": 0
+          },
+          "confidence": 1
+        },
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.03,
+              "unrelated": 0.97
+            },
+            "confidence": 0.96
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-ml-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "follows",
+          "probabilities": {
+            "correctly-dismissed": 0.48,
+            "contradicts": 0.02,
+            "follows": 0.5
+          },
+          "confidence": 0.26
+        },
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.72,
+              "consistent-but-independent": 0.27,
+              "relies-on-evicted": 0.01
+            },
+            "confidence": 0.58
+          }
+        },
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": 0.46153846153846156
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-refund-flow",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.refund-chargeback": 0.38
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.07,
+              "relies-on-evicted": 0,
+              "unrelated": 0.93
+            },
+            "confidence": 0.89
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-refund-flow-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.refund-chargeback": 0.57
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.15,
+              "unrelated": 0.84,
+              "relies-on-evicted": 0.01
+            },
+            "confidence": 0.77
+          }
+        },
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": 0.375
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-inventory-race",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.inventory-reservation": 0.65
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.04,
+              "relies-on-evicted": 0,
+              "unrelated": 0.96
+            },
+            "confidence": 0.94
+          },
+          "rule.accessibility-ui": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.05,
+              "relies-on-evicted": 0,
+              "unrelated": 0.95
+            },
+            "confidence": 0.93
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-inventory-race-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.inventory-reservation": 0.52
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.18,
+              "relies-on-evicted": 0.51,
+              "unrelated": 0.31
+            },
+            "confidence": 0.26
+          },
+          "rule.accessibility-ui": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.17,
+              "relies-on-evicted": 0.53,
+              "unrelated": 0.3
+            },
+            "confidence": 0.3
+          }
+        },
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": 0.3333333333333333
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-gdpr-delete",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.gdpr-deletion": 0.31
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.92,
+              "consistent-but-independent": 0.08,
+              "relies-on-evicted": 0
+            },
+            "confidence": 0.88
+          },
+          "rule.accessibility-ui": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.92,
+              "consistent-but-independent": 0.08,
+              "relies-on-evicted": 0
+            },
+            "confidence": 0.87
+          },
+          "rule.production-change-control": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.93,
+              "consistent-but-independent": 0.07,
+              "relies-on-evicted": 0
+            },
+            "confidence": 0.89
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-gdpr-delete-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.gdpr-deletion": 0.54
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.22,
+              "unrelated": 0.27,
+              "relies-on-evicted": 0.51
+            },
+            "confidence": 0.27
+          },
+          "rule.accessibility-ui": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "relies-on-evicted": 0.52,
+              "unrelated": 0.29,
+              "consistent-but-independent": 0.19
+            },
+            "confidence": 0.28
+          },
+          "rule.production-change-control": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.19,
+              "unrelated": 0.24,
+              "relies-on-evicted": 0.57
+            },
+            "confidence": 0.35
+          }
+        },
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": 0.2857142857142857
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-notification-retry",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.notification-delivery": 0.36
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.12,
+              "unrelated": 0.87,
+              "relies-on-evicted": 0.01
+            },
+            "confidence": 0.81
+          },
+          "rule.accessibility-ui": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.12,
+              "relies-on-evicted": 0.01,
+              "unrelated": 0.87
+            },
+            "confidence": 0.81
+          },
+          "rule.production-change-control": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.1,
+              "unrelated": 0.89,
+              "relies-on-evicted": 0.01
+            },
+            "confidence": 0.84
+          },
+          "rule.inventory-reservation": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.11,
+              "unrelated": 0.88,
+              "relies-on-evicted": 0.01
+            },
+            "confidence": 0.83
+          },
+          "rule.refund-chargeback": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.14,
+              "unrelated": 0.85,
+              "relies-on-evicted": 0.01
+            },
+            "confidence": 0.79
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-notification-retry-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.notification-delivery": 0.48
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.13,
+              "relies-on-evicted": 0.79,
+              "unrelated": 0.08
+            },
+            "confidence": 0.68
+          },
+          "rule.accessibility-ui": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.14,
+              "relies-on-evicted": 0.78,
+              "unrelated": 0.08
+            },
+            "confidence": 0.67
+          },
+          "rule.production-change-control": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.14,
+              "relies-on-evicted": 0.76,
+              "unrelated": 0.1
+            },
+            "confidence": 0.65
+          },
+          "rule.inventory-reservation": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.13,
+              "relies-on-evicted": 0.78,
+              "unrelated": 0.09
+            },
+            "confidence": 0.68
+          },
+          "rule.refund-chargeback": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.15,
+              "relies-on-evicted": 0.77,
+              "unrelated": 0.08
+            },
+            "confidence": 0.66
+          }
+        },
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": 0.2727272727272727
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-android",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "correctly-dismissed",
+          "probabilities": {
+            "correctly-dismissed": 1,
+            "follows": 0,
+            "contradicts": 0
+          },
+          "confidence": 1
+        },
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.94,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.06
+            },
+            "confidence": 0.91
+          },
+          "rule.accessibility-ui": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.94,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.06
+            },
+            "confidence": 0.9
+          },
+          "rule.production-change-control": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.94,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.06
+            },
+            "confidence": 0.9
+          },
+          "rule.inventory-reservation": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.94,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.06
+            },
+            "confidence": 0.9
+          },
+          "rule.refund-chargeback": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.92,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.08
+            },
+            "confidence": 0.88
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-android-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "follows",
+          "probabilities": {
+            "follows": 0.7,
+            "correctly-dismissed": 0.29,
+            "contradicts": 0.01
+          },
+          "confidence": 0.55
+        },
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.45,
+              "relies-on-evicted": 0.19,
+              "consistent-but-independent": 0.36
+            },
+            "confidence": 0.18
+          },
+          "rule.accessibility-ui": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.4,
+              "relies-on-evicted": 0.25,
+              "consistent-but-independent": 0.35
+            },
+            "confidence": 0.09
+          },
+          "rule.production-change-control": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.39,
+              "relies-on-evicted": 0.26,
+              "consistent-but-independent": 0.35
+            },
+            "confidence": 0.09
+          },
+          "rule.inventory-reservation": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.43,
+              "relies-on-evicted": 0.23,
+              "consistent-but-independent": 0.34
+            },
+            "confidence": 0.14
+          },
+          "rule.refund-chargeback": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.42,
+              "relies-on-evicted": 0.22,
+              "consistent-but-independent": 0.36
+            },
+            "confidence": 0.12
+          }
+        },
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": 0.2727272727272727
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-notebook",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "correctly-dismissed",
+          "probabilities": {
+            "contradicts": 0,
+            "correctly-dismissed": 1,
+            "follows": 0
+          },
+          "confidence": 1
+        },
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.12,
+              "unrelated": 0.88,
+              "relies-on-evicted": 0
+            },
+            "confidence": 0.81
+          },
+          "rule.accessibility-ui": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.12,
+              "unrelated": 0.88,
+              "relies-on-evicted": 0
+            },
+            "confidence": 0.82
+          },
+          "rule.production-change-control": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.12,
+              "unrelated": 0.88,
+              "relies-on-evicted": 0
+            },
+            "confidence": 0.81
+          },
+          "rule.inventory-reservation": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.11,
+              "unrelated": 0.88,
+              "relies-on-evicted": 0.01
+            },
+            "confidence": 0.82
+          },
+          "rule.refund-chargeback": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.1,
+              "unrelated": 0.9,
+              "relies-on-evicted": 0
+            },
+            "confidence": 0.85
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-notebook-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": null,
+        "evictions": {
+          "rule.brand-ui-copy": null,
+          "rule.accessibility-ui": null,
+          "rule.production-change-control": null,
+          "rule.inventory-reservation": null,
+          "rule.refund-chargeback": null
+        },
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": 0.2608695652173913
+        },
+        "noulError": "answer eviction:rule.brand-ui-copy: choice unrelated is not the max-probability option (relies-on-evicted)"
+      },
+      {
+        "probeId": "pq-rate-limit",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.rate-limiting": 0.72
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.07,
+              "relies-on-evicted": 0,
+              "unrelated": 0.93
+            },
+            "confidence": 0.88
+          },
+          "rule.accessibility-ui": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.07,
+              "relies-on-evicted": 0,
+              "unrelated": 0.93
+            },
+            "confidence": 0.89
+          },
+          "rule.production-change-control": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.08,
+              "relies-on-evicted": 0,
+              "unrelated": 0.92
+            },
+            "confidence": 0.87
+          },
+          "rule.inventory-reservation": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.08,
+              "relies-on-evicted": 0,
+              "unrelated": 0.92
+            },
+            "confidence": 0.87
+          },
+          "rule.refund-chargeback": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.08,
+              "relies-on-evicted": 0,
+              "unrelated": 0.92
+            },
+            "confidence": 0.87
+          },
+          "rule.payments-card-data": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.1,
+              "relies-on-evicted": 0,
+              "unrelated": 0.9
+            },
+            "confidence": 0.85
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-rate-limit-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.rate-limiting": 0.51
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "unrelated": 0.12,
+              "consistent-but-independent": 0.14,
+              "relies-on-evicted": 0.74
+            },
+            "confidence": 0.62
+          },
+          "rule.accessibility-ui": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "unrelated": 0.08,
+              "consistent-but-independent": 0.14,
+              "relies-on-evicted": 0.78
+            },
+            "confidence": 0.67
+          },
+          "rule.production-change-control": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "unrelated": 0.09,
+              "consistent-but-independent": 0.13,
+              "relies-on-evicted": 0.78
+            },
+            "confidence": 0.66
+          },
+          "rule.inventory-reservation": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "unrelated": 0.08,
+              "consistent-but-independent": 0.13,
+              "relies-on-evicted": 0.79
+            },
+            "confidence": 0.68
+          },
+          "rule.refund-chargeback": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "unrelated": 0.11,
+              "consistent-but-independent": 0.16,
+              "relies-on-evicted": 0.73
+            },
+            "confidence": 0.61
+          },
+          "rule.payments-card-data": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "unrelated": 0.08,
+              "consistent-but-independent": 0.14,
+              "relies-on-evicted": 0.78
+            },
+            "confidence": 0.66
+          }
+        },
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": 0.2
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-caching",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.caching-policy": 0.15
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.15,
+              "relies-on-evicted": 0.02,
+              "unrelated": 0.83
+            },
+            "confidence": 0.76
+          },
+          "rule.accessibility-ui": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.14,
+              "relies-on-evicted": 0.01,
+              "unrelated": 0.85
+            },
+            "confidence": 0.76
+          },
+          "rule.production-change-control": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.15,
+              "relies-on-evicted": 0.01,
+              "unrelated": 0.84
+            },
+            "confidence": 0.75
+          },
+          "rule.inventory-reservation": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.14,
+              "relies-on-evicted": 0.01,
+              "unrelated": 0.85
+            },
+            "confidence": 0.76
+          },
+          "rule.refund-chargeback": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.16,
+              "relies-on-evicted": 0.01,
+              "unrelated": 0.83
+            },
+            "confidence": 0.74
+          },
+          "rule.payments-card-data": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.14,
+              "relies-on-evicted": 0.01,
+              "unrelated": 0.85
+            },
+            "confidence": 0.76
+          },
+          "rule.data-retention": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.14,
+              "relies-on-evicted": 0.01,
+              "unrelated": 0.85
+            },
+            "confidence": 0.77
+          },
+          "rule.gdpr-deletion": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.14,
+              "relies-on-evicted": 0.02,
+              "unrelated": 0.84
+            },
+            "confidence": 0.76
+          },
+          "rule.notification-delivery": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.14,
+              "relies-on-evicted": 0.02,
+              "unrelated": 0.84
+            },
+            "confidence": 0.76
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-caching-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.caching-policy": 0.42
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.1,
+              "relies-on-evicted": 0.81,
+              "unrelated": 0.09
+            },
+            "confidence": 0.72
+          },
+          "rule.accessibility-ui": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.12,
+              "relies-on-evicted": 0.79,
+              "unrelated": 0.09
+            },
+            "confidence": 0.69
+          },
+          "rule.production-change-control": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.11,
+              "relies-on-evicted": 0.81,
+              "unrelated": 0.08
+            },
+            "confidence": 0.72
+          },
+          "rule.inventory-reservation": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.1,
+              "relies-on-evicted": 0.82,
+              "unrelated": 0.08
+            },
+            "confidence": 0.73
+          },
+          "rule.refund-chargeback": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.1,
+              "relies-on-evicted": 0.82,
+              "unrelated": 0.08
+            },
+            "confidence": 0.74
+          },
+          "rule.payments-card-data": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.09,
+              "relies-on-evicted": 0.85,
+              "unrelated": 0.06
+            },
+            "confidence": 0.77
+          },
+          "rule.data-retention": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.12,
+              "relies-on-evicted": 0.79,
+              "unrelated": 0.09
+            },
+            "confidence": 0.7
+          },
+          "rule.gdpr-deletion": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.1,
+              "relies-on-evicted": 0.82,
+              "unrelated": 0.08
+            },
+            "confidence": 0.73
+          },
+          "rule.notification-delivery": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.1,
+              "relies-on-evicted": 0.81,
+              "unrelated": 0.09
+            },
+            "confidence": 0.71
+          }
+        },
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": 0.20833333333333334
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-order-state",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.order-state-machine": 0.28
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "unrelated": 0.91,
+              "consistent-but-independent": 0.09
+            },
+            "confidence": 0.86
+          },
+          "rule.accessibility-ui": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "unrelated": 0.9,
+              "consistent-but-independent": 0.1
+            },
+            "confidence": 0.85
+          },
+          "rule.production-change-control": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "unrelated": 0.9,
+              "consistent-but-independent": 0.1
+            },
+            "confidence": 0.84
+          },
+          "rule.inventory-reservation": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "unrelated": 0.91,
+              "consistent-but-independent": 0.09
+            },
+            "confidence": 0.86
+          },
+          "rule.data-retention": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "unrelated": 0.91,
+              "consistent-but-independent": 0.09
+            },
+            "confidence": 0.85
+          },
+          "rule.gdpr-deletion": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "unrelated": 0.9,
+              "consistent-but-independent": 0.1
+            },
+            "confidence": 0.85
+          },
+          "rule.notification-delivery": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "unrelated": 0.9,
+              "consistent-but-independent": 0.1
+            },
+            "confidence": 0.85
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-order-state-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.order-state-machine": 0.38
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.15,
+              "relies-on-evicted": 0.74,
+              "unrelated": 0.11
+            },
+            "confidence": 0.61
+          },
+          "rule.accessibility-ui": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.11,
+              "relies-on-evicted": 0.78,
+              "unrelated": 0.11
+            },
+            "confidence": 0.67
+          },
+          "rule.production-change-control": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.13,
+              "relies-on-evicted": 0.76,
+              "unrelated": 0.11
+            },
+            "confidence": 0.64
+          },
+          "rule.inventory-reservation": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.14,
+              "unrelated": 0.11,
+              "relies-on-evicted": 0.75
+            },
+            "confidence": 0.63
+          },
+          "rule.data-retention": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.13,
+              "relies-on-evicted": 0.76,
+              "unrelated": 0.11
+            },
+            "confidence": 0.65
+          },
+          "rule.gdpr-deletion": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.13,
+              "relies-on-evicted": 0.77,
+              "unrelated": 0.1
+            },
+            "confidence": 0.67
+          },
+          "rule.notification-delivery": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.12,
+              "relies-on-evicted": 0.77,
+              "unrelated": 0.11
+            },
+            "confidence": 0.66
+          }
+        },
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": 0.23076923076923078
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-audit",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.audit-trails": 0.08
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0.02,
+              "unrelated": 0.92,
+              "consistent-but-independent": 0.06
+            },
+            "confidence": 0.89
+          },
+          "rule.accessibility-ui": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0.02,
+              "unrelated": 0.92,
+              "consistent-but-independent": 0.06
+            },
+            "confidence": 0.88
+          },
+          "rule.production-change-control": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0.03,
+              "unrelated": 0.92,
+              "consistent-but-independent": 0.05
+            },
+            "confidence": 0.88
+          },
+          "rule.inventory-reservation": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0.02,
+              "unrelated": 0.93,
+              "consistent-but-independent": 0.05
+            },
+            "confidence": 0.89
+          },
+          "rule.data-retention": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0.02,
+              "unrelated": 0.92,
+              "consistent-but-independent": 0.06
+            },
+            "confidence": 0.89
+          },
+          "rule.gdpr-deletion": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.05,
+              "relies-on-evicted": 0.02,
+              "unrelated": 0.93
+            },
+            "confidence": 0.88
+          },
+          "rule.notification-delivery": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0.02,
+              "unrelated": 0.93,
+              "consistent-but-independent": 0.05
+            },
+            "confidence": 0.89
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-audit-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.audit-trails": 0.36
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.14,
+              "unrelated": 0.14,
+              "relies-on-evicted": 0.72
+            },
+            "confidence": 0.59
+          },
+          "rule.accessibility-ui": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.15,
+              "unrelated": 0.14,
+              "relies-on-evicted": 0.71
+            },
+            "confidence": 0.57
+          },
+          "rule.production-change-control": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.15,
+              "unrelated": 0.15,
+              "relies-on-evicted": 0.7
+            },
+            "confidence": 0.55
+          },
+          "rule.inventory-reservation": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.14,
+              "unrelated": 0.11,
+              "relies-on-evicted": 0.75
+            },
+            "confidence": 0.62
+          },
+          "rule.data-retention": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.14,
+              "unrelated": 0.11,
+              "relies-on-evicted": 0.75
+            },
+            "confidence": 0.63
+          },
+          "rule.gdpr-deletion": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.14,
+              "unrelated": 0.14,
+              "relies-on-evicted": 0.72
+            },
+            "confidence": 0.59
+          },
+          "rule.notification-delivery": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "consistent-but-independent": 0.14,
+              "unrelated": 0.11,
+              "relies-on-evicted": 0.75
+            },
+            "confidence": 0.63
+          }
+        },
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": 0.2222222222222222
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-flags",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.feature-flags": 0.23
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.03,
+              "unrelated": 0.97,
+              "relies-on-evicted": 0
+            },
+            "confidence": 0.95
+          },
+          "rule.accessibility-ui": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.03,
+              "unrelated": 0.96,
+              "relies-on-evicted": 0.01
+            },
+            "confidence": 0.95
+          },
+          "rule.inventory-reservation": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.03,
+              "unrelated": 0.97,
+              "relies-on-evicted": 0
+            },
+            "confidence": 0.95
+          },
+          "rule.data-retention": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.02,
+              "unrelated": 0.98,
+              "relies-on-evicted": 0
+            },
+            "confidence": 0.96
+          },
+          "rule.gdpr-deletion": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.02,
+              "unrelated": 0.98,
+              "relies-on-evicted": 0
+            },
+            "confidence": 0.96
+          },
+          "rule.notification-delivery": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.03,
+              "unrelated": 0.96,
+              "relies-on-evicted": 0.01
+            },
+            "confidence": 0.95
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-canary-slo",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.canary-deploys": 0.3,
+          "rule.slo-error-budgets": 0.29
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.06,
+              "unrelated": 0.94
+            },
+            "confidence": 0.91
+          },
+          "rule.accessibility-ui": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.06,
+              "unrelated": 0.9400000000000001
+            },
+            "confidence": 0.9
+          },
+          "rule.inventory-reservation": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.05,
+              "unrelated": 0.95
+            },
+            "confidence": 0.92
+          },
+          "rule.data-retention": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.05,
+              "unrelated": 0.95
+            },
+            "confidence": 0.92
+          },
+          "rule.gdpr-deletion": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.06,
+              "unrelated": 0.9400000000000001
+            },
+            "confidence": 0.9
+          },
+          "rule.notification-delivery": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.06,
+              "unrelated": 0.94
+            },
+            "confidence": 0.9
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-canary-slo-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.canary-deploys": 0.41,
+          "rule.slo-error-budgets": 0.42
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "unrelated": 0.08,
+              "relies-on-evicted": 0.8,
+              "consistent-but-independent": 0.12
+            },
+            "confidence": 0.7
+          },
+          "rule.accessibility-ui": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "relies-on-evicted": 0.81,
+              "unrelated": 0.08,
+              "consistent-but-independent": 0.11
+            },
+            "confidence": 0.72
+          },
+          "rule.inventory-reservation": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "relies-on-evicted": 0.8,
+              "unrelated": 0.09,
+              "consistent-but-independent": 0.11
+            },
+            "confidence": 0.71
+          },
+          "rule.data-retention": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "relies-on-evicted": 0.82,
+              "unrelated": 0.08,
+              "consistent-but-independent": 0.1
+            },
+            "confidence": 0.73
+          },
+          "rule.gdpr-deletion": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "unrelated": 0.06,
+              "relies-on-evicted": 0.84,
+              "consistent-but-independent": 0.1
+            },
+            "confidence": 0.76
+          },
+          "rule.notification-delivery": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "relies-on-evicted": 0.79,
+              "unrelated": 0.08,
+              "consistent-but-independent": 0.13
+            },
+            "confidence": 0.69
+          }
+        },
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": 0.17647058823529413
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-tax",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.tax-calculation": 0.69
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.93,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.07
+            },
+            "confidence": 0.89
+          },
+          "rule.accessibility-ui": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.93,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.07
+            },
+            "confidence": 0.89
+          },
+          "rule.inventory-reservation": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.94,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.06
+            },
+            "confidence": 0.91
+          },
+          "rule.data-retention": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.06,
+              "unrelated": 0.94
+            },
+            "confidence": 0.91
+          },
+          "rule.gdpr-deletion": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.05,
+              "unrelated": 0.95
+            },
+            "confidence": 0.92
+          },
+          "rule.notification-delivery": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.94,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.06
+            },
+            "confidence": 0.91
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-currency",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.multi-currency": 0.47
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.05,
+              "relies-on-evicted": 0,
+              "unrelated": 0.95
+            },
+            "confidence": 0.92
+          },
+          "rule.accessibility-ui": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.06,
+              "unrelated": 0.94
+            },
+            "confidence": 0.91
+          },
+          "rule.inventory-reservation": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.07,
+              "unrelated": 0.93
+            },
+            "confidence": 0.89
+          },
+          "rule.data-retention": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.06,
+              "relies-on-evicted": 0,
+              "unrelated": 0.9400000000000001
+            },
+            "confidence": 0.9
+          },
+          "rule.gdpr-deletion": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.07,
+              "relies-on-evicted": 0,
+              "unrelated": 0.93
+            },
+            "confidence": 0.9
+          },
+          "rule.notification-delivery": {
+            "choice": "unrelated",
+            "probabilities": {
+              "consistent-but-independent": 0.08,
+              "relies-on-evicted": 0,
+              "unrelated": 0.92
+            },
+            "confidence": 0.88
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-currency-recall",
+        "retrieval": {
+          "citedExpected": false,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": false
+        },
+        "noul": {
+          "rule.multi-currency": 0.39
+        },
+        "disposition": null,
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "unrelated": 0.19,
+              "relies-on-evicted": 0.64,
+              "consistent-but-independent": 0.17
+            },
+            "confidence": 0.46
+          },
+          "rule.accessibility-ui": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "unrelated": 0.18,
+              "relies-on-evicted": 0.68,
+              "consistent-but-independent": 0.14
+            },
+            "confidence": 0.52
+          },
+          "rule.inventory-reservation": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "unrelated": 0.18,
+              "relies-on-evicted": 0.67,
+              "consistent-but-independent": 0.15
+            },
+            "confidence": 0.5
+          },
+          "rule.data-retention": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "unrelated": 0.19,
+              "relies-on-evicted": 0.65,
+              "consistent-but-independent": 0.16
+            },
+            "confidence": 0.47
+          },
+          "rule.gdpr-deletion": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "unrelated": 0.17,
+              "relies-on-evicted": 0.69,
+              "consistent-but-independent": 0.14
+            },
+            "confidence": 0.53
+          },
+          "rule.notification-delivery": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "unrelated": 0.17,
+              "relies-on-evicted": 0.68,
+              "consistent-but-independent": 0.14
+            },
+            "confidence": 0.53
+          }
+        },
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": 0.15789473684210525
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-lookalike-readonly",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "correctly-dismissed",
+          "probabilities": {
+            "contradicts": 0.01,
+            "follows": 0.4,
+            "correctly-dismissed": 0.59
+          },
+          "confidence": 0.39
+        },
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.87,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.13
+            },
+            "confidence": 0.8
+          },
+          "rule.accessibility-ui": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.88,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.12
+            },
+            "confidence": 0.82
+          },
+          "rule.inventory-reservation": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.89,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.11
+            },
+            "confidence": 0.83
+          },
+          "rule.data-retention": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.87,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.13
+            },
+            "confidence": 0.8
+          },
+          "rule.gdpr-deletion": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.88,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.12
+            },
+            "confidence": 0.82
+          },
+          "rule.notification-delivery": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.88,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.12
+            },
+            "confidence": 0.81
+          },
+          "rule.rate-limiting": {
+            "choice": "unrelated",
+            "probabilities": {
+              "unrelated": 0.89,
+              "relies-on-evicted": 0,
+              "consistent-but-independent": 0.11
+            },
+            "confidence": 0.83
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      },
+      {
+        "probeId": "pq-lookalike-readonly-recall",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "follows",
+          "probabilities": {
+            "follows": 0.76,
+            "correctly-dismissed": 0.23,
+            "contradicts": 0.01
+          },
+          "confidence": 0.64
+        },
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "unrelated": 0.35,
+              "consistent-but-independent": 0.25,
+              "relies-on-evicted": 0.39999999999999997
+            },
+            "confidence": 0.11
+          },
+          "rule.accessibility-ui": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "unrelated": 0.32,
+              "consistent-but-independent": 0.26,
+              "relies-on-evicted": 0.42
+            },
+            "confidence": 0.13
+          },
+          "rule.inventory-reservation": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "unrelated": 0.35,
+              "consistent-but-independent": 0.29,
+              "relies-on-evicted": 0.36
+            },
+            "confidence": 0.04
+          },
+          "rule.data-retention": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "unrelated": 0.32,
+              "consistent-but-independent": 0.28,
+              "relies-on-evicted": 0.39999999999999997
+            },
+            "confidence": 0.11
+          },
+          "rule.gdpr-deletion": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "unrelated": 0.28,
+              "consistent-but-independent": 0.25,
+              "relies-on-evicted": 0.47
+            },
+            "confidence": 0.21
+          },
+          "rule.notification-delivery": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "unrelated": 0.34,
+              "relies-on-evicted": 0.42,
+              "consistent-but-independent": 0.24
+            },
+            "confidence": 0.13
+          },
+          "rule.rate-limiting": {
+            "choice": "relies-on-evicted",
+            "probabilities": {
+              "unrelated": 0.35,
+              "consistent-but-independent": 0.25,
+              "relies-on-evicted": 0.39999999999999997
+            },
+            "confidence": 0.11
+          }
+        },
+        "selfReport": {
+          "recallVsExpected": 0,
+          "precisionVsExpected": 0,
+          "agreementWithRunner": 0.15789473684210525
+        },
+        "noulError": null
+      },
+      {
+        "probeId": "pq-lookalike-checkout",
+        "retrieval": {
+          "citedExpected": true,
+          "citedForbidden": false,
+          "quoteHit": true,
+          "expectedMaterialized": true,
+          "forbiddenAbsent": true,
+          "pass": true
+        },
+        "noul": {},
+        "disposition": {
+          "choice": "follows",
+          "probabilities": {
+            "follows": 0.83,
+            "contradicts": 0.01,
+            "correctly-dismissed": 0.16
+          },
+          "confidence": 0.74
+        },
+        "evictions": {
+          "rule.brand-ui-copy": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0.1,
+              "consistent-but-independent": 0.17,
+              "unrelated": 0.73
+            },
+            "confidence": 0.59
+          },
+          "rule.accessibility-ui": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0.09,
+              "consistent-but-independent": 0.19,
+              "unrelated": 0.72
+            },
+            "confidence": 0.58
+          },
+          "rule.inventory-reservation": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0.1,
+              "consistent-but-independent": 0.17,
+              "unrelated": 0.73
+            },
+            "confidence": 0.59
+          },
+          "rule.data-retention": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0.1,
+              "consistent-but-independent": 0.16,
+              "unrelated": 0.74
+            },
+            "confidence": 0.61
+          },
+          "rule.gdpr-deletion": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0.09,
+              "consistent-but-independent": 0.17,
+              "unrelated": 0.74
+            },
+            "confidence": 0.62
+          },
+          "rule.notification-delivery": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0.09,
+              "consistent-but-independent": 0.16,
+              "unrelated": 0.75
+            },
+            "confidence": 0.62
+          },
+          "rule.rate-limiting": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0.08,
+              "consistent-but-independent": 0.16,
+              "unrelated": 0.76
+            },
+            "confidence": 0.63
+          },
+          "rule.canary-deploys": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0.09,
+              "consistent-but-independent": 0.17,
+              "unrelated": 0.74
+            },
+            "confidence": 0.62
+          },
+          "rule.feature-flags": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0.09,
+              "consistent-but-independent": 0.18,
+              "unrelated": 0.73
+            },
+            "confidence": 0.59
+          },
+          "rule.production-change-control": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0.08,
+              "consistent-but-independent": 0.16,
+              "unrelated": 0.76
+            },
+            "confidence": 0.64
+          },
+          "rule.slo-error-budgets": {
+            "choice": "unrelated",
+            "probabilities": {
+              "relies-on-evicted": 0.09,
+              "consistent-but-independent": 0.17,
+              "unrelated": 0.74
+            },
+            "confidence": 0.61
+          }
+        },
+        "selfReport": null,
+        "noulError": null
+      }
+    ]
+  },
+  "quality": {
+    "load_all_single": {
+      "rulePrecision": null,
+      "ruleRecall": 0.95,
+      "criticalMisses": 1,
+      "skillAccuracy": null,
+      "staleTokens": 0,
+      "missingTokens": 0,
+      "staleRatio": null,
+      "evictionFidelity": null,
+      "selfReportAccuracy": 0.9318181818181818
+    },
+    "apm_discovery": {
+      "rulePrecision": null,
+      "ruleRecall": 0.95,
+      "criticalMisses": 1,
+      "skillAccuracy": null,
+      "staleTokens": 0,
+      "missingTokens": 0,
+      "staleRatio": null,
+      "evictionFidelity": null,
+      "selfReportAccuracy": 0
+    },
+    "jev_single": {
+      "rulePrecision": null,
+      "ruleRecall": 0.15,
+      "criticalMisses": 5,
+      "skillAccuracy": null,
+      "staleTokens": 0,
+      "missingTokens": 0,
+      "staleRatio": null,
+      "evictionFidelity": 0.7270253164556958,
+      "selfReportAccuracy": 0.1590909090909091
+    }
+  }
+}

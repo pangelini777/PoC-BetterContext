@@ -1,0 +1,967 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Progressive Context Benchmark Runs</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f5f7;
+      --surface: #ffffff;
+      --surface-muted: #f8f9fa;
+      --border: #d8dce1;
+      --border-strong: #b8bec6;
+      --text: #1e2329;
+      --muted: #5f6873;
+      --accent: #245f9e;
+      --accent-soft: #e8f1fa;
+      --success: #216e45;
+      --success-soft: #e8f5ed;
+      --warning: #8a5300;
+      --warning-soft: #fff3d6;
+      --danger: #a12929;
+      --danger-soft: #fdecec;
+      --shadow: 0 1px 2px rgb(24 32 42 / 8%), 0 4px 16px rgb(24 32 42 / 5%);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-synthesis: none;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-width: 20rem;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    .skip-link {
+      position: fixed;
+      z-index: 100;
+      top: 0.5rem;
+      left: 0.5rem;
+      padding: 0.55rem 0.75rem;
+      border-radius: 0.35rem;
+      background: var(--text);
+      color: var(--surface);
+      transform: translateY(-150%);
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .header-inner,
+    main {
+      width: min(100% - 2rem, 100rem);
+      margin-inline: auto;
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1.5rem;
+      padding-block: 1.5rem;
+    }
+
+    h1,
+    h2,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 0.25rem;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      line-height: 1.2;
+      letter-spacing: -0.025em;
+    }
+
+    .subtitle {
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .connection-panel {
+      flex: 0 0 auto;
+      min-width: 14rem;
+      text-align: right;
+    }
+
+    .connection-line {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-weight: 650;
+    }
+
+    .connection-dot {
+      width: 0.6rem;
+      height: 0.6rem;
+      border-radius: 50%;
+      background: var(--warning);
+    }
+
+    .connection-dot[data-state="connected"] {
+      background: var(--success);
+    }
+
+    .connection-dot[data-state="error"] {
+      background: var(--danger);
+    }
+
+    .refresh-time,
+    .snapshot-time {
+      margin: 0.2rem 0 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    main {
+      padding-block: 1.5rem 3rem;
+    }
+
+    .summary {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .summary p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .runs {
+      display: grid;
+      gap: 1.25rem;
+    }
+
+    .run-card {
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 0.65rem;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .run-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0.8rem 1rem;
+      padding: 1rem 1.1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .run-heading-line {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.55rem;
+    }
+
+    .run-header h2 {
+      margin-bottom: 0;
+      font-size: 1.1rem;
+      overflow-wrap: anywhere;
+    }
+
+    .run-id {
+      margin: 0.3rem 0 0;
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      font-size: 0.78rem;
+      overflow-wrap: anywhere;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.4rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 1.6rem;
+      padding: 0.16rem 0.55rem;
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      background: var(--surface-muted);
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 700;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    .badge[data-state="running"] {
+      border-color: #d7a84c;
+      background: var(--warning-soft);
+      color: var(--warning);
+    }
+
+    .badge[data-state="completed"] {
+      border-color: #8bc5a3;
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    .run-meta {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(9rem, 1fr));
+      grid-column: 1 / -1;
+      gap: 0.65rem 1.25rem;
+      margin: 0;
+      padding-top: 0.25rem;
+    }
+
+    .run-meta div {
+      min-width: 0;
+    }
+
+    .run-meta dt {
+      margin-bottom: 0.12rem;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .run-meta dd {
+      margin: 0;
+      font-size: 0.88rem;
+      overflow-wrap: anywhere;
+    }
+
+    .table-scroll {
+      width: 100%;
+      overflow-x: auto;
+      overscroll-behavior-inline: contain;
+    }
+
+    table {
+      width: 100%;
+      min-width: max-content;
+      border-collapse: collapse;
+      font-variant-numeric: tabular-nums;
+      font-size: 0.82rem;
+    }
+
+    caption {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    th,
+    td {
+      padding: 0.62rem 0.7rem;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      text-align: right;
+      vertical-align: top;
+      white-space: nowrap;
+    }
+
+    tr:last-child th,
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    th:last-child,
+    td:last-child {
+      border-right: 0;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: var(--surface-muted);
+      color: var(--muted);
+      font-size: 0.7rem;
+      letter-spacing: 0.025em;
+      text-transform: uppercase;
+    }
+
+    thead tr:first-child th {
+      border-bottom-color: var(--border-strong);
+      background: var(--accent-soft);
+      color: var(--accent);
+      text-align: center;
+    }
+
+    tbody th {
+      max-width: 18rem;
+      background: var(--surface);
+      text-align: left;
+      white-space: normal;
+    }
+
+    tbody tr:nth-child(even) th,
+    tbody tr:nth-child(even) td {
+      background: var(--surface-muted);
+    }
+
+    .arm-name {
+      display: block;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .arm-key {
+      display: block;
+      margin-top: 0.15rem;
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      font-size: 0.72rem;
+      font-weight: 400;
+      overflow-wrap: anywhere;
+    }
+
+    .cell-status {
+      font-weight: 700;
+      text-align: left;
+    }
+
+    .cell-status[data-state="running"] {
+      color: var(--warning);
+    }
+
+    .cell-status[data-state="completed"],
+    .cell-eligible[data-state="yes"] {
+      color: var(--success);
+    }
+
+    .cell-eligible[data-state="no"] {
+      color: var(--danger);
+    }
+
+    .reasons {
+      max-width: 24rem;
+      text-align: left;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    .empty-state {
+      padding: 3rem 1rem;
+      border: 1px dashed var(--border-strong);
+      border-radius: 0.65rem;
+      background: var(--surface);
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .empty-state strong {
+      display: block;
+      margin-bottom: 0.35rem;
+      color: var(--text);
+    }
+
+    .fatal-message {
+      display: none;
+      margin-bottom: 1rem;
+      padding: 0.75rem 0.9rem;
+      border: 1px solid #e5abab;
+      border-radius: 0.45rem;
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .fatal-message[data-visible="true"] {
+      display: block;
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    @media (max-width: 52rem) {
+      .header-inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .connection-panel {
+        min-width: 0;
+        text-align: left;
+      }
+
+      .run-meta {
+        grid-template-columns: repeat(2, minmax(8rem, 1fr));
+      }
+    }
+
+    @media (max-width: 34rem) {
+      .header-inner,
+      main {
+        width: min(100% - 1rem, 100rem);
+      }
+
+      .run-header {
+        grid-template-columns: 1fr;
+      }
+
+      .badges {
+        justify-content: flex-start;
+      }
+
+      .run-meta {
+        grid-column: 1;
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .connection-dot[data-state="connecting"] {
+        animation: pulse 1.2s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        50% { opacity: 0.35; }
+      }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        color-scheme: dark;
+        --bg: #11151a;
+        --surface: #191e24;
+        --surface-muted: #20262d;
+        --border: #363e48;
+        --border-strong: #56616d;
+        --text: #eef1f4;
+        --muted: #a9b2bd;
+        --accent: #8dc3f7;
+        --accent-soft: #1d344b;
+        --success: #83d6a5;
+        --success-soft: #173728;
+        --warning: #f0c66d;
+        --warning-soft: #3f3015;
+        --danger: #f2a0a0;
+        --danger-soft: #402020;
+        --shadow: 0 1px 2px rgb(0 0 0 / 25%), 0 5px 20px rgb(0 0 0 / 18%);
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to benchmark runs</a>
+
+  <header>
+    <div class="header-inner">
+      <div>
+        <h1>Progressive Context Benchmarks</h1>
+        <p class="subtitle">Live and completed benchmark runs, refreshed automatically.</p>
+      </div>
+      <div class="connection-panel" role="status" aria-live="polite" aria-atomic="true">
+        <div class="connection-line">
+          <span id="connection-dot" class="connection-dot" data-state="connecting" aria-hidden="true"></span>
+          <span id="connection-text">Connecting…</span>
+        </div>
+        <p id="refresh-time" class="refresh-time">Last refresh: —</p>
+        <p id="snapshot-time" class="snapshot-time">Server snapshot: —</p>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content" tabindex="-1">
+    <div class="summary">
+      <p id="run-summary">Loading benchmark runs…</p>
+      <p>Polling every 2 seconds</p>
+    </div>
+    <p id="error-message" class="fatal-message" role="alert" data-visible="false"></p>
+    <div id="runs" class="runs" aria-busy="true">
+      <div class="empty-state">
+        <strong>Loading runs</strong>
+        Waiting for the first response from the local dashboard server.
+      </div>
+    </div>
+    <noscript>
+      <div class="empty-state">
+        <strong>JavaScript is required</strong>
+        Enable JavaScript to load and automatically refresh benchmark runs.
+      </div>
+    </noscript>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const POLL_INTERVAL_MS = 2000;
+      const EMPTY = "—";
+      const runsElement = document.querySelector("#runs");
+      const summaryElement = document.querySelector("#run-summary");
+      const connectionDot = document.querySelector("#connection-dot");
+      const connectionText = document.querySelector("#connection-text");
+      const refreshTime = document.querySelector("#refresh-time");
+      const snapshotTime = document.querySelector("#snapshot-time");
+      const errorMessage = document.querySelector("#error-message");
+      const numberFormatter = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 });
+      const integerFormatter = new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 });
+      const percentFormatter = new Intl.NumberFormat(undefined, {
+        style: "percent",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 1
+      });
+      const dateFormatter = new Intl.DateTimeFormat(undefined, {
+        dateStyle: "medium",
+        timeStyle: "medium"
+      });
+      const relativeFormatter = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+
+      let requestInFlight = false;
+      let hasSuccessfulResponse = false;
+
+      // Column visibility is data-driven (columnsForRun): a column renders
+      // only when at least one arm on the card carries a non-null value.
+      // Dead columns (all-null across every run kind) were removed 2026-09-22:
+      // load-all denominator, materialization lifecycle counts, eligibility
+      // gate, per-probe text dump, and scripted precision/skill/stale metrics
+      // that punish correct behavior (see PROBE-SCALE-REPORT §4).
+      const baseColumns = [
+        { key: "status", label: "Status", group: "State", format: formatStatus, className: "cell-status" },
+        { key: "contextTokens", label: "Context", group: "Context", format: formatInteger },
+        { key: "avgContextTokens", label: "Avg ctx", group: "Context", format: formatInteger },
+        { key: "peakContextTokens", label: "Peak ctx", group: "Context", format: formatInteger },
+        { key: "loadedResources", label: "Resources", group: "Context", format: formatInteger },
+        { key: "avgLoadedResources", label: "Avg res", group: "Context", format: formatInteger },
+        { key: "inputTokens", label: "Input", group: "Tokens", format: formatInteger },
+        { key: "outputTokens", label: "Output", group: "Tokens", format: formatInteger },
+        { key: "totalTokens", label: "Total", group: "Tokens", format: formatInteger },
+        { key: "durationMs", label: "Duration", group: "Execution", format: formatDuration },
+        { key: "turns", label: "Turns", group: "Execution", format: formatInteger },
+        { key: "verification", label: "Probes", group: "Result", format: formatVerification },
+        { key: "unloadMode", label: "Unload", group: "Result", format: formatUnloadMode }
+      ];
+
+      // Probe-eval cards add Noul grades link + fidelity/self-report numbers.
+      // Shown only when at least one arm carries probe data.
+      const probeColumns = [
+        { key: "gradesPath", label: "Noul grades", group: "Probes", format: formatGradesLink, className: "reasons" },
+        { key: "evictionFidelity", label: "Fidelity", group: "Probes", format: formatRatio },
+        { key: "selfReportAccuracy", label: "Self-report", group: "Probes", format: formatRatio }
+      ];
+
+      const scriptedColumns = [
+        { key: "scenarios", label: "Scenarios", group: "Scripted quality", format: formatInteger },
+        { key: "events", label: "Events", group: "Scripted quality", format: formatInteger },
+        { key: "ruleRecall", label: "Rule recall", group: "Scripted quality", format: formatRatio },
+        { key: "criticalMisses", label: "Critical misses", group: "Scripted quality", format: formatInteger },
+        { key: "missingTokens", label: "Missing tokens", group: "Scripted quality", format: formatInteger }
+      ];
+
+      function isPresent(value) {
+        return value !== null && value !== undefined && value !== "";
+      }
+
+      function asFiniteNumber(value) {
+        if (typeof value === "number" && Number.isFinite(value)) return value;
+        return null;
+      }
+
+      function formatText(value) {
+        return isPresent(value) ? String(value) : EMPTY;
+      }
+
+      function formatInteger(value) {
+        const number = asFiniteNumber(value);
+        return number === null ? EMPTY : integerFormatter.format(number);
+      }
+
+      function formatNumber(value) {
+        const number = asFiniteNumber(value);
+        return number === null ? EMPTY : numberFormatter.format(number);
+      }
+
+      function formatRatio(value) {
+        const number = asFiniteNumber(value);
+        return number === null ? EMPTY : percentFormatter.format(number);
+      }
+
+      function formatDuration(value) {
+        const milliseconds = asFiniteNumber(value);
+        if (milliseconds === null) return EMPTY;
+        if (milliseconds < 1000) return `${integerFormatter.format(milliseconds)} ms`;
+        const seconds = milliseconds / 1000;
+        if (seconds < 60) return `${formatNumber(seconds)} s`;
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = Math.round(seconds % 60);
+        if (minutes < 60) return `${integerFormatter.format(minutes)}m ${integerFormatter.format(remainingSeconds)}s`;
+        const hours = Math.floor(minutes / 60);
+        const remainingMinutes = minutes % 60;
+        return `${integerFormatter.format(hours)}h ${integerFormatter.format(remainingMinutes)}m`;
+      }
+
+      function formatStatus(value) {
+        if (!isPresent(value)) return EMPTY;
+        const status = String(value);
+        return status.charAt(0).toUpperCase() + status.slice(1);
+      }
+
+      function formatVerification(_value, arm) {
+        if (!isPresent(arm.verificationPassed) || !isPresent(arm.verificationTotal)) return EMPTY;
+        return `${formatInteger(arm.verificationPassed)} / ${formatInteger(arm.verificationTotal)}`;
+      }
+
+      function formatEligibility(value) {
+        if (value === true) return "Yes";
+        if (value === false) return "No";
+        return EMPTY;
+      }
+
+      function formatUnloadMode(value) {
+        if (value === "byte-proof") return "Byte-proof";
+        if (value === "behavioral") return "Behavioral";
+        if (value === "none") return "None";
+        return formatText(value);
+      }
+
+      function formatReasons(value) {
+        if (Array.isArray(value)) return value.length > 0 ? value.map(formatText).join("; ") : EMPTY;
+        return formatText(value);
+      }
+
+      // Compact per-probe numbers: "12/16 pass (pq-a:1 pq-b:0 …)". Full ids
+      // stay in the title tooltip; the cell shows short pass/fail digits.
+      function formatProbeDetail(value) {
+        if (!Array.isArray(value) || value.length === 0) return EMPTY;
+        const passes = value.filter((entry) => typeof entry === "string" && entry.endsWith(":pass")).length;
+        const digits = value.map((entry) => {
+          if (typeof entry !== "string") return "?";
+          return entry.endsWith(":pass") ? "1" : entry.endsWith(":fail") ? "0" : "?";
+        }).join(" ");
+        return `${passes}/${value.length} [${digits}]`;
+      }
+
+      function probeDetailTitle(value) {
+        if (!Array.isArray(value) || value.length === 0) return "";
+        return value.map(formatText).join("; ");
+      }
+
+      function formatGradesLink(value) {
+        if (!isPresent(value)) return EMPTY;
+        return String(value).split("/").pop();
+      }
+
+      function formatDate(value) {
+        if (!isPresent(value)) return EMPTY;
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? formatText(value) : dateFormatter.format(date);
+      }
+
+      function formatRelativeDate(value) {
+        if (!isPresent(value)) return EMPTY;
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return formatText(value);
+        const differenceSeconds = Math.round((date.getTime() - Date.now()) / 1000);
+        if (Math.abs(differenceSeconds) < 60) return relativeFormatter.format(differenceSeconds, "second");
+        const differenceMinutes = Math.round(differenceSeconds / 60);
+        if (Math.abs(differenceMinutes) < 60) return relativeFormatter.format(differenceMinutes, "minute");
+        const differenceHours = Math.round(differenceMinutes / 60);
+        if (Math.abs(differenceHours) < 24) return relativeFormatter.format(differenceHours, "hour");
+        return formatDate(value);
+      }
+
+      function appendTextElement(parent, tagName, text, className) {
+        const element = document.createElement(tagName);
+        if (className) element.className = className;
+        element.textContent = text;
+        parent.append(element);
+        return element;
+      }
+
+      function normalizedState(value) {
+        return value === "running" || value === "completed" ? value : "unknown";
+      }
+
+      function appendBadge(parent, value, state) {
+        const badge = appendTextElement(parent, "span", formatText(value), "badge");
+        if (state) badge.dataset.state = normalizedState(state);
+      }
+
+      function appendMeta(metadata, label, value, title) {
+        const wrapper = document.createElement("div");
+        appendTextElement(wrapper, "dt", label);
+        const detail = appendTextElement(wrapper, "dd", value);
+        if (title) detail.title = title;
+        metadata.append(wrapper);
+      }
+
+      // Visibility is per-column: a column renders only if at least one arm
+      // on THIS card carries a value. Dead columns never appear anywhere.
+      function columnsForRun(run) {
+        const arms = Array.isArray(run.arms) ? run.arms : [];
+        const visible = (column) => arms.some((arm) => arm && isPresent(arm[column.key]));
+        let columns = baseColumns.filter(visible);
+        const isProbeKind = run && (run.kind === "probe-eval" || run.kind === "probe-multi");
+        if (isProbeKind || probeColumns.some(visible)) columns = columns.concat(probeColumns.filter(visible));
+        if (scriptedColumns.some(visible)) columns = columns.concat(scriptedColumns.filter(visible));
+        return columns;
+      }
+
+      function groupedColumns(columns) {
+        const groups = [];
+        for (const column of columns) {
+          const previous = groups[groups.length - 1];
+          if (previous && previous.label === column.group) {
+            previous.count += 1;
+          } else {
+            groups.push({ label: column.group, count: 1 });
+          }
+        }
+        return groups;
+      }
+
+      function createArmTable(run) {
+        const wrapper = document.createElement("div");
+        wrapper.className = "table-scroll";
+        wrapper.tabIndex = 0;
+        wrapper.setAttribute("role", "region");
+        wrapper.setAttribute("aria-label", `${formatText(run.label)} arm metrics; scroll horizontally for more columns`);
+
+        const table = document.createElement("table");
+        const caption = document.createElement("caption");
+        caption.textContent = `Per-arm metrics for ${formatText(run.label)}`;
+        table.append(caption);
+
+        const columns = columnsForRun(run);
+        const head = document.createElement("thead");
+        const groupRow = document.createElement("tr");
+        const armGroup = appendTextElement(groupRow, "th", "Arm");
+        armGroup.scope = "colgroup";
+        armGroup.rowSpan = 2;
+        for (const group of groupedColumns(columns)) {
+          const groupHeader = appendTextElement(groupRow, "th", group.label);
+          groupHeader.scope = "colgroup";
+          groupHeader.colSpan = group.count;
+        }
+        head.append(groupRow);
+
+        const labelRow = document.createElement("tr");
+        for (const column of columns) {
+          const heading = appendTextElement(labelRow, "th", column.label);
+          heading.scope = "col";
+        }
+        head.append(labelRow);
+        table.append(head);
+
+        const body = document.createElement("tbody");
+        const arms = Array.isArray(run.arms) ? run.arms : [];
+        if (arms.length === 0) {
+          const row = document.createElement("tr");
+          const cell = appendTextElement(row, "td", "No arm data is available yet.");
+          cell.colSpan = columns.length + 1;
+          cell.className = "reasons";
+          body.append(row);
+        } else {
+          for (const candidate of arms) {
+            const arm = candidate && typeof candidate === "object" ? candidate : {};
+            const row = document.createElement("tr");
+            const armHeading = document.createElement("th");
+            armHeading.scope = "row";
+            appendTextElement(armHeading, "span", formatText(arm.label), "arm-name");
+            if (isPresent(arm.name) && arm.name !== arm.label) {
+              appendTextElement(armHeading, "span", formatText(arm.name), "arm-key");
+            }
+            row.append(armHeading);
+
+            for (const column of columns) {
+              const cell = appendTextElement(row, "td", column.format(arm[column.key], arm));
+              if (column.className) cell.className = column.className;
+              if (column.key === "status") cell.dataset.state = normalizedState(arm.status);
+              if (column.key === "eligible") {
+                cell.dataset.state = arm.eligible === true ? "yes" : arm.eligible === false ? "no" : "unknown";
+              }
+              if (column.key === "durationMs" && isPresent(arm.durationMs)) {
+                cell.title = `${formatInteger(arm.durationMs)} milliseconds`;
+              }
+              if (column.key === "probeDetail" && Array.isArray(arm.probeDetail)) {
+                cell.title = probeDetailTitle(arm.probeDetail);
+              }
+              if (column.key === "gradesPath" && isPresent(arm.gradesPath)) {
+                cell.title = `Noul grades file: ${arm.gradesPath}`;
+              }
+            }
+            body.append(row);
+          }
+        }
+        table.append(body);
+        wrapper.append(table);
+        return wrapper;
+      }
+
+      function createRunCard(candidate, index) {
+        const run = candidate && typeof candidate === "object" ? candidate : {};
+        const card = document.createElement("article");
+        card.className = "run-card";
+        card.setAttribute("aria-labelledby", `run-heading-${index}`);
+
+        const header = document.createElement("div");
+        header.className = "run-header";
+        const identity = document.createElement("div");
+        const headingLine = document.createElement("div");
+        headingLine.className = "run-heading-line";
+        const heading = appendTextElement(headingLine, "h2", formatText(run.label));
+        heading.id = `run-heading-${index}`;
+        identity.append(headingLine);
+        appendTextElement(identity, "p", `Run ID: ${formatText(run.id)}`, "run-id");
+        header.append(identity);
+
+        const badges = document.createElement("div");
+        badges.className = "badges";
+        appendBadge(badges, formatStatus(run.status), run.status);
+        appendBadge(badges, run.kind);
+        header.append(badges);
+
+        const metadata = document.createElement("dl");
+        metadata.className = "run-meta";
+        appendMeta(metadata, "Created", formatDate(run.createdAt), isPresent(run.createdAt) ? String(run.createdAt) : "");
+        appendMeta(metadata, "Updated", formatRelativeDate(run.updatedAt), isPresent(run.updatedAt) ? formatDate(run.updatedAt) : "");
+        appendMeta(metadata, "Model", formatText(run.model));
+        appendMeta(metadata, "Routing backend", formatText(run.routingBackend));
+        header.append(metadata);
+
+        card.append(header, createArmTable(run));
+        return card;
+      }
+
+      function snapshotScrollPositions() {
+        const positions = new Map();
+        for (const scroller of runsElement.querySelectorAll(".table-scroll")) {
+          const card = scroller.closest(".run-card");
+          const runId = card?.querySelector(".run-id")?.textContent ?? "";
+          positions.set(`${runId}::${scroller.getAttribute("aria-label")}`, {
+            left: scroller.scrollLeft,
+            top: scroller.scrollTop,
+          });
+        }
+        return positions;
+      }
+
+      function restoreScrollPositions(positions) {
+        for (const scroller of runsElement.querySelectorAll(".table-scroll")) {
+          const card = scroller.closest(".run-card");
+          const runId = card?.querySelector(".run-id")?.textContent ?? "";
+          const saved = positions.get(`${runId}::${scroller.getAttribute("aria-label")}`);
+          if (saved) {
+            scroller.scrollLeft = saved.left;
+            scroller.scrollTop = saved.top;
+          }
+        }
+      }
+
+      function renderRuns(runs) {
+        const selection = window.getSelection();
+        const hasUserSelection = selection !== null && selection.rangeCount > 0 && !selection.isCollapsed &&
+          runsElement.contains(selection.anchorNode);
+        const active = document.activeElement;
+        const focusedId = active && runsElement.contains(active) ? active.id : null;
+        const scrollPositions = snapshotScrollPositions();
+        const fragment = document.createDocumentFragment();
+        if (runs.length === 0) {
+          const empty = document.createElement("div");
+          empty.className = "empty-state";
+          appendTextElement(empty, "strong", "No benchmark runs found");
+          empty.append(document.createTextNode("New live and completed runs will appear here automatically."));
+          fragment.append(empty);
+        } else {
+          runs.forEach((run, index) => fragment.append(createRunCard(run, index)));
+        }
+        // Preserve text selection, focus, and scroll: skip DOM replacement while
+        // the user is selecting or focused inside the runs. Fresh data arrives
+        // on the next poll after the interaction ends.
+        if (hasUserSelection || (active && runsElement.contains(active))) {
+          return;
+        }
+        runsElement.replaceChildren(fragment);
+        restoreScrollPositions(scrollPositions);
+        runsElement.setAttribute("aria-busy", "false");
+
+        const runningCount = runs.filter((run) => run && run.status === "running").length;
+        const completedCount = runs.filter((run) => run && run.status === "completed").length;
+        summaryElement.textContent = `${integerFormatter.format(runs.length)} run${runs.length === 1 ? "" : "s"} · ${integerFormatter.format(runningCount)} running · ${integerFormatter.format(completedCount)} completed`;
+        if (focusedId) {
+          const next = document.getElementById(focusedId);
+          if (next) next.focus({ preventScroll: true });
+        }
+      }
+
+      function setConnection(state, text) {
+        connectionDot.dataset.state = state;
+        connectionText.textContent = text;
+      }
+
+      async function refresh() {
+        if (requestInFlight) return;
+        requestInFlight = true;
+        if (!hasSuccessfulResponse) setConnection("connecting", "Connecting…");
+
+        try {
+          const response = await fetch("/api/runs", {
+            method: "GET",
+            cache: "no-store",
+            headers: { Accept: "application/json" }
+          });
+          if (!response.ok) throw new Error(`Request failed with HTTP ${response.status}`);
+
+          const payload = await response.json();
+          if (!payload || !Array.isArray(payload.runs)) {
+            throw new Error("The server returned an invalid runs response");
+          }
+
+          renderRuns(payload.runs);
+          hasSuccessfulResponse = true;
+          setConnection("connected", "Connected");
+          refreshTime.textContent = `Last refresh: ${dateFormatter.format(new Date())}`;
+          snapshotTime.textContent = `Server snapshot: ${formatDate(payload.generatedAt)}`;
+          errorMessage.dataset.visible = "false";
+          errorMessage.textContent = "";
+        } catch (error) {
+          setConnection("error", "Connection error — retrying");
+          const detail = error instanceof Error ? error.message : "Unable to load benchmark runs";
+          errorMessage.textContent = hasSuccessfulResponse
+            ? `${detail}. The last successful data remains visible; retrying automatically.`
+            : `${detail}. Retrying automatically.`;
+          errorMessage.dataset.visible = "true";
+          runsElement.setAttribute("aria-busy", "false");
+          if (!hasSuccessfulResponse) summaryElement.textContent = "Benchmark runs are temporarily unavailable.";
+        } finally {
+          requestInFlight = false;
+        }
+      }
+
+      void refresh();
+      window.setInterval(() => void refresh(), POLL_INTERVAL_MS);
+    })();
+  </script>
+</body>
+</html>

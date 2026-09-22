@@ -1,0 +1,121 @@
+{
+  "version": "probe-v3-frozen",
+  "extends": "probe-v2-frozen",
+  "notes": "Extension set for eviction-fidelity and self-report eval. The 10 v1 probes stay frozen in probe-questions.json and the 6 v2 probes in probe-questions-v2.json; these 10 cover new phases (rate-limit, caching, refunds-deep, audit, rollout, pricing) plus a checkout-api revisit to force re-materialization and two look-alike skill-discrimination probes. Same grading contract: mustCite/mustQuote/mustNotCite endorsement-scoped to the Rules: line; mustQuote entries are any-of (a turn passes when any one entry matches). recallTemplate is auto-inserted at each phase boundary. Frozen 2026-09-22; do not retune against results.",
+  "probes": [
+    {
+      "id": "pq-rate-limit",
+      "phase": "rate-limit",
+      "question": "The checkout API is seeing burst traffic from a single client. Which rate-limiting rules constrain this endpoint? Name each rule id and state the required response when the limit is exceeded.",
+      "expectedIds": ["rule.rate-limiting"],
+      "expectedSkills": [],
+      "forbiddenIds": ["rule.mobile-ios-guidelines", "rule.ml-model-governance"],
+      "mustCite": ["rule.rate-limiting"],
+      "mustQuote": ["429", "rate", "limit", "retry"],
+      "mustNotCite": ["rule.mobile-ios-guidelines", "rule.ml-model-governance"]
+    },
+    {
+      "id": "pq-caching",
+      "phase": "caching",
+      "question": "Order totals may be cached at the edge. Which caching-policy rules govern cacheability and invalidation here? Name each rule id and one required invalidation condition.",
+      "expectedIds": ["rule.caching-policy"],
+      "expectedSkills": [],
+      "forbiddenIds": ["rule.mobile-ios-guidelines", "rule.ml-model-governance"],
+      "mustCite": ["rule.caching-policy"],
+      "mustQuote": ["invalidat", "no-store", "max-age", "stale"],
+      "mustNotCite": ["rule.mobile-ios-guidelines"]
+    },
+    {
+      "id": "pq-order-state",
+      "phase": "checkout-api",
+      "question": "An order moves from pending to paid to fulfilled with a possible refund. You already answered checkout questions earlier; which order state-machine rules govern the allowed transitions now? Name each rule id and one forbidden transition.",
+      "expectedIds": ["rule.order-state-machine"],
+      "expectedSkills": [],
+      "forbiddenIds": ["rule.mobile-ios-guidelines", "rule.ml-model-governance"],
+      "mustCite": ["rule.order-state-machine"],
+      "mustQuote": ["transition", "pending", "fulfilled", "refund"],
+      "mustNotCite": ["rule.mobile-ios-guidelines"]
+    },
+    {
+      "id": "pq-audit",
+      "phase": "audit",
+      "question": "Every refund and payout change must leave an audit trail. Which audit-trail rules apply? Name each rule id and one required field of each audit entry.",
+      "expectedIds": ["rule.audit-trails"],
+      "expectedSkills": [],
+      "forbiddenIds": ["rule.mobile-ios-guidelines", "rule.ml-model-governance"],
+      "mustCite": ["rule.audit-trails"],
+      "mustQuote": ["audit", "actor", "timestamp"],
+      "mustNotCite": ["rule.mobile-ios-guidelines"]
+    },
+    {
+      "id": "pq-flags",
+      "phase": "rollout",
+      "question": "The new pricing engine will roll out behind a feature flag. Which feature-flag rules govern the rollout? Name each rule id and the required kill-switch property.",
+      "expectedIds": ["rule.feature-flags"],
+      "expectedSkills": [],
+      "forbiddenIds": ["rule.mobile-ios-guidelines", "rule.ml-model-governance"],
+      "mustCite": ["rule.feature-flags"],
+      "mustQuote": ["flag", "kill", "rollout", "switch"],
+      "mustNotCite": ["rule.mobile-ios-guidelines"]
+    },
+    {
+      "id": "pq-canary-slo",
+      "phase": "rollout",
+      "question": "The release will canary to 5% of traffic with error-budget gates. Which canary and SLO rules govern promotion? Name each rule id and the required promotion gate.",
+      "expectedIds": ["rule.canary-deploys", "rule.slo-error-budgets"],
+      "expectedSkills": [],
+      "forbiddenIds": ["rule.mobile-ios-guidelines", "rule.ml-model-governance"],
+      "mustCite": ["rule.canary-deploys"],
+      "mustQuote": ["canary", "error budget", "promot", "rollback"],
+      "mustNotCite": ["rule.mobile-ios-guidelines", "rule.ml-model-governance"]
+    },
+    {
+      "id": "pq-tax",
+      "phase": "pricing",
+      "question": "Checkout must compute sales tax for taxable jurisdictions. Which tax-calculation rules govern the computation? Name each rule id and state where tax must be computed.",
+      "expectedIds": ["rule.tax-calculation"],
+      "expectedSkills": [],
+      "forbiddenIds": ["rule.mobile-ios-guidelines", "rule.ml-model-governance"],
+      "mustCite": ["rule.tax-calculation"],
+      "mustQuote": ["tax", "jurisdiction", "nexus"],
+      "mustNotCite": ["rule.mobile-ios-guidelines"]
+    },
+    {
+      "id": "pq-currency",
+      "phase": "pricing",
+      "question": "Prices display in EUR but settle in USD. Which multi-currency rules govern conversion and rounding? Name each rule id and the required rounding rule.",
+      "expectedIds": ["rule.multi-currency"],
+      "expectedSkills": [],
+      "forbiddenIds": ["rule.mobile-ios-guidelines", "rule.ml-model-governance"],
+      "mustCite": ["rule.multi-currency"],
+      "mustQuote": ["currenc", "conver", "round", "fx"],
+      "mustNotCite": ["rule.mobile-ios-guidelines"]
+    },
+    {
+      "id": "pq-lookalike-readonly",
+      "phase": "refunds-deep",
+      "question": "Generate a read-only report of refund totals per day from the orders table without changing any schema. Which skill governs this read-only query? Name the skill id and state the required read-only property.",
+      "expectedIds": [],
+      "expectedSkills": ["skill.query-postgres-readonly"],
+      "forbiddenIds": ["skill.migrate-postgres-schema", "rule.mobile-ios-guidelines"],
+      "mustCite": [],
+      "mustQuote": ["readonly", "read-only", "select"],
+      "mustNotCite": ["skill.migrate-postgres-schema"]
+    },
+    {
+      "id": "pq-lookalike-checkout",
+      "phase": "checkout-api",
+      "question": "Create a new Stripe Checkout Session for cart cart_test_4001 from the checkout route. Which skill governs session creation? Name the skill id and state the required redirect property.",
+      "expectedIds": [],
+      "expectedSkills": ["skill.create-checkout-session"],
+      "forbiddenIds": ["skill.handle-webhook", "rule.mobile-ios-guidelines"],
+      "mustCite": [],
+      "mustQuote": ["checkout", "session", "redirect"],
+      "mustNotCite": ["skill.handle-webhook"]
+    }
+  ],
+  "recallTemplate": {
+    "idSuffix": "-recall",
+    "question": "You have answered several questions across phases. Without quoting rule text, list the rule/skill ids that are still active constraints on your current work. Answer template: Rules: <comma list or none>."
+  }
+}
