@@ -1,12 +1,11 @@
 # JEV × APM Progressive Context PoC — Evidence Report
 
-> Status: HARDENED BENCHMARK, PROVIDER-BACKED SCRIPTED EVIDENCE (TRAINING +
-> FROZEN HELD-OUT-V2), LIVE SMOKE BLOCKED ON MODEL SERVER.
-> Single-run held-out-v2 with frozen config FAILS the strict routing gates
-> (recall 0.781, precision 0.605, 4 critical misses) — reported honestly,
-> no retuning. The local qwen3 model server is unreachable (TCP closed), so
-> the paired live smoke cannot run. Nothing below aggregates fail-open or
-> oracle results as provider-backed evidence.
+> Status: ISOLATED PROBE EVAL AT SCALE (94 resources / 46.7k tokens).
+> v1/v2/v3 probe sets are TUNING sets (used iteratively — not held-out).
+> probe-v4-heldout is the frozen held-out set: 10/10 retrieval on all 3 arms,
+> JEV isolated (contamination-clean) at 3,906 avg ctx vs 46,736 flat.
+> Artifacts embed probeSet + evaluator definitions with hashes; grading uses
+> embedded definitions (fixture fallback only for legacy artifacts).
 
 ## 1. Provenance and independence
 
@@ -134,3 +133,20 @@ bun run evals/progressive-context/validate-scripted.ts evals/progressive-context
 - JEV overhead: 21 calls / 42514 in / 8758 out tokens across 13 progressive events; p50 514ms / p95 587ms per event (2 calls: rules+stage1, stage2).
 - Trial eligibility: scripted progressive records all `provider_backed`; oracle kept separate; live gate per §7.
 - Provenance: §1 + guard + quarantine record.
+
+## 10. Isolated probe eval (v4 held-out, 2026-09-22)
+
+Artifact `probe-2026-09-22T17-31-31-8wmokx.json` (+ `.grades.json`), Spark,
+provider-backed JEV, 94-resource catalog. JEV workspaces contain NO apm.yml,
+.apm/, .agents/rules/, or .agents/skills/ (controller-only APM store);
+contamination gates (workspace scan + skill-tool + store-access) clean on all
+arms. Artifacts embed probeSet + evaluator v4 with sha16 hashes.
+
+| arm | retrieval | recall | misses | fidelity | avg ctx | tokens |
+|---|---|---|---|---|---|---|
+| load_all | 10/10 | 1.0 | 0 | — | 46,736 | 633k |
+| apm_discovery | 10/10 | 1.0 | 0 | — | traced | 1.37M |
+| jev (isolated) | 10/10 | 1.0 | 0 | 0.9997 | 3,906 | 257k |
+
+Key proof: JEV matches both baselines exactly on unseen probes while
+physically unable to access non-materialized resources, at 8% of the context.

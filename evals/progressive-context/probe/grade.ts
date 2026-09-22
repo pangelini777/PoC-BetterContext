@@ -1,9 +1,19 @@
 // Probe-question grader: deterministic retrieval scoring + SystemOne Noul grading.
+// Implements evaluator v4 (probe-retrieval+noul): Rules-line endorsement
+// substring rule (endorses) for retrieval — an expected id counts when a
+// Rules-line entry contains it or vice versa, with slug/stem cover in both
+// directions; mustCite all endorsed, mustNotCite none endorsed, mustQuote
+// any-of present — plus per-expected-rule compliance Noul (state
+// {question, answer, ruleBody}), distractor Choice
+// {follows, contradicts, correctly-dismissed}, eviction Choice
+// {relies-on-evicted, consistent-but-independent, unrelated}, and Rules-line
+// recall self-report vs expected/current set (+ Jaccard agreementWithRunner).
 //
 // Pure retrieval checks run with no network. Noul grading calls the JEV
 // System One API and is fail-open: any error yields null scores, never throws.
 //
-// Fixture shape mirrors fixtures/probe-questions.json (probe-v1-frozen).
+// ProbeQuestion shape mirrors one entry of the embedded artifact probeSet
+// (legacy: fixtures/probe-questions.json, probe-v1-frozen).
 
 import { systemOne, type Question } from "../../../packages/jev-client/src/client.ts";
 

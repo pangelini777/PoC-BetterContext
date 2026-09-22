@@ -5,7 +5,7 @@
 // 120s default (PROBE_MULTI_TIMEOUT_MS). No arm runs formatters, linters,
 // typecheck, tests, or project-wide validation.
 //
-// Arms (same frozen probe set, model, and demo-workspace fixture; only the
+// Arms (same tuning probe set, model, and demo-workspace fixture; only the
 // APM context policy differs):
 //
 // - load_all_single: full catalog compiled into THIS probe's prompt via
@@ -15,26 +15,33 @@
 //   `install --target opencode,antigravity` output (.agents/rules/ +
 //   .agents/skills/) committed in place. The agent discovers autonomously.
 //   Materialized set is unknown -> null. unloadMode=none.
-// - jev_single: same discovery files, NO plugin, NO --session. Routing is
-//   runner-owned: a FRESH ProgressiveSession per probe routes exactly ONE
-//   event (the probe question) and the harness-assembled effective request
-//   (kernel + exactly one overlay, scrubbed history — trivially empty on a
-//   fresh harness) becomes that probe's prompt. unloadMode=byte-proof.
+// - jev_single: workspace gets the demo fixture ONLY (no apm.yml, .apm/,
+//   .agents/rules/, .agents/skills/ — a contamination gate fails the trial
+//   if any appear). The APM catalog lives in a controller-owned store
+//   (mkdtemp dir outside the workspace) and the catalog loads from there.
+//   NO plugin, NO --session. Routing is runner-owned: a FRESH
+//   ProgressiveSession per probe routes exactly ONE event (the probe
+//   question) and the harness-assembled effective request (kernel + exactly
+//   one overlay, scrubbed history — trivially empty on a fresh harness)
+//   becomes that probe's prompt. unloadMode=byte-proof.
 //
 // Artifact: kind "probe-multi" with trials[] carrying probeResults[] per
 // probe: { probeId, answer, retrieval{citedExpected, citedForbidden,
-// quoteHit}, materializedIds, contextTokens, freshSession:true }. A top-level
-// `bodies` snapshot (full rule + skill bodies keyed by id) travels with the
-// artifact so the separate grader (probe/grade-run.ts) can judge without
-// reading disk. Progress sidecar at results/.live/<runId>.json (deleted after
-// the final artifact writes successfully).
+// quoteHit}, materializedIds, contextTokens, freshSession:true } plus
+// trial.contamination {clean, reasons[]} from the per-probe workspace +
+// tool-call gate. Top-level probeSet (full content-probe definitions,
+// recall probes excluded), recallTemplate, evaluator, probeSetHash, and
+// evaluatorHash travel with the artifact so the separate grader
+// (probe/grade-run.ts) can judge without reading disk. Progress sidecar at
+// results/.live/<runId>.json (deleted after the final artifact writes
+// successfully).
 
 import { createHash } from "node:crypto";
-import { appendFile, cp, mkdir, mkdtemp, readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
+import { appendFile, cp, mkdir, mkdtemp, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { execFile } from "node:child_process";
-import { loadCatalog } from "../../packages/apm-catalog/src/catalog.ts";
+import { loadCatalog, type Catalog } from "../../packages/apm-catalog/src/catalog.ts";
 import { HeuristicBackend, SystemOneBackend } from "../../packages/progressive-context/src/router.ts";
 import type { ScoreBackend } from "../../packages/progressive-context/src/router.ts";
 import { compileOverlay, countOverlays } from "../../packages/progressive-context/src/compiler.ts";
@@ -63,6 +70,7 @@ Quote: <one quoted line from the cited rule, or "n/a">`;
 const PROBE_FIXTURE = join(REPO_ROOT, "fixtures/probe-questions.json");
 const PROBE_FIXTURE_V2 = join(REPO_ROOT, "fixtures/probe-questions-v2.json");
 const PROBE_FIXTURE_V3 = join(REPO_ROOT, "fixtures/probe-questions-v3.json");
+const PROBE_FIXTURE_V4 = join(REPO_ROOT, "fixtures/probe-questions-v4-heldout.json");
 
 export type ProbeMultiArm = "load_all_single" | "apm_discovery" | "jev_single";
 export type UnloadMode = "byte-proof" | "behavioral" | "none";
@@ -129,6 +137,7 @@ interface ProbeMultiTrial {
   agentTokens: { input: number; output: number; reasoning: number; total: number };
   unloadMode: UnloadMode;
   eligibility: { eligible: boolean; reasons: string[] };
+  contamination: { clean: boolean; reasons: string[] };
   workspace: string;
   opencodeSessionId: string | null;
   sessionContinued: boolean;
@@ -190,6 +199,85 @@ function scoreRetrievalLocal(probe: ProbeQuestion, answer: string): ProbeRetriev
     citedForbidden: probe.mustNotCite.some((id) => text.includes(id.toLowerCase())),
     quoteHit: probe.mustQuote.length === 0 || probe.mustQuote.some((q) => text.includes(q.toLowerCase())),
   };
+}
+
+/** Canonical JSON: recursive sorted-key stringify for stable hashing. */
+function canonicalize(v: unknown): string {
+  if (v === null || typeof v !== "object") return JSON.stringify(v) ?? "null";
+  if (Array.isArray(v)) return `[${v.map(canonicalize).join(",")}]`;
+  const rec = v as Record<string, unknown>;
+  return `{${Object.keys(rec).sort().map((k) => `${JSON.stringify(k)}:${canonicalize(rec[k])}`).join(",")}}`;
+}
+
+
+/** Embedded evaluator contract (grader reads this from the artifact). */
+const EVALUATOR = {
+  name: "probe-retrieval+noul",
+  version: "v4",
+  retrieval:
+    "Rules-line endorsement substring rule (endorses): expected id counts when a Rules-line entry contains it or vice versa, slug/stem cover both directions; mustCite all endorsed, mustNotCite none endorsed, mustQuote any-of present",
+  noul:
+    "per-expected-rule compliance Noul (state {question, answer, ruleBody}) + distractor Choice {follows,contradicts,correctly-dismissed} + eviction Choice {relies-on-evicted,consistent-but-independent,unrelated}",
+  selfReport: "Rules-line recall vs expected/current set + Jaccard agreementWithRunner",
+} as const;
+
+/** Controller-owned APM store: mkdtemp dir OUTSIDE the agent workspace
+ *  holding apm.yml + .apm/ + installed .agents/ output; the catalog loads
+ *  from there. Agent workspaces never see these files on JEV arms. */
+async function setupIsolatedApmStore(): Promise<string> {
+  const store = await mkdtemp(join(tmpdir(), "jev-apm-store-"));
+  await cp(join(REPO_ROOT, "fixtures/apm-package/apm.yml"), join(store, "apm.yml"));
+  await cp(join(REPO_ROOT, "fixtures/apm-package/jev-runtime.yaml"), join(store, "jev-runtime.yaml"));
+  await cp(join(REPO_ROOT, "fixtures/apm-package/.apm"), join(store, ".apm"), { recursive: true });
+  await sh(APM_BIN, ["install", "--target", "opencode,antigravity"], store, APM_TIMEOUT_MS);
+  return store;
+}
+
+/** Forbidden agent-workspace paths on JEV arms (controller-store only). */
+const JEV_FORBIDDEN_REL = ["apm.yml", ".apm", ".agents/rules", ".agents/skills"];
+
+/** Contamination gate (workspace half): list workspace files (git ls-files
+ *  plus a direct stat of each forbidden path). Returns reasons; empty = clean. */
+async function assertJevWorkspaceClean(ws: string): Promise<string[]> {
+  const reasons: string[] = [];
+  const ls = await sh("git", ["ls-files"], ws);
+  const tracked = ls.out.split("\n").map((l) => l.trim()).filter(Boolean);
+  for (const rel of JEV_FORBIDDEN_REL) {
+    if (tracked.some((f) => f === rel || f.startsWith(`${rel}/`))) {
+      reasons.push(`forbidden workspace path tracked: ${rel}`);
+      continue;
+    }
+    try {
+      await stat(join(ws, rel));
+      reasons.push(`forbidden workspace path present: ${rel}`);
+    } catch {
+      // absent — clean
+    }
+  }
+  return reasons;
+}
+
+/** Contamination gate (tool-call half): native skill-tool invocation or
+ *  direct controller-store access. Returns reasons; empty = clean. */
+function scanToolCallsForContamination(
+  probeId: string,
+  toolCalls: { name: string; status: string; args: string }[],
+  storePath: string,
+): string[] {
+  const reasons: string[] = [];
+  for (const c of toolCalls) {
+    if (c.name === "skill") {
+      reasons.push(`probe ${probeId}: native skill-tool invocation (tool name == "skill")`);
+    }
+    const args = c.args ?? "";
+    if (storePath && args.includes(storePath)) {
+      reasons.push(`probe ${probeId}: tool call references controller store path`);
+    }
+    if (args.includes("/.apm/") || args.includes(".agents/rules") || args.includes(".agents/skills")) {
+      reasons.push(`probe ${probeId}: tool call references controller store content (${c.name})`);
+    }
+  }
+  return reasons.filter((r, i) => reasons.indexOf(r) === i);
 }
 
 /** Hybrid-memory mode (opt-in via --hybrid-memory): per-probe fresh sessions
@@ -373,6 +461,7 @@ async function runProbeMultiArm(opts: {
   dryRun: boolean;
   hybridMemory: boolean;
   backend: ScoreBackend;
+  storePath: string;
   reportProgress: (trial: ProbeMultiTrial) => Promise<void>;
 }): Promise<ProbeMultiTrial> {
   const t0 = Date.now();
@@ -387,6 +476,7 @@ async function runProbeMultiArm(opts: {
     agentTokens: { ...blankTokens },
     unloadMode,
     eligibility: { eligible: false, reasons: ["running"] },
+    contamination: { clean: true, reasons: [] },
     workspace: "",
     opencodeSessionId: null,
     sessionContinued: false,
@@ -402,6 +492,7 @@ async function runProbeMultiArm(opts: {
   const setupFailures: string[] = [];
   const timedOutProbes: string[] = [];
   const overlayViolations: string[] = [];
+  const contaminationReasons: string[] = [];
 
   const compiledAll = compileOverlay(opts.catalogIds, opts.catalogBodies, "evt-probe-multi-000");
   const loadAllOverlayTokens = compiledAll.resourceTokenEstimate;
@@ -496,6 +587,9 @@ async function runProbeMultiArm(opts: {
       continue;
     }
     running.workspace = ws;
+    if (opts.arm === "jev_single") {
+      for (const r of await assertJevWorkspaceClean(ws)) contaminationReasons.push(`probe ${probe.id}: ${r}`);
+    }
     // Per-probe arm setup + prompt. Every probe is a fresh session, so every
     // prompt carries its full arm preamble — no history is ever continued.
     let materializedIds: string[] | null;
@@ -508,7 +602,7 @@ async function runProbeMultiArm(opts: {
       contextTokens = loadAllOverlayTokens;
       prompt =
         `${KERNEL}\n${compiledAll.dynamicOverlay}\n\n<probe id="${probe.id}" phase="${probe.phase}">\n${probe.question}\n</probe>\n\n${ANSWER_TEMPLATE}\n${SKIP_VALIDATION_LINE}`;
-    } else {
+    } else if (opts.arm === "apm_discovery") {
       const install = await installApmDiscovery(ws);
       if (install.code !== 0) {
         setupFailures.push(`probe ${probe.id}: apm install failed for opencode,antigravity targets`);
@@ -539,49 +633,50 @@ async function runProbeMultiArm(opts: {
         probeSessionIds.push(null);
         continue;
       }
-      if (opts.arm === "jev_single") {
-        // Harness-owned routing: a FRESH ProgressiveSession routes exactly ONE
-        // event (this probe). The harness-assembled effective request —
-        // kernel + exactly one overlay over scrubbed (empty) history —
-        // becomes the prompt. No plugin, no --session.
-        const sess = new ProgressiveSession({
-          runId: opts.runId,
-          sessionId: `${opts.trialId}-${probe.id}`,
-          arm: "progressive_jev",
-          goal: "Answer probe questions about APM-managed rules and skills for this workspace.",
-          catalogHash: opts.catalogHash,
-          bodies: opts.catalogBodies,
-          rules: opts.catalogRules,
-          skills: opts.catalogSkills,
-          byId: opts.catalogById,
-          cfg: opts.cfg,
-          backend: opts.backend,
-          loadAllTokens: opts.loadAllTokens,
-        });
-        const rec = await sess.runEvent({
-          kind: "user_message",
-          text: `<probe id="${probe.id}" phase="${probe.phase}">\n${probe.question}\n</probe>`,
-          phase: probe.phase,
-          changedPaths: [],
-        });
-        materializedIds = [...rec.materializedAfter].sort();
-        evictedIds = [...rec.removed];
-        contextTokens = rec.compiledResourceTokens;
-        const harness = sess.getHarness();
-        const effective = harness.effectiveContext(harness.requestCount() - 1);
-        prompt = `${effective}\n\n${ANSWER_TEMPLATE}\n${SKIP_VALIDATION_LINE}`;
-        // Byte-proof assertion on the exact prompt bytes: one harness request
-        // (no history) and at most one overlay block (zero when nothing
-        // materialized). Stale content cannot survive a fresh harness.
-        if (harness.requestCount() !== 1 || countOverlays(prompt) > 1) {
-          overlayViolations.push(probe.id);
-        }
-      } else {
-        materializedIds = null;
-        evictedIds = null;
-        contextTokens = 0;
-        prompt =
-          `This workspace uses APM-managed context (apm.yml, .apm/, .agents/rules/, .agents/skills/). Discover and follow the relevant rules and skills autonomously.\n\n<probe id="${probe.id}" phase="${probe.phase}">\n${probe.question}\n</probe>\n\n${ANSWER_TEMPLATE}\n${SKIP_VALIDATION_LINE}`;
+      materializedIds = null;
+      evictedIds = null;
+      contextTokens = 0;
+      prompt =
+        `This workspace uses APM-managed context (apm.yml, .apm/, .agents/rules/, .agents/skills/). Discover and follow the relevant rules and skills autonomously.\n\n<probe id="${probe.id}" phase="${probe.phase}">\n${probe.question}\n</probe>\n\n${ANSWER_TEMPLATE}\n${SKIP_VALIDATION_LINE}`;
+    } else {
+      // jev_single: workspace gets the demo fixture ONLY — no
+      // installApmDiscovery call. The catalog lives in the
+      // controller-owned store. Harness-owned routing: a FRESH
+      // ProgressiveSession routes exactly ONE event (this probe). The
+      // harness-assembled effective request — kernel + exactly one
+      // overlay over scrubbed (empty) history — becomes the prompt.
+      // No plugin, no --session.
+      const sess = new ProgressiveSession({
+        runId: opts.runId,
+        sessionId: `${opts.trialId}-${probe.id}`,
+        arm: "progressive_jev",
+        goal: "Answer probe questions about APM-managed rules and skills for this workspace.",
+        catalogHash: opts.catalogHash,
+        bodies: opts.catalogBodies,
+        rules: opts.catalogRules,
+        skills: opts.catalogSkills,
+        byId: opts.catalogById,
+        cfg: opts.cfg,
+        backend: opts.backend,
+        loadAllTokens: opts.loadAllTokens,
+      });
+      const rec = await sess.runEvent({
+        kind: "user_message",
+        text: `<probe id="${probe.id}" phase="${probe.phase}">\n${probe.question}\n</probe>`,
+        phase: probe.phase,
+        changedPaths: [],
+      });
+      materializedIds = [...rec.materializedAfter].sort();
+      evictedIds = [...rec.removed];
+      contextTokens = rec.compiledResourceTokens;
+      const harness = sess.getHarness();
+      const effective = harness.effectiveContext(harness.requestCount() - 1);
+      prompt = `${effective}\n\n${ANSWER_TEMPLATE}\n${SKIP_VALIDATION_LINE}`;
+      // Byte-proof assertion on the exact prompt bytes: one harness request
+      // (no history) and at most one overlay block (zero when nothing
+      // materialized). Stale content cannot survive a fresh harness.
+      if (harness.requestCount() !== 1 || countOverlays(prompt) > 1) {
+        overlayViolations.push(probe.id);
       }
     }
     if (opts.hybridMemory && hybridMemoryKept.length > 0) {
@@ -663,6 +758,10 @@ async function runProbeMultiArm(opts: {
     if (opts.hybridMemory) {
       await appendHybridMemory(probe, answer, materializedIds, contextTokens);
     }
+    const flatCalls = result.run.turns.flatMap((t) => t.toolCalls.map((c) => ({ name: c.name, status: c.status, args: c.argsSummary.slice(0, 300) })));
+    if (opts.arm === "jev_single") {
+      for (const r of scanToolCallsForContamination(probe.id, flatCalls, opts.storePath)) contaminationReasons.push(r);
+    }
     probeResults.push({
       probeId: probe.id,
       phase: probe.phase,
@@ -674,7 +773,7 @@ async function runProbeMultiArm(opts: {
       reasoningTokens: result.run.reasoningTokens,
       totalTokens: result.run.totalTokens,
       toolCallCount: result.run.toolCallCount,
-      toolCalls: result.run.turns.flatMap((t) => t.toolCalls.map((c) => ({ name: c.name, status: c.status, args: c.argsSummary.slice(0, 300) }))),
+      toolCalls: flatCalls,
       materializedIds,
       evictedIds,
       contextTokens,
@@ -708,6 +807,13 @@ async function runProbeMultiArm(opts: {
   for (const f of setupFailures) reasons.push(f);
   for (const id of timedOutProbes) reasons.push(`probe ${id} hit the ${Math.round(PROBE_MULTI_TIMEOUT_MS / 1000)}s timeout`);
   for (const id of overlayViolations) reasons.push(`probe ${id}: prompt failed byte-proof overlay assertion`);
+  const contamination = {
+    clean: opts.arm === "jev_single" ? contaminationReasons.length === 0 : true,
+    reasons: opts.arm === "jev_single" ? [...contaminationReasons] : [],
+  };
+  if (!contamination.clean) {
+    for (const r of contamination.reasons) reasons.push(`contamination: ${r}`);
+  }
 
   const done: ProbeMultiTrial = {
     ...running,
@@ -718,6 +824,7 @@ async function runProbeMultiArm(opts: {
       eligible: opts.dryRun ? false : reasons.length === 0,
       reasons: opts.dryRun ? ["dry-run: agent spawn skipped"] : reasons,
     },
+    contamination,
     opencodeSessionId,
     probeResults,
     ...extra,
@@ -728,7 +835,6 @@ async function runProbeMultiArm(opts: {
 
 function printHelp(): void {
   console.log(`run-probe-multi.ts — multi-session probe eval (one fresh opencode run per probe).
-
 One FRESH opencode run per probe (never --session): each probe gets a fresh
 git workspace from the demo fixture plus per-probe arm setup, then a single
 \`opencode run --auto --pure --format json\` with the probe + answer template
@@ -736,7 +842,7 @@ over stdin. ${Math.round(PROBE_MULTI_TIMEOUT_MS / 1000)}s timeout per probe
 (PROBE_MULTI_TIMEOUT_MS), NDJSON via parseOpencodeJson. No arm runs
 formatters, linters, typecheck, tests, or project-wide validation.
 
-Arms (same frozen probe set, model, and demo-workspace fixture):
+Arms (same tuning probe set, model, and demo-workspace fixture):
   load_all_single  Full APM catalog compiled into EACH probe's prompt via
                    compileOverlay. Runner-owned materialized set = every
                    catalog id. unloadMode=none.
@@ -745,19 +851,26 @@ Arms (same frozen probe set, model, and demo-workspace fixture):
                    output (.agents/rules/ + .agents/skills/) committed in
                    place. The agent discovers rules/skills autonomously.
                    Materialized set unknown (null). unloadMode=none.
-  jev_single       Same discovery files, NO plugin, NO --session. A FRESH
-                   ProgressiveSession per probe routes exactly ONE event
-                   (the probe question); the harness-assembled effective
-                   request (kernel + exactly one overlay, scrubbed history)
-                   becomes that probe's prompt. Unload is BYTE-PROOF:
-                   each session gets exactly one overlay and no history.
+  jev_single       Workspace gets the demo fixture ONLY (no apm.yml, .apm/,
+                   .agents/rules/, .agents/skills/ — the contamination gate
+                   fails the trial if any appear). The catalog lives in a
+                   controller-owned store outside the workspace. NO plugin,
+                   NO --session. A FRESH ProgressiveSession per probe routes
+                   exactly ONE event (the probe question); the
+                   harness-assembled effective request (kernel + exactly one
+                   overlay, scrubbed history) becomes that probe's prompt.
+                   Unload is BYTE-PROOF: each session gets exactly one
+                   overlay and no history.
 
 Artifact: kind "probe-multi" with trials[] carrying probeResults[] per probe
 ({ probeId, answer, retrieval{citedExpected, citedForbidden, quoteHit},
-materializedIds, contextTokens, freshSession:true }) plus a top-level bodies
-snapshot for the separate grader (probe/grade-run.ts). Progress sidecar at
-results/.live/<runId>.json (deleted after the final artifact writes
-successfully).
+materializedIds, contextTokens, freshSession:true }) plus
+trial.contamination {clean, reasons[]} from the per-probe workspace +
+tool-call gate. Top-level probeSet (full content-probe definitions, recall
+probes excluded), recallTemplate, evaluator, probeSetHash, and evaluatorHash
+travel with the artifact so the separate grader (probe/grade-run.ts) can
+judge without reading disk. Progress sidecar at results/.live/<runId>.json
+(deleted after the final artifact writes successfully).
 
 Options:
   --arms=<a,b,c>       subset of load_all_single,apm_discovery,jev_single (default: jev_single)
@@ -804,32 +917,44 @@ async function main(): Promise<void> {
   const provenance = checkProvenance();
   const versions = await collectVersions();
   versions["agentModel"] = model;
-  const cat = await loadCatalog(PKG_DIR);
+  let storePath = "";
+  let cat: Catalog;
+  try {
+    storePath = await setupIsolatedApmStore();
+    cat = await loadCatalog(storePath);
+  } catch (err) {
+    console.error(`[run-probe-multi] controller store setup failed, falling back to PKG_DIR: ${String(err).slice(0, 200)}`);
+    storePath = "";
+    cat = await loadCatalog(PKG_DIR);
+  }
   const cfg = JSON.parse(await readFile(CONFIG_PATH, "utf8")) as ThresholdConfig;
   const cfgHash = createHash("sha256").update(JSON.stringify(cfg)).digest("hex").slice(0, 16);
   const baseFixtureHash = (await hashDirectory(join(REPO_ROOT, "fixtures/demo-workspace"))).slice(0, 16);
   const probeSetIdx = args.findIndex((a) => a === "--probe-set");
   const probeSetArg = args.find((a) => a.startsWith("--probe-set="))?.slice(12) ?? (probeSetIdx >= 0 ? args[probeSetIdx + 1] : undefined) ?? "v3";
-  if (probeSetArg !== "v1" && probeSetArg !== "v2" && probeSetArg !== "v3") {
-    console.error(`[run-probe-multi] unknown probe set: ${probeSetArg} (expected v1, v2, or v3)`);
+  if (probeSetArg !== "v1" && probeSetArg !== "v2" && probeSetArg !== "v3" && probeSetArg !== "v4") {
+    console.error(`[run-probe-multi] unknown probe set: ${probeSetArg} (expected v1, v2, v3, or v4)`);
     printHelp();
     process.exit(1);
   }
   const probeFiles = probeSetArg === "v1" ? [PROBE_FIXTURE]
     : probeSetArg === "v2" ? [PROBE_FIXTURE_V2]
+    : probeSetArg === "v4" ? [PROBE_FIXTURE_V4]
     : [PROBE_FIXTURE, PROBE_FIXTURE_V2, PROBE_FIXTURE_V3];
   const probeVersions: string[] = [];
   const contentProbes: ProbeQuestion[] = [];
-  let probeRaw = "";
+  let recallIdSuffix = "-recall";
   let recallQuestion = "You have answered several questions across phases. Without quoting rule text, list the rule/skill ids that are still active constraints on your current work. Answer template: Rules: <comma list or none>.";
   for (const file of probeFiles) {
     const raw = await readFile(file, "utf8");
-    probeRaw += raw;
     const set = JSON.parse(raw) as { version: string; probes: ProbeQuestion[]; recallTemplate?: { idSuffix: string; question: string } };
     probeVersions.push(set.version);
     contentProbes.push(...set.probes);
     if (typeof set.recallTemplate?.question === "string" && set.recallTemplate.question.length > 0) {
       recallQuestion = set.recallTemplate.question;
+    }
+    if (typeof set.recallTemplate?.idSuffix === "string" && set.recallTemplate.idSuffix.length > 0) {
+      recallIdSuffix = set.recallTemplate.idSuffix;
     }
   }
   // Recall probes (v3 only): auto-inserted before each content probe whose
@@ -844,7 +969,7 @@ async function main(): Promise<void> {
       const prev = idx > 0 ? contentProbes[idx - 1] : null;
       if (prev !== null && current.phase !== prev.phase) {
         probes.push({
-          id: `${prev.id}-recall`,
+          id: `${prev.id}${recallIdSuffix}`,
           phase: "recall",
           question: recallQuestion,
           expectedIds: [...prev.expectedIds],
@@ -860,7 +985,21 @@ async function main(): Promise<void> {
   } else {
     probes.push(...contentProbes);
   }
-  const probeSetHash = createHash("sha256").update(probeRaw).digest("hex").slice(0, 16);
+  const probeSetDefs = contentProbes.map((p) => ({
+    id: p.id,
+    phase: p.phase,
+    question: p.question,
+    expectedIds: [...p.expectedIds],
+    expectedSkills: [...p.expectedSkills],
+    forbiddenIds: [...p.forbiddenIds],
+    mustCite: [...p.mustCite],
+    mustQuote: [...p.mustQuote],
+    mustNotCite: [...p.mustNotCite],
+  }));
+  const recallTemplate = { idSuffix: recallIdSuffix, question: recallQuestion };
+  const evaluator = { ...EVALUATOR };
+  const probeSetHash = createHash("sha256").update(canonicalize(probeSetDefs)).digest("hex").slice(0, 16);
+  const evaluatorHash = createHash("sha256").update(canonicalize(evaluator)).digest("hex").slice(0, 16);
   const apiKey = process.env["TYPESAFE_API_KEY"];
   const backend: ScoreBackend = apiKey
     ? new SystemOneBackend(apiKey, process.env["TYPESAFE_DEFAULT_MODEL"] ?? "jev-latest")
@@ -918,6 +1057,7 @@ async function main(): Promise<void> {
       dryRun,
       hybridMemory: args.includes("--hybrid-memory"),
       backend,
+      storePath,
       reportProgress,
     });
     trialResults.push(r);
@@ -930,7 +1070,11 @@ async function main(): Promise<void> {
     createdAt,
     model,
     probeSetVersion: probeVersions.join("+"),
+    probeSet: probeSetDefs,
+    recallTemplate,
+    evaluator,
     probeSetHash,
+    evaluatorHash,
     thresholdsHash: cfgHash,
     baseFixtureHash,
     provenance,

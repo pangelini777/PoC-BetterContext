@@ -4,6 +4,16 @@
 // evicted id + Choice disposition for distractors), derives probe quality
 // metrics in the scripted quality vocabulary, writes
 // <artifact>.grades.json alongside. Fail-open: Noul errors yield nulls.
+//
+// Probe definitions come from the artifact itself when embedded
+// (artifact.probeSet + artifact.recallTemplate + artifact.evaluator, with
+// artifact.probeSetHash / artifact.evaluatorHash verified when present):
+// regrading an embedded artifact never touches the fixture files. Fixture
+// files (fixtures/probe-questions{,-v2,-v3}.json) are read ONLY for legacy
+// artifacts that lack an embedded probeSet; that fallback is recorded as
+// fallback:true in the output. Version strings are never imported from
+// fixtures when the artifact carries them.
+import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { endorsedIds, gradeProbe } from "./grade.ts";
 
@@ -18,18 +28,82 @@ const model = process.env["TYPESAFE_DEFAULT_MODEL"] ?? "jev-latest";
 const data = JSON.parse(await readFile(artifactPath, "utf8")) as {
   trials: { arm: string; probeResults: { probeId: string; phase?: string; question?: string; answer: string; materializedIds: string[] | null; evictedIds?: string[] | null; contextTokens: number }[] }[];
   bodies: Record<string, string>;
+  probeSetVersion?: string;
+  probeSet?: ProbeFixture[];
+  recallTemplate?: { idSuffix: string; question: string };
+  evaluator?: { name: string; version: string; retrieval: string; noul: string; selfReport: string };
+  probeSetHash?: string;
+  evaluatorHash?: string;
 };
 type ProbeFixture = { id: string; phase: string; question: string; expectedIds: string[]; expectedSkills: string[]; forbiddenIds: string[]; mustCite: string[]; mustQuote: string[]; mustNotCite: string[] };
-const fixtureFiles = ["fixtures/probe-questions.json", "fixtures/probe-questions-v2.json", "fixtures/probe-questions-v3.json"];
-const byId: Record<string, ProbeFixture> = {};
-for (const file of fixtureFiles) {
-  try {
-    const fixture = JSON.parse(await readFile(file, "utf8")) as { probes: ProbeFixture[] };
-    for (const probe of fixture.probes) byId[probe.id] = probe;
-  } catch {
-    // Missing fixture file: probes from it are skipped, never fatal.
+
+/** Canonical JSON: object keys sorted recursively, matching the runners' hash input. */
+const canonicalize = (v: unknown): unknown => {
+  if (Array.isArray(v)) return v.map(canonicalize);
+  if (v !== null && typeof v === "object") {
+    return Object.fromEntries(
+      Object.keys(v as Record<string, unknown>).sort().map((k) => [k, canonicalize((v as Record<string, unknown>)[k])]),
+    );
   }
+  return v;
+};
+const sha16 = (v: unknown): string =>
+  createHash("sha256").update(JSON.stringify(canonicalize(v))).digest("hex").slice(0, 16);
+
+const byId: Record<string, ProbeFixture> = {};
+let fallback = false;
+let probeSetVersion: string | undefined = data.probeSetVersion;
+let probeSetHash: string | undefined = data.probeSetHash;
+let evaluatorHash: string | undefined = data.evaluatorHash;
+let evaluatorVersion: string | undefined = data.evaluator?.version;
+let recallTemplate: { idSuffix: string; question: string } | undefined = data.recallTemplate;
+const warnings: string[] = [];
+/** Default recall question when neither the trial result nor the embedded
+ * recallTemplate carries one (matches the runners' hardcoded default). */
+const DEFAULT_RECALL_QUESTION = "You have answered several questions across phases. Without quoting rule text, list the rule/skill ids that are still active constraints on your current work. Answer template: Rules: <comma list or none>.";
+/** A recall probe: synthesized at phase boundaries (id suffix from the
+ * embedded recallTemplate, default `-recall`; or phase `recall`). */
+const isRecallProbe = (probeId: string, probe: ProbeFixture | undefined): boolean =>
+  probeId.endsWith(recallTemplate?.idSuffix ?? "-recall") || probe?.phase === "recall";
+
+if (Array.isArray(data.probeSet) && data.probeSet.length > 0) {
+  // Embedded artifact: definitions travel with the artifact; fixtures stay unread.
+  for (const probe of data.probeSet) byId[probe.id] = probe;
+  if (typeof data.probeSetHash === "string" && data.probeSetHash.length > 0) {
+    const actual = sha16(data.probeSet);
+    if (actual !== data.probeSetHash) {
+      warnings.push(`probeSetHash mismatch: artifact claims ${data.probeSetHash}, recomputed ${actual}; proceeding with embedded probeSet`);
+    }
+  }
+  if (data.evaluator !== undefined) {
+    if (typeof data.evaluatorHash === "string" && data.evaluatorHash.length > 0) {
+      const actual = sha16(data.evaluator);
+      if (actual !== data.evaluatorHash) {
+        warnings.push(`evaluatorHash mismatch: artifact claims ${data.evaluatorHash}, recomputed ${actual}; proceeding with embedded evaluator`);
+      }
+    }
+  } else if (typeof data.evaluatorHash === "string") {
+    warnings.push("evaluatorHash present but no embedded evaluator; proceeding without evaluator verification");
+  }
+} else {
+  // Legacy artifact without an embedded probeSet: fall back to fixture files.
+  fallback = true;
+  const fixtureFiles = ["fixtures/probe-questions.json", "fixtures/probe-questions-v2.json", "fixtures/probe-questions-v3.json"];
+  const fixtureVersions: string[] = [];
+  for (const file of fixtureFiles) {
+    try {
+      const fixture = JSON.parse(await readFile(file, "utf8")) as { version?: string; probes: ProbeFixture[]; recallTemplate?: { idSuffix: string; question: string } };
+      for (const probe of fixture.probes) byId[probe.id] = probe;
+      if (typeof fixture.version === "string") fixtureVersions.push(fixture.version);
+      if (!recallTemplate && fixture.recallTemplate) recallTemplate = fixture.recallTemplate;
+    } catch {
+      // Missing fixture file: probes from it are skipped, never fatal.
+    }
+  }
+  if (probeSetVersion === undefined && fixtureVersions.length > 0) probeSetVersion = fixtureVersions.join("+");
+  console.error(`[grade-run] legacy artifact without embedded probeSet; falling back to fixture files (fallback:true)`);
 }
+for (const w of warnings) console.error(`[grade-run] WARNING: ${w}`);
 
 // Critical rule ids from the catalog sidecar (critical: true entries).
 const CRITICAL_IDS = new Set([
@@ -49,9 +123,6 @@ const norm = (id: string): string => id.toLowerCase();
 const arms: Record<string, unknown[]> = {};
 const quality: Record<string, unknown> = {};
 let totalUsage = { input_tokens: 0, output_tokens: 0 };
-/** A recall probe: synthesized at phase boundaries (id suffix `-recall`, phase `recall`). */
-const isRecallProbe = (probeId: string, probe: ProbeFixture | undefined): boolean =>
-  probeId.endsWith("-recall") || probe?.phase === "recall";
 for (const trial of data.trials) {
   const grades: unknown[] = [];
   // Evicted ids accumulate across the arm's session: any id evicted on an
@@ -67,14 +138,15 @@ for (const trial of data.trials) {
     if (materialized !== null) for (const id of materialized) evictedSoFar.delete(id);
     let probe = byId[result.probeId];
     if (!probe && isRecallProbe(result.probeId, undefined)) {
-      // Runner-synthesized recall probe not yet in the fixture map: fall back
-      // to the previous content probe's expected set as the still-active set.
+      // Runner-synthesized recall probe not in the probe map (recall probes
+      // are excluded from the embedded probeSet by contract): fall back to
+      // the previous content probe's expected set as the still-active set.
       const prev = probeResults.slice(0, idx).reverse().find((r) => !isRecallProbe(r.probeId, byId[r.probeId]));
       const prevFixture = prev ? byId[prev.probeId] : undefined;
       probe = {
         id: result.probeId,
         phase: result.phase ?? "recall",
-        question: result.question ?? "",
+        question: result.question ?? recallTemplate?.question ?? DEFAULT_RECALL_QUESTION,
         expectedIds: prevFixture?.expectedIds ?? [],
         expectedSkills: [],
         forbiddenIds: [],
@@ -199,7 +271,24 @@ for (const trial of data.trials) {
     discoveredFiles,
   };
 }
-const out = { artifact: artifactPath, model, gradedAt: new Date().toISOString(), usage: totalUsage, arms, quality };
+const out = {
+  artifact: artifactPath,
+  model,
+  gradedAt: new Date().toISOString(),
+  usage: totalUsage,
+  // Probe-source provenance: embedded definitions preferred; fixture files
+  // only for legacy artifacts (fallback:true). Hash fields echo the verified
+  // artifact values (undefined when the artifact lacks them).
+  fallback,
+  probeSetSource: fallback ? "fixture-fallback" : "embedded",
+  probeSetVersion,
+  probeSetHash,
+  evaluatorVersion,
+  evaluatorHash,
+  warnings,
+  arms,
+  quality,
+};
 const outPath = `${artifactPath}.grades.json`;
 await writeFile(outPath, JSON.stringify(out, null, 2));
 console.log(outPath);

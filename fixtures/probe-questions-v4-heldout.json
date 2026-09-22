@@ -1,0 +1,120 @@
+{
+  "version": "probe-v4-heldout-frozen",
+  "notes": "FROZEN HELD-OUT — never used for tuning; first run is the comparison. Standalone set (does not extend v1/v2/v3): 10 NEW content probes over phases not covered before (rate-limit-deep, caching-invalidation, order-cancel, refund-partial, tax-exempt, currency-rounding, audit-export, flag-rollout, incident-sev, deploy-freeze). pq-deploy-freeze doubles as the migrate-vs-query look-alike trap (read-only inspection, never run a migration); pq-incident-sev doubles as the android-distractor variant (web runbook, not the Android Kotlin path). Same grading contract as v3: mustCite/mustQuote/mustNotCite endorsement-scoped to the Rules: line; mustQuote entries are any-of (a turn passes when any one entry matches). recallTemplate is auto-inserted at each phase boundary. Frozen 2026-09-22; do not retune against results.",
+  "probes": [
+    {
+      "id": "pq-rate-limit-deep",
+      "phase": "rate-limit-deep",
+      "question": "A single API key sustains traffic above its quota with bursts exhausting headroom on the checkout API. Which rate-limiting rules and skills govern enforcement here? Name each rule/skill id and state the required rejection code and response headers.",
+      "expectedIds": ["rule.rate-limiting"],
+      "expectedSkills": ["skill.limit-rate"],
+      "forbiddenIds": ["rule.mobile-ios-guidelines", "rule.ml-model-governance", "rule.android-kotlin-guidelines"],
+      "mustCite": ["rule.rate-limiting"],
+      "mustQuote": ["429", "retry", "quota", "bucket"],
+      "mustNotCite": ["rule.mobile-ios-guidelines", "rule.ml-model-governance", "rule.android-kotlin-guidelines"]
+    },
+    {
+      "id": "pq-cache-invalidation",
+      "phase": "caching-invalidation",
+      "question": "A price change must purge stale edge-cached order totals immediately. Which caching-policy rules and skills govern invalidation? Name each rule/skill id and state the required purge-confirmation property.",
+      "expectedIds": ["rule.caching-policy"],
+      "expectedSkills": ["skill.invalidate-cache"],
+      "forbiddenIds": ["rule.mobile-ios-guidelines", "rule.ml-model-governance", "rule.android-kotlin-guidelines"],
+      "mustCite": ["rule.caching-policy"],
+      "mustQuote": ["invalidat", "purge", "stale", "version"],
+      "mustNotCite": ["rule.mobile-ios-guidelines", "rule.ml-model-governance", "rule.android-kotlin-guidelines"]
+    },
+    {
+      "id": "pq-order-cancel",
+      "phase": "order-cancel",
+      "question": "A paid order ord_test_4002 must be cancelled and its inventory hold released without firing fulfillment side effects. Which order and inventory rules govern this? Name each rule id and state one forbidden transition plus the required hold-release property.",
+      "expectedIds": ["rule.order-state-machine", "rule.inventory-reservation"],
+      "expectedSkills": ["skill.inspect-order-state"],
+      "forbiddenIds": ["rule.mobile-ios-guidelines", "rule.ml-model-governance", "rule.android-kotlin-guidelines"],
+      "mustCite": ["rule.order-state-machine"],
+      "mustQuote": ["cancel", "transition", "release", "terminal"],
+      "mustNotCite": ["rule.mobile-ios-guidelines", "rule.ml-model-governance", "rule.android-kotlin-guidelines"]
+    },
+    {
+      "id": "pq-refund-partial",
+      "phase": "refund-partial",
+      "question": "A customer requests a partial refund for 2 of 5 items on a captured charge, and the client retries the request. Which refund and idempotency rules govern this? Name each rule id and state the required idempotency-key replay property and the partial-refund math rule.",
+      "expectedIds": ["rule.refund-chargeback", "rule.idempotency-keys"],
+      "expectedSkills": ["skill.process-refund"],
+      "forbiddenIds": ["rule.mobile-ios-guidelines", "rule.ml-model-governance", "rule.android-kotlin-guidelines"],
+      "mustCite": ["rule.refund-chargeback"],
+      "mustQuote": ["partial", "idempoten", "refund", "ledger"],
+      "mustNotCite": ["rule.mobile-ios-guidelines", "rule.ml-model-governance", "rule.android-kotlin-guidelines"]
+    },
+    {
+      "id": "pq-tax-exempt",
+      "phase": "tax-exempt",
+      "question": "An order contains tax-exempt gift-card lines alongside taxable lines shipping to a nexus jurisdiction. Which tax-calculation rules govern this? Name each rule id and state where tax must be computed and how exempt lines are handled.",
+      "expectedIds": ["rule.tax-calculation"],
+      "expectedSkills": ["skill.calculate-tax"],
+      "forbiddenIds": ["rule.mobile-ios-guidelines", "rule.ml-model-governance", "rule.android-kotlin-guidelines"],
+      "mustCite": ["rule.tax-calculation"],
+      "mustQuote": ["exempt", "jurisdiction", "nexus", "tax"],
+      "mustNotCite": ["rule.mobile-ios-guidelines", "rule.ml-model-governance", "rule.android-kotlin-guidelines"]
+    },
+    {
+      "id": "pq-currency-rounding",
+      "phase": "currency-rounding",
+      "question": "A JPY-denominated cart settles in USD using a trusted FX rate. Which multi-currency rules govern conversion and rounding? Name each rule id and state the required minor-unit rounding rule and the settlement-currency property.",
+      "expectedIds": ["rule.multi-currency"],
+      "expectedSkills": ["skill.convert-currency"],
+      "forbiddenIds": ["rule.mobile-ios-guidelines", "rule.ml-model-governance", "rule.android-kotlin-guidelines"],
+      "mustCite": ["rule.multi-currency"],
+      "mustQuote": ["round", "minor", "fx", "settle"],
+      "mustNotCite": ["rule.mobile-ios-guidelines", "rule.ml-model-governance", "rule.android-kotlin-guidelines"]
+    },
+    {
+      "id": "pq-audit-export",
+      "phase": "audit-export",
+      "question": "Compliance requests a bounded export of the audit trail for last week's refunds with redacted payloads. Which audit-trail rules and skills govern the export? Name each rule/skill id and state the required manifest and redaction properties.",
+      "expectedIds": ["rule.audit-trails"],
+      "expectedSkills": ["skill.export-audit-trail"],
+      "forbiddenIds": ["rule.mobile-ios-guidelines", "rule.ml-model-governance", "rule.android-kotlin-guidelines"],
+      "mustCite": ["rule.audit-trails"],
+      "mustQuote": ["audit", "redact", "manifest", "sign"],
+      "mustNotCite": ["rule.mobile-ios-guidelines", "rule.ml-model-governance", "rule.android-kotlin-guidelines"]
+    },
+    {
+      "id": "pq-flag-rollout",
+      "phase": "flag-rollout",
+      "question": "The new tax engine rolls out to 10% of checkouts behind a flag with deterministic bucketing and a kill switch. Which feature-flag rules and skills govern evaluation? Name each rule/skill id and state the required kill-switch default.",
+      "expectedIds": ["rule.feature-flags"],
+      "expectedSkills": ["skill.evaluate-flag"],
+      "forbiddenIds": ["rule.mobile-ios-guidelines", "rule.ml-model-governance", "rule.android-kotlin-guidelines"],
+      "mustCite": ["rule.feature-flags"],
+      "mustQuote": ["flag", "kill", "bucket", "rollout"],
+      "mustNotCite": ["rule.mobile-ios-guidelines", "rule.ml-model-governance", "rule.android-kotlin-guidelines"]
+    },
+    {
+      "id": "pq-incident-sev",
+      "phase": "incident-sev",
+      "question": "A SEV-1 outage hits the web checkout; the responder must triage severity, mitigate first, and follow the web incident runbook (not the Android Kotlin component path). Which incident-response rules and skills govern this? Name each rule/skill id and state the required mitigation-first property.",
+      "expectedIds": ["rule.incident-response"],
+      "expectedSkills": ["skill.command-incident"],
+      "forbiddenIds": ["rule.mobile-ios-guidelines", "rule.ml-model-governance", "rule.android-kotlin-guidelines", "skill.build-android-component"],
+      "mustCite": ["rule.incident-response"],
+      "mustQuote": ["sever", "mitigat", "incident", "role"],
+      "mustNotCite": ["rule.mobile-ios-guidelines", "rule.android-kotlin-guidelines", "skill.build-android-component"]
+    },
+    {
+      "id": "pq-deploy-freeze",
+      "phase": "deploy-freeze",
+      "question": "The production deploy is frozen with the error budget burned; before the window you must verify pending schema-migration state with a read-only inspection without running any migration. Which change-control rules govern unfreezing, and which skill governs the read-only check? Name each id and state the required freeze-lift gate.",
+      "expectedIds": ["rule.production-change-control", "rule.slo-error-budgets"],
+      "expectedSkills": ["skill.query-postgres-readonly"],
+      "forbiddenIds": ["skill.migrate-postgres-schema", "skill.plan-migration-rollback", "rule.android-kotlin-guidelines"],
+      "mustCite": ["rule.production-change-control"],
+      "mustQuote": ["freeze", "budget", "read-only", "readonly", "rollback"],
+      "mustNotCite": ["skill.migrate-postgres-schema", "skill.plan-migration-rollback", "rule.android-kotlin-guidelines"]
+    }
+  ],
+  "recallTemplate": {
+    "idSuffix": "-recall",
+    "question": "You have answered several questions across phases. Without quoting rule text, list the rule/skill ids that are still active constraints on your current work. Answer template: Rules: <comma list or none>."
+  }
+}

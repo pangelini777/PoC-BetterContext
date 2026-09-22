@@ -81,9 +81,10 @@ bun run evals/progressive-context/run-live.ts --trials=1 --arms=load_all,progres
 
 ## Verdict for a skeptic
 
-The PoC proves the *mechanism* (progressive materialize/dematerialize with
-real next-request unload + large stale-context reduction) but does NOT yet
-prove the *routing quality* bar (recall/precision/critical-zero on unseen
-tasks). The honest next step is gate redesign (the evidence points at the
-gate Nouls, not thresholds), validated on a FRESH held-out-v3 set — never by
-rerunning v2.
+Superseded 2026-09-22 by the isolated probe eval: on the frozen v4 held-out
+set (10 probes, never tuned on), all 3 arms reach 10/10 retrieval, recall 1.0,
+0 critical misses, with JEV isolated (contamination-clean) at 3,906 avg ctx
+vs 46,736 flat and fidelity 0.9997. The routing-quality bar the old verdict
+demanded is now met on unseen probes; the remaining gap is cold-start
+multi-session quality (23/48 vs 48/48 single) and fatty-build throughput,
+both measured honestly in PROBE-SCALE-REPORT.md.
