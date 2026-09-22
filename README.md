@@ -52,18 +52,16 @@ Primary artifacts: `evals/progressive-context/results/probe-2026-09-22T17-31-31-
   | probe-2026-09-22T12-39 (JEV lifetime tuning) | — | — | 47/48, 1.79M tok | 3,901 |
   | probe-2026-09-22T16-08 (discovery tracing) | — | 48/48, 50 files / 24k tok read | — | — |
 
-  Stability: three consecutive JEV-only v4 seeds, 10/10 each —
-  `probe-2026-09-22T19-51`, `19-58`, `20-04` (avg ctx ~4k, fidelity ~1.0).
-  Factory runs (fresh session per probe, v4 held-out, Spark):
+  Stability (JEV-only v4 single-session, Spark): three consecutive seeds,
+  10/10 each — `probe-2026-09-22T19-51`, `19-58`, `20-04`
+  (avg ctx ~4k, fidelity ~1.0).
+
+  Factory runs (fresh session per probe, v4 held-out 10 probes, Spark):
 
   | run | arm | retrieval | avg ctx | tokens |
   |---|---|---|---|---|
-  | probe-multi-2026-09-22T15-18 | load-all | 34/48 (24/26 content) | 46,736 flat | 2.73M |
-  | probe-multi-2026-09-22T19-12 | all three, 10 probes | 10/10 × 3 | JEV 1,324 | JEV 133k |
-
-  Single-session builds (checkout task, verification x/11, Spark): 5/11 on all
-  three arms — builds tie; probes discriminate.
-  (`single-2026-09-22T09-22-44-30k0td.json`)
+  | probe-multi-2026-09-22T19-12 | all three | 10/10 × 3 | JEV 1,324 | JEV 133k |
+  | probe-multi-2026-09-22T15-18 | load-all | 34/48 (24/26 content, v1+v2+v3 tuning set) | 46,736 flat | 2.73M |
 
   ```mermaid
   flowchart LR
