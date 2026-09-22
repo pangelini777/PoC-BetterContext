@@ -38,6 +38,69 @@ Primary artifacts: `evals/progressive-context/results/probe-2026-09-22T17-31-31-
   rules provably absent from all future requests.
   Reference: `live-2026-09-21T21-11-07` (4/4 unload proofs, sentinel-zero).
 
+  ## All benchmarks
+
+  Tuning trajectory (v1+v2+v3, 48 probes/arm, Spark) — how naming and lifetime
+  fixes converged all arms to perfect retrieval:
+
+  | run | load-all | discovery | JEV | JEV avg ctx |
+  |---|---|---|---|---|
+  | probe-2026-09-22T11-09 (renamed catalog) | 48/48, 3.60M tok | 48/48, 3.67M tok | 48/48, 2.72M tok | 5,228 |
+  | probe-2026-09-22T12-39 (JEV lifetime tuning) | — | — | 47/48, 1.79M tok | 3,901 |
+  | probe-2026-09-22T16-08 (discovery tracing) | — | 48/48, 50 files / 24k tok read | — | — |
+
+  Factory runs (fresh session per probe, v4 held-out, Spark):
+
+  | run | arm | retrieval | avg ctx | tokens |
+  |---|---|---|---|---|
+  | probe-multi-2026-09-22T15-18 | load-all | 34/48 (24/26 content) | 46,736 flat | 2.73M |
+  | probe-multi-2026-09-22T19-12 | all three, 10 probes | 10/10 × 3 | JEV 1,324 | JEV 133k |
+
+  Single-session builds (checkout task, verification x/11, Spark): 5/11 on all
+  three arms — builds tie; probes discriminate.
+  (`single-2026-09-22T09-22-44-30k0td.json`)
+
+  ```mermaid
+  flowchart LR
+      subgraph CTRL["Controller (owns APM store)"]
+          CAT["94-resource catalog"]
+          JEV["JEV router + resolver"]
+          CMP["Overlay compiler"]
+      end
+      subgraph WS["Agent workspace (one continued session)"]
+          PLG["JEV plugin"]
+          AGT["Agent"]
+      end
+      CAT --> JEV
+      JEV -->|"materialized bodies"| CMP
+      CMP -->|"fresh overlay per turn"| PLG
+      PLG -->|"scrub + inject"| AGT
+      AGT -->|"tool/file activity"| JEV
+  ```
+
+  ```mermaid
+  flowchart LR
+      subgraph CTRL["Controller (owns APM store)"]
+          CAT["94-resource catalog"]
+          JEV["JEV router + resolver"]
+          CMP["Harness-assembled prompt"]
+      end
+      subgraph S1["Probe 1 session"]
+          A1["Agent"]
+      end
+      subgraph S2["Probe 2 session"]
+          A2["Agent"]
+      end
+      subgraph SN["Probe N session"]
+          AN["Agent"]
+      end
+      CAT --> JEV
+      JEV -->|"one overlay per probe"| CMP
+      CMP --> A1
+      CMP --> A2
+      CMP --> AN
+  ```
+
 ## Try it
 
 ```bash
