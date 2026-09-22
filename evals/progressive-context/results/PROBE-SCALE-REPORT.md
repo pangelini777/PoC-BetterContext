@@ -43,8 +43,9 @@ Noul comprehension 0.6–0.95 on all arms wherever graded; distractors
 
   1. **Routing quality ties at Spark quality; cost differs 10×.** With clean
   naming, all arms answer correctly (47–48/48). JEV does it at ~4–5k avg ctx
-  vs 46.7k flat; ~920k vs ~2.7M tokens per 48-probe arm (committed artifacts;
-  hybrid variant uncommitted, unclaimed).
+  vs 46.7k flat. Committed JEV arm totals: 2.76M pre-rename
+  (`probe-2026-09-22T09-49-26`), 2.72M renamed (`probe-2026-09-22T11-09-56`),
+  1.79M lifetime-tuned (`probe-2026-09-22T12-39-24`).
 > Update 2026-09-22: critical misses are now 0 on all arms. The single miss
 > was a fixture artifact (pq-webhook-idempotency listed rule.secrets-management
 > as expected while the question never asks about secrets); expectedIds trimmed
