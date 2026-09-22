@@ -52,16 +52,14 @@ Primary artifacts: `evals/progressive-context/results/probe-2026-09-22T17-31-31-
   | probe-2026-09-22T12-39 (JEV lifetime tuning) | — | — | 47/48, 1.79M tok | 3,901 |
   | probe-2026-09-22T16-08 (discovery tracing) | — | 48/48, 50 files / 24k tok read | — | — |
 
-  Stability (JEV-only v4 single-session, Spark): three consecutive seeds,
-  10/10 each — `probe-2026-09-22T19-51`, `19-58`, `20-04`
-  (avg ctx ~4k, fidelity ~1.0).
+  v4 held-out runs (10 probes, Spark) — five single-session, one multi-session:
 
-  Factory runs (fresh session per probe, v4 held-out 10 probes, Spark):
-
-  | run | arm | retrieval | avg ctx | tokens |
+  | run | mode | load-all | discovery | JEV |
   |---|---|---|---|---|
-  | probe-multi-2026-09-22T19-12 | all three | 10/10 × 3 | JEV 1,324 | JEV 133k |
-
+  | probe-2026-09-22T17-31 (headline) | single | 10/10 | 10/10 | 10/10, 3,906 ctx |
+  | probe-2026-09-22T19-35 (replication, JEV-first) | single | 10/10 | 10/10 | 10/10 |
+  | probe-2026-09-22T19-51 / 19-58 / 20-04 (stability ×3) | single, JEV-only | — | — | 10/10 each, ~4k ctx |
+  | probe-multi-2026-09-22T19-12 | **multi (fresh/probe)** | 10/10 | 10/10 | 10/10, 1,324 ctx |
   ```mermaid
   flowchart TB
       subgraph CTRL["Controller — owns the 94-resource APM store"]
