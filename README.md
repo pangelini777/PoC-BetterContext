@@ -106,6 +106,67 @@ Primary artifacts: `evals/progressive-context/results/probe-2026-09-22T17-31-31-
       CMP --> AN
   ```
 
+  ## Example System One call
+
+  Routing sends one batched request per event — a Noul per rule, a Choice over
+  skill summaries, and gating Nouls — with the trajectory state:
+
+  ```json
+  // POST {baseURL}/v1/systemone { state, model, questions }
+  {
+    "state": {
+      "goal": "Answer probe questions about APM-managed rules and skills.",
+      "phase": "tax-exempt",
+      "currentEvent": "Are exempt lines excluded from...",
+      "eventKind": "user_message",
+      "changedPaths": [],
+      "recentEvidence": ["...previous event text..."],
+      "currentlyActive": ["rule.logging-sensitive-data"]
+    },
+    "model": "jev-latest",
+    "questions": {
+      "rule::rule.tax-calculation": {
+        "type": "noul",
+        "instructions": "Is this rule needed now to constrain or guide correct execution of the current phase or immediate next action? Rule summary: ...",
+        "criteria": {
+          "true": "The rule constrains or guides the current phase or immediate next action.",
+          "false": "The rule is irrelevant to the current phase or would add only stale context."
+        }
+      },
+      "which_skill": {
+        "type": "choice",
+        "instructions": "Which single skill procedure, if any, best fits the current phase or immediate next action?",
+        "criteria": { "skill.calculate-tax": "...", "...": "..." }
+      }
+    }
+  }
+  ```
+
+  Response (validated strictly — probabilities sum to ~1, winner holds max):
+
+  ```json
+  {
+    "model": "jev-latest",
+    "answers": {
+      "rule::rule.tax-calculation": { "type": "noul", "noul": 0.91 },
+      "rule::rule.ml-model-governance": { "type": "noul", "noul": 0.04 },
+      "which_skill": {
+        "type": "choice",
+        "choice": "skill.calculate-tax",
+        "probabilities": { "skill.calculate-tax": 0.72, "...": "..." },
+        "confidence": 0.81
+      }
+    },
+    "usage": { "input_tokens": 42514, "output_tokens": 8758 }
+  }
+  ```
+
+  The resolver turns scores into lifecycle transitions (activate/retain/unload
+  with hysteresis, dependencies, lifetimes); the compiler injects exactly the
+  materialized bodies. Grading reuses the same API: per-rule compliance Nouls
+  plus eviction Choices (`relies-on-evicted` / `consistent-but-independent` /
+  `unrelated`).
+
 ## Try it
 
 ```bash
