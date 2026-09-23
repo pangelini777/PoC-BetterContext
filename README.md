@@ -116,14 +116,16 @@ Primary artifacts: `evals/progressive-context/results/probe-2026-09-22T17-31-31-
   converges). The fixture ships stubs (`NOT_IMPLEMENTED`, 501s); the agent
   must replace them with real implementations.
 
-  What the 8 hidden checks measure (evaluator-only, never shown to JEV or
-  the agent): 4 *capability* checks (refund route with trusted totals,
-  idempotency handling, both notify channels, fallback + retry), 3 *rule
-  compliance* checks (no raw card data, no personal-data logging, no
-  hardcoded secrets — the materialized rules biting as code constraints),
-  and 1 *convergence* check (the agent's own `bun test` exits 0 with ≥2
-  passes). A perfect 8/8 means the agent built the feature, obeyed the
-  rules, and proved it with tests.
+  What the hidden checks measure (evaluator-only, never shown to JEV or
+  the agent): capability checks (refund route with trusted totals,
+  idempotency handling, both notify channels, fallback + retry), *rule
+  compliance* checks — normative requirements straight from the rule bodies
+  (no raw card data, no personal-data logging, no hardcoded secrets; the
+  4-phase variant adds webhook signature discipline), and a *convergence*
+  check (the agent's own `bun test` exits 0 with ≥2 passes). Counts per
+  verifier: refund slice 5 checks (1 rule), 2-phase journey 8 checks
+  (3 rules), 4-phase journey 12 checks (4 rules). A perfect score means the
+  agent built the feature, obeyed the rules, and proved it with tests.
 
   What varies across runs — and why: the overlay *stability* fix (unchanged
   sets send silence, not a "fresh" block), the *continuity* note
