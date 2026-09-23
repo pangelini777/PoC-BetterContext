@@ -52,8 +52,43 @@ Primary artifacts: `evals/progressive-context/results/probe-2026-09-22T17-31-31-
   | probe-2026-09-22T12-39 (JEV lifetime tuning) | — | — | 47/48, 1.79M tok | 3,901 |
   | probe-2026-09-22T16-08 (discovery tracing) | — | 48/48, 50 files / 24k tok read | — | — |
 
-  v4 held-out runs (10 probes, Spark) — five single-session, one multi-session:
+  ## How a probe run works
 
+  One continued `opencode run --session` chain per arm (fresh sessions per
+  probe in multi-session mode). Each turn asks the **agent model** one frozen
+  probe question; the **JEV model** (System One) scores routing in parallel.
+  The two models never see each other's outputs — the runner mediates.
+
+  Per turn: (1) runner → JEV: one batched `POST /v1/systemone` with trajectory
+  state (`goal`, `phase`, current event, last 3 events, active ids, changed
+  paths) and ~100 questions — one Noul per rule, a Choice over skill
+  summaries, gating Nouls, then a second-pass Choice + fit-Nouls over the
+  top-3 shortlist; (2) runner → deterministic resolver (thresholds,
+  hysteresis, dependencies, lifetimes) + compiler, which injects exactly the
+  materialized bodies into one `<jev-apm-context>` overlay; (3) runner →
+  agent: probe question + `Rules:`/`Answer:`/`Quote:` template + overlay over
+  stdin to `opencode run`; (4) agent → runner: answer + tool calls + tokens.
+
+  **Agent answers** are graded deterministically: the `Rules:` line must
+  endorse every `mustCite` id, none of `mustNotCite`, and quote any-of
+  `mustQuote`. Distractors (`pq-ios`, `pq-ml`) expect `Rules: none` plus a
+  non-applicability statement; recall probes re-list still-active ids from
+  the overlay, not memory.
+
+  **JEV answers** are graded by JEV itself: comprehension Nouls per expected
+  rule (P(answer complies) — e.g. 0.94 on the payments probe), a disposition
+  Choice on distractors (`correctly-dismissed`), and an eviction Choice per
+  evicted id → fidelity = mean(1 − P(relies)).
+
+  Worked example — `pq-payments-boundary` (phase `checkout-api`, JEV arm):
+  overlay carries 3 rules (780 ctx tokens); agent answers
+  `Rules: rule.payments-card-data` + one sentence + a verbatim quote
+  ("...must never receive, persist, log, or test with raw card numbers...")
+  → retrieval PASS, Noul 0.94. Distractor `pq-ios` with 11 unrelated rules
+  in context → `Rules: none` → PASS, `correctly-dismissed`.
+  Full detail: `evals/progressive-context/PROBE-RUN.md`.
+
+   v4 held-out runs (10 probes, Spark) — five single-session, one multi-session:
   | run | mode | load-all | discovery | JEV | ctx avg − | sess tok − |
   |---|---|---|---|---|---|---|
   | probe-2026-09-22T17-31 (headline) | single | 10/10, 46,736 ctx, 633k tok | 10/10, 1.37M tok | 10/10, 3,906 ctx, 257k tok | −91.64% | −59.4% |
