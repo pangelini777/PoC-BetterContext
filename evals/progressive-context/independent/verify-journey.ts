@@ -35,9 +35,11 @@ function stripSh(src: string): string {
 export async function verifyJourney(ws: string): Promise<{ checks: VerifyCheck[]; passed: number; total: number }> {
     const checks: VerifyCheck[] = [];
     const route = stripJs(await readIf(join(ws, "route.ts")));
-    const notify = stripJs(await readIf(join(ws, "notify.ts")));
-    const privacy = stripJs(await readIf(join(ws, "privacy.ts")));
-    const logger = stripJs(await readIf(join(ws, "logger.ts")));
+    // Canonical paths are lib/ (per task prompt); fall back to root for
+    // arms/runs that scaffolded at root.
+    const notify = stripJs(await readIf(join(ws, "lib/notify.ts"))) || stripJs(await readIf(join(ws, "notify.ts")));
+    const privacy = stripJs(await readIf(join(ws, "lib/privacy.ts"))) || stripJs(await readIf(join(ws, "privacy.ts")));
+    const logger = stripJs(await readIf(join(ws, "lib/logger.ts"))) || stripJs(await readIf(join(ws, "logger.ts")));
     const release = stripSh(await readIf(join(ws, "release.sh")));
 
     // Rule-adherence checks (4/5 in report §rule-adherence): normative

@@ -46,7 +46,7 @@ import { parseOpencodeJson } from "./live/opencode-parser.ts";
 import type { ParsedRun } from "./live/opencode-parser.ts";
 
 export const TASK_PROMPT = `Implement POST /api/refunds with Idempotency-Key handling (scoped replay 200 + Idempotent-Replayed vs 422 on key reuse), trusted server-side totals from the fixture catalog (never client totals), and one focused bun test proving duplicate delivery converges. Do not run validation suites; do not deploy.`;
-export const JOURNEY_TASK_PROMPT = `4-phase engineering journey (up to 20 turns total; advance exactly one coherent phase per turn and end each turn with CONTINUE, or DONE only when all four phases are implemented and verified). Phase 1 (turns 1-5) refunds: implement POST /api/refunds with Idempotency-Key handling (scoped replay 200 + Idempotent-Replayed vs 422 on key reuse) and trusted server-side totals from the fixture catalog (never client totals). Phase 2 (turns 6-10) notifications: implement lib/notify.ts with an email template plus SMS fallback and retry. Phase 3 (turns 11-15) privacy: implement the GDPR deletion endpoint plus audit export in lib/privacy.ts. Phase 4 (turns 16-20) release: write the deploy checklist plus release.sh with migration ordering. Do not run validation suites; do not deploy.`;
+export const JOURNEY_TASK_PROMPT = `4-phase engineering journey (up to 30 turns total; advance exactly one coherent phase per turn and end each turn with CONTINUE, or DONE only when all four phases are implemented and verified). Implement new modules at their fixture paths (route.ts, lib/notify.ts, lib/privacy.ts, journey.test.ts, release.sh); do not create root-level duplicates (notify.ts, privacy.ts). Phase 1 (turns 1-7) refunds: implement POST /api/refunds with Idempotency-Key handling (scoped replay 200 + Idempotent-Replayed vs 422 on key reuse) and trusted server-side totals from the fixture catalog (never client totals). Phase 2 (turns 8-14) notifications: implement lib/notify.ts with an email template plus SMS fallback and retry. Phase 3 (turns 15-22) privacy: implement the GDPR deletion endpoint plus audit export in lib/privacy.ts. Phase 4 (turns 23-30) release: write the deploy checklist plus release.sh with migration ordering. Do not run validation suites; do not deploy.`;
 export const JOURNEY2_TASK_PROMPT = `2-phase engineering journey (up to 20 turns total; advance exactly one coherent step per turn and end each turn with CONTINUE, or DONE only when both phases are implemented and verified). Implement new modules at their fixture paths (route.ts, lib/notify.ts, lib/privacy.ts, journey.test.ts); do not create root-level duplicates (notify.ts, privacy.ts). Phase 1 (turns 1-10) refunds: implement POST /api/refunds with Idempotency-Key handling (scoped replay 200 + Idempotent-Replayed vs 422 on key reuse) and trusted server-side totals from the fixture catalog (never client totals), plus a focused bun test proving duplicate delivery converges. Phase 2 (turns 11-20) notifications: implement lib/notify.ts with an email template plus SMS fallback and retry, plus a focused bun test proving fallback converges. Do not run validation suites; do not deploy.`;
 
 export type VerifierKind = "refund" | "journey" | "journey2";
@@ -351,6 +351,7 @@ async function runBuildArm(opts: {
   let compiledTokens = 0;
   let jevCompiledTokens = 0;
   let jevLoadedResources = 0;
+  let buildSess: ProgressiveSession | null = null;
 
   if (opts.arm === "load_all_single") {
     const compiled = compileOverlay(opts.catalogIds, opts.catalogBodies, "evt-build-000");
@@ -389,7 +390,10 @@ async function runBuildArm(opts: {
         await opts.reportProgress(skipped);
         return skipped;
       }
-      const sess = new ProgressiveSession({
+      // Runner-owned ProgressiveSession. Seeded once here, then stepped
+      // per turn inside the controller loop (per-turn routing). The plugin
+      // reads the decisions file the runner rewrites each turn.
+      buildSess = new ProgressiveSession({
         runId: opts.runId,
         sessionId: `${opts.trialId}-${opts.arm}`,
         arm: "progressive_jev",
@@ -403,7 +407,7 @@ async function runBuildArm(opts: {
         backend: opts.backend,
         loadAllTokens: opts.loadAllTokens,
       });
-      const rec = await sess.runEvent({ kind: "user_message", text: taskPrompt, phase: "ui", changedPaths: [] });
+      const rec = await buildSess.runEvent({ kind: "user_message", text: taskPrompt, phase: "ui", changedPaths: [] });
       // Runner-owned routing up front: one initial event seeds the decisions
       // file the plugin reads per turn. No gold labels enter this path.
       const decisions = {
@@ -549,12 +553,8 @@ End your response with a line containing exactly CONTINUE if work remains, or ex
     cumulativeTotal += tres.run.totalTokens;
     if (tres.timedOut) timedOutAny = true;
 
-    const sample = opts.arm === "load_all_single"
-      ? { turn, compiledResourceTokens: compiledTokens, loadedResources: opts.catalogIds.length }
-      : opts.arm === "jev_single"
-        ? { turn, compiledResourceTokens: jevCompiledTokens, loadedResources: jevLoadedResources }
-        : { turn, compiledResourceTokens: 0, loadedResources: 0 };
-    contextSamples.push(sample);
+    // Context sample pushed AFTER per-turn routing below, so it reflects
+    // the post-routing materialized set (not the pre-turn one).
 
     const nowFiles = await gitFiles(ws);
     const changedPaths: string[] = [];
@@ -566,7 +566,6 @@ End your response with a line containing exactly CONTINUE if work remains, or ex
       if ((await sh("git", ["diff", "--quiet", "--", f], ws)).code !== 0) changedPaths.push(f);
     }
     changedPaths.sort();
-
     turnRecords.push({
       turn,
       changedPaths,
@@ -583,6 +582,68 @@ End your response with a line containing exactly CONTINUE if work remains, or ex
       budgetReached: tres.budgetReached,
       done: tres.run.done,
     });
+    // Per-turn routing (JEV arm only): step the runner-owned session on the
+    // observed turn outcome and rewrite the decisions file the plugin reads
+    // next turn. Previous materialized set seeds eviction detection. No gold
+    // labels enter this path: event text is assistant summary + tool names.
+    // The plugin turn log is mirrored outside the workspace (runner-owned
+    // telemetry the agent cannot read or destroy); the in-workspace copy
+    // remains as the plugin's append target.
+    if (opts.arm === "jev_single" && buildSess !== null) {
+      try {
+        const toolNames = tres.run.turns.flatMap((t) => t.toolCalls.map((c) => c.name));
+        const prevDecisions = JSON.parse(await readFile(join(ws, DECISIONS_REL), "utf8")) as {
+          materialized?: { id: string }[];
+        };
+        const prevIds = Array.isArray(prevDecisions.materialized) ? prevDecisions.materialized.map((m) => m.id).sort() : [];
+        const rec = await buildSess.runEvent({
+          kind: "observation",
+          text: `turn ${turn}: ${tres.run.assistantText.slice(0, 500)} [tools: ${[...new Set(toolNames)].join(",")}]`,
+          changedPaths: changedPaths.filter((p) => !p.startsWith(".agents/") && !p.startsWith(".opencode/")),
+        });
+        const nextIds = [...rec.materializedAfter].sort();
+        const evicted = prevIds.filter((id) => !nextIds.includes(id));
+        const evictedProbes: Record<string, string> = {};
+        for (const id of evicted) evictedProbes[id] = (opts.catalogBodies.get(id) ?? "").slice(0, 60);
+        await writeFile(join(ws, DECISIONS_REL), `${JSON.stringify({
+          eventId: rec.semanticEventId,
+          kernel: KERNEL,
+          materialized: rec.materializedAfter.map((id: string) => ({
+            id,
+            name: id.includes(".") ? id.slice(id.indexOf(".") + 1) : id,
+            body: opts.catalogBodies.get(id) ?? "",
+          })),
+          evictedIds: evicted,
+          evictedProbes,
+        }, null, 2)}\n`);
+        jevCompiledTokens = rec.compiledResourceTokens;
+        jevLoadedResources = rec.materializedAfter.length;
+        (turnRecords[turnRecords.length - 1] as Record<string, unknown>).routing = {
+          eventId: rec.semanticEventId,
+          added: rec.added,
+          removed: rec.removed,
+          materialized: rec.materializedAfter,
+        };
+      } catch {
+        // Fail-open: routing errors keep the previous decisions file; the
+        // plugin re-injects the last known set (stability skip).
+      }
+      // Mirror the plugin turn log outside the workspace every turn, before
+      // the agent's next turn can read or destroy it. Runner-owned telemetry.
+      try {
+        const logRaw = await readFile(join(ws, TURN_LOG_REL), "utf8");
+        const mirrorDir = join(RESULTS_DIR, ".turnlog-mirror", `${opts.runId}-${opts.trialId}-${opts.arm}`);
+        await mkdir(mirrorDir, { recursive: true });
+        await writeFile(join(mirrorDir, `turn-${String(turn).padStart(3, "0")}.jsonl`), logRaw);
+      } catch {
+        // Missing log mirrors as absent; final collection reports it.
+      }
+    }
+    contextSamples.push(opts.arm === "load_all_single"
+      ? { turn, compiledResourceTokens: compiledTokens, loadedResources: opts.catalogIds.length }
+      : opts.arm === "jev_single"
+        ? { turn, compiledResourceTokens: jevCompiledTokens, loadedResources: jevLoadedResources }
+        : { turn, compiledResourceTokens: 0, loadedResources: 0 });
     await opts.reportProgress({
       ...running,
       turns: turnRecords.length,
@@ -620,10 +681,17 @@ End your response with a line containing exactly CONTINUE if work remains, or ex
   }
 
   // jev_single behavioral evidence: per-turn plugin log (never byte-proof).
+  // Prefer the runner-owned mirror (agent cannot destroy it); fall back to
+  // the in-workspace copy.
   let pluginTurns: unknown[] = [];
   if (opts.arm === "jev_single") {
     try {
-      const raw = await readFile(join(ws, TURN_LOG_REL), "utf8");
+      const mirrorDir = join(RESULTS_DIR, ".turnlog-mirror", `${opts.runId}-${opts.trialId}-${opts.arm}`);
+      const names = (await readdir(mirrorDir)).filter((n) => n.endsWith(".jsonl")).sort();
+      const latest = names.length > 0 ? names[names.length - 1] : null;
+      const raw = latest !== null
+        ? await readFile(join(mirrorDir, latest), "utf8")
+        : await readFile(join(ws, TURN_LOG_REL), "utf8");
       pluginTurns = raw.split("\n").filter((l) => l.trim()).map((l) => JSON.parse(l) as unknown);
     } catch {
       pluginTurns = [];

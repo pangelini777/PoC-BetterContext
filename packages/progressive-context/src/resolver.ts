@@ -29,8 +29,20 @@ interface Entry {
   status: ResourceStatus | "none";
   belowStreak: number;
   activePhase?: string;
+  // Probationary materialization: resources activated on chatter alone
+  // (announcement without file evidence) carry a short fuse. Each step
+  // without matching file evidence decrements the fuse; file evidence
+  // clears it permanently. Talk opens the door, work keeps it open.
+  probationTurnsLeft?: number;
 }
 
+/** File evidence: the event carries changed code paths (work), not just
+ * assistant prose (talk). Harness instrumentation (.agents/, .opencode/)
+ * never counts as evidence. */
+function hasFileEvidence(event: SemanticEvent): boolean {
+  const paths = event.changedPaths ?? [];
+  return paths.some((p) => !p.startsWith(".agents/") && !p.startsWith(".opencode/"));
+}
 function activateThreshold(cfg: ThresholdConfig, d: ResourceDescriptor): number {
   return d.critical ? cfg.rules.activateCritical : cfg.rules.activate;
 }
@@ -109,6 +121,33 @@ export class LifecycleResolver {
         e.status = "materialized";
         e.belowStreak = 0;
         e.activePhase = event.phase;
+        // Chatter-only activation starts probationary: 2 turns to show file
+        // evidence. File-evidenced activation skips probation entirely.
+        // Task/session-lifetime resources are exempt: their lifetime is the
+        // commitment mechanism (they persist by design, not by evidence).
+        e.probationTurnsLeft = hasFileEvidence(event) || d.lifetime === "task" || d.lifetime === "session" ? undefined : 2;
+      } else if (isActive && e.probationTurnsLeft !== undefined) {
+        // Probationary hold: file evidence graduates to full membership;
+        // otherwise the fuse burns. Expiry dematerializes regardless of
+        // score — unconfirmed talk must not accumulate.
+        if (hasFileEvidence(event)) {
+          e.probationTurnsLeft = undefined;
+          const stay = cur as ResourceStatus;
+          transitions.push({ resourceId: id, from: stay, to: stay, reason: "probation_confirmed", score: p, semanticEventId: event.id });
+          e.belowStreak = 0;
+        } else {
+          e.probationTurnsLeft -= 1;
+          if (e.probationTurnsLeft <= 0) {
+            const stay = cur as ResourceStatus;
+            transitions.push({ resourceId: id, from: stay, to: "dematerialized", reason: "probation_expired", semanticEventId: event.id });
+            e.status = "dematerialized";
+            e.belowStreak = 0;
+            e.probationTurnsLeft = undefined;
+          } else {
+            const stay = cur as ResourceStatus;
+            transitions.push({ resourceId: id, from: stay, to: stay, reason: "retain_probationary", score: p, semanticEventId: event.id });
+          }
+        }
       } else if (isActive && p >= this.cfg.rules.retain) {
         const stay = cur as ResourceStatus;
         transitions.push({ resourceId: id, from: stay, to: stay, reason: "retain", score: p, semanticEventId: event.id });

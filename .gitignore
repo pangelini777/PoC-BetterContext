@@ -10,6 +10,9 @@ build/
 coverage/
 .tmp/
 tmp/
+.tmp-run/
+*.so
 results/private/
 evals/progressive-context/results/.live/
+evals/progressive-context/results/.turnlog-mirror/
 .DS_Store
