@@ -98,6 +98,41 @@ Primary artifacts: `evals/progressive-context/results/probe-2026-09-22T17-31-31-
   | probe-2026-09-22T20-04 (stability 3/3) | single, JEV-only | — | — | 10/10, 4,145 ctx, 233k tok | −91.13%* | — |
   | probe-multi-2026-09-22T19-12 | **multi (fresh/probe)** | 10/10, 46,736 ctx, 580k tok | 10/10, 1.60M tok | 10/10, 1,324 ctx, 133k tok | −97.17% | −77.1% |
 
+  ## The live engineering exercise (build-slice runs)
+
+  Probes test whether the agent *cites the right rules*. Builds test whether
+  it *ships working code under those rules* — the PoC's correctness leg.
+  Each run is a paired head-to-head: same fixture, same model, same task
+  prompt, same 20-turn budget. Only the APM context policy differs
+  (progressive JEV overlay vs native discovery), and the agent never knows
+  which arm it is running.
+
+  The 2-phase journey: **Phase 1 — refunds** (POST `/api/refunds` with
+  `Idempotency-Key` handling: scoped replay `200` + `Idempotent-Replayed`
+  vs `422` on key reuse; trusted server-side totals from the fixture catalog,
+  never client totals; a focused `bun` test proving duplicate delivery
+  converges). **Phase 2 — notifications** (`lib/notify.ts` with an email
+  template plus SMS fallback and retry, plus a test proving fallback
+  converges). The fixture ships stubs (`NOT_IMPLEMENTED`, 501s); the agent
+  must replace them with real implementations.
+
+  What the 8 hidden checks measure (evaluator-only, never shown to JEV or
+  the agent): 4 *capability* checks (refund route with trusted totals,
+  idempotency handling, both notify channels, fallback + retry), 3 *rule
+  compliance* checks (no raw card data, no personal-data logging, no
+  hardcoded secrets — the materialized rules biting as code constraints),
+  and 1 *convergence* check (the agent's own `bun test` exits 0 with ≥2
+  passes). A perfect 8/8 means the agent built the feature, obeyed the
+  rules, and proved it with tests.
+
+  What varies across runs — and why: the overlay *stability* fix (unchanged
+  sets send silence, not a "fresh" block), the *continuity* note
+  (`still-active` ids survive phase transitions), the JEV-owned *test-gate*
+  Noul (test permission fires at phase boundaries, not every turn), and the
+  `lib/`-first verifier path. Each was a response to an observed failure
+  mode (phase-transition amnesia, test compulsion, root-scaffolding), not
+  tuning on held-out gold.
+
   Two-phase engineering journey (refunds → notifications, 20 turns, 8 checks):
 
   | run | model | order | JEV | discovery |
@@ -109,6 +144,25 @@ Primary artifacts: `evals/progressive-context/results/probe-2026-09-22T17-31-31-
   JEV holds 8/8 on two different model families; the advantage grows with
   model strength (tie → +1 → +4). Discovery collapses on luna-pro (20 turns,
   no implementation) while JEV ships a verified build on the same model.
+
+  ```mermaid
+  flowchart TB
+      subgraph CTRL["Controller — owns the 94-resource APM store"]
+          OBS["Observe: phase + tool/file activity"]
+          JEV["JEV router: score every rule/skill"]
+          RES["Resolver: activate / retain / DEMATERIALIZE"]
+          CMP["Compiler: inject selected bodies only"]
+      end
+      subgraph AGT["Agent (sees only the overlay)"]
+          ACT["Act on the task"]
+      end
+      OBS --> JEV
+      JEV --> RES
+      RES -->|"materialized"| CMP
+      RES -->|"dematerialized: never compiled, never sent"| EVICT{"✕ evicted"}
+      CMP --> ACT
+      ACT --> OBS
+  ```
 
   ## Model selection
 
@@ -134,24 +188,6 @@ Primary artifacts: `evals/progressive-context/results/probe-2026-09-22T17-31-31-
   JEV/load-all whole-session billing totals (input+output+reasoning, history
   included). \*Stability rows have no same-run baseline; ctx measured against
   the 46,736 flat catalog size, session reduction not computable.
-  ```mermaid
-  flowchart TB
-      subgraph CTRL["Controller — owns the 94-resource APM store"]
-          OBS["Observe: phase + tool/file activity"]
-          JEV["JEV router: score every rule/skill"]
-          RES["Resolver: activate / retain / DEMATERIALIZE"]
-          CMP["Compiler: inject selected bodies only"]
-      end
-      subgraph AGT["Agent (sees only the overlay)"]
-          ACT["Act on the task"]
-      end
-      OBS --> JEV
-      JEV --> RES
-      RES -->|"materialized"| CMP
-      RES -->|"dematerialized: never compiled, never sent"| EVICT{"✕ evicted"}
-      CMP --> ACT
-      ACT --> OBS
-  ```
 
   Rules act in two places. **At routing time**, JEV scores every rule against
   the current phase and the resolver activates, retains, or dematerializes —
