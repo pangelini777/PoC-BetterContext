@@ -119,6 +119,7 @@ function emptyArm(name: string, label: string, status: RunStatus): ArmView {
     verificationPassed: null,
     verificationTotal: null,
     verificationDetail: null,
+    turnDetail: null,
     eligible: null,
     eligibilityReasons: null,
     unloadMode: null,
@@ -477,10 +478,47 @@ function normalizeSingleTrial(trial: JsonObject, runStatus: RunStatus): ArmView 
   view.verificationPassed = verification.passed;
   view.verificationTotal = verification.total;
   view.verificationDetail = verification.detail;
+  view.turnDetail = observedTurns(trial.turnRecords);
   view.eligible = eligibility === null ? null : asBoolean(eligibility.eligible);
   view.eligibilityReasons = eligibility === null ? null : asStringArray(eligibility.reasons);
   view.unloadMode = asString(trial.unloadMode);
   return view;
+}
+
+/** Per-turn drill-down for build-slice/single-session trials. Compact by
+ * design: file lists and rule ids verbatim, assistant prose excluded. */
+function observedTurns(records: unknown): import("./types.ts").TurnView[] | null {
+  if (!Array.isArray(records) || records.length === 0) return null;
+  const out: import("./types.ts").TurnView[] = [];
+  for (const record of records) {
+    if (!isObject(record)) continue;
+    const turn = asCount(record.turn);
+    if (turn === null) continue;
+    const routing = isObject(record.routing) ? record.routing : null;
+    const gate = isObject(record.testGate) ? record.testGate : null;
+    const fired = gate !== null ? asBoolean(gate.fired) : null;
+    const score = gate !== null ? asNumber(gate.score) : null;
+    out.push({
+      turn,
+      files: Array.isArray(record.changedPaths)
+        ? (record.changedPaths as unknown[]).filter((p): p is string => typeof p === "string")
+        : null,
+      inputTokens: asCount(record.inputTokens),
+      outputTokens: asCount(record.outputTokens),
+      totalTokens: asCount(record.totalTokens),
+      added: routing !== null && Array.isArray(routing.added)
+        ? (routing.added as unknown[]).filter((p): p is string => typeof p === "string")
+        : null,
+      removed: routing !== null && Array.isArray(routing.removed)
+        ? (routing.removed as unknown[]).filter((p): p is string => typeof p === "string")
+        : null,
+      materialized: routing !== null && Array.isArray(routing.materialized)
+        ? (routing.materialized as unknown[]).filter((p): p is string => typeof p === "string")
+        : null,
+      testGate: gate === null ? null : `${fired === true ? "fired" : "quiet"}${score !== null ? ` @${score.toFixed(2)}` : ""}`,
+    });
+  }
+  return out.length > 0 ? out : null;
 }
 
 function normalizeSingleArtifact(artifact: JsonObject): RunView | null {

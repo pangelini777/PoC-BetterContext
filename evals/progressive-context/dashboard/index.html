@@ -224,6 +224,22 @@
       color: var(--success);
     }
 
+    .badge[data-state="verdict-pass"] {
+      border-color: #8bc5a3;
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    .badge[data-state="verdict-partial"] {
+      border-color: #d7a84c;
+      background: var(--warning-soft);
+      color: var(--warning);
+    }
+    .badge[data-state="failed"] {
+      border-color: #d98a8a;
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
     .run-meta {
       display: grid;
       grid-template-columns: repeat(4, minmax(9rem, 1fr));
@@ -373,6 +389,12 @@
       padding: 3rem 1rem;
       border: 1px dashed var(--border-strong);
       border-radius: 0.65rem;
+        }
+        table.append(body);
+        wrapper.append(table);
+        return wrapper;
+      }
+
       background: var(--surface);
       color: var(--muted);
       text-align: center;
@@ -673,6 +695,58 @@
         return value.map(formatText).join("; ");
       }
 
+      function shortId(id) {
+        const text = String(id);
+        const dot = text.indexOf(".");
+        return dot >= 0 ? text.slice(dot + 1) : text;
+      }
+
+      function formatIdList(ids) {
+        if (!Array.isArray(ids) || ids.length === 0) return EMPTY;
+        return ids.map(shortId).join(", ");
+      }
+
+      // Per-turn drill-down table: one row per turn with tokens, touched
+      // files, JEV routing deltas, and the test-gate state.
+      function createTurnTable(turns) {
+        const table = document.createElement("table");
+        table.className = "turn-table";
+        const caption = document.createElement("caption");
+        caption.textContent = "Per-turn detail";
+        table.append(caption);
+        const head = document.createElement("thead");
+        const headerRow = document.createElement("tr");
+        for (const label of ["Turn", "In", "Out", "Total", "Files", "JEV +/−", "Materialized", "Test gate"]) {
+          const heading = appendTextElement(headerRow, "th", label);
+          heading.scope = "col";
+        }
+        head.append(headerRow);
+        table.append(head);
+        const body = document.createElement("tbody");
+        for (const candidate of turns) {
+          const t = candidate && typeof candidate === "object" ? candidate : {};
+          const row = document.createElement("tr");
+          appendTextElement(row, "td", formatInteger(t.turn));
+          appendTextElement(row, "td", formatInteger(t.inputTokens));
+          appendTextElement(row, "td", formatInteger(t.outputTokens));
+          appendTextElement(row, "td", formatInteger(t.totalTokens));
+          const filesCell = appendTextElement(row, "td", formatIdList(t.files));
+          if (Array.isArray(t.files)) filesCell.title = t.files.join("; ");
+          const added = Array.isArray(t.added) ? t.added.length : 0;
+          const removed = Array.isArray(t.removed) ? t.removed.length : 0;
+          const deltaCell = appendTextElement(row, "td", (t.added || t.removed) ? `+${added}/−${removed}` : EMPTY);
+          const deltaTitle = [];
+          if (Array.isArray(t.added) && t.added.length > 0) deltaTitle.push(`added: ${t.added.join(", ")}`);
+          if (Array.isArray(t.removed) && t.removed.length > 0) deltaTitle.push(`removed: ${t.removed.join(", ")}`);
+          if (deltaTitle.length > 0) deltaCell.title = deltaTitle.join("; ");
+          const matCell = appendTextElement(row, "td", formatIdList(t.materialized));
+          if (Array.isArray(t.materialized)) matCell.title = t.materialized.join("; ");
+          appendTextElement(row, "td", formatText(t.testGate));
+          body.append(row);
+        }
+        table.append(body);
+        return table;
+      }
       function formatGradesLink(value) {
         if (!isPresent(value)) return EMPTY;
         return String(value).split("/").pop();
@@ -683,13 +757,11 @@
         const date = new Date(value);
         return Number.isNaN(date.getTime()) ? formatText(value) : dateFormatter.format(date);
       }
-
       function formatRelativeDate(value) {
         if (!isPresent(value)) return EMPTY;
         const date = new Date(value);
         if (Number.isNaN(date.getTime())) return formatText(value);
         const differenceSeconds = Math.round((date.getTime() - Date.now()) / 1000);
-        if (Math.abs(differenceSeconds) < 60) return relativeFormatter.format(differenceSeconds, "second");
         const differenceMinutes = Math.round(differenceSeconds / 60);
         if (Math.abs(differenceMinutes) < 60) return relativeFormatter.format(differenceMinutes, "minute");
         const differenceHours = Math.round(differenceMinutes / 60);
@@ -821,12 +893,29 @@
               }
             }
             body.append(row);
+            // Expandable per-turn drill-down (hover the arm row): turn list
+            // with tokens, files, JEV added/removed/materialized, test-gate.
+            if (Array.isArray(arm.turnDetail) && arm.turnDetail.length > 0) {
+              const detailRow = document.createElement("tr");
+              detailRow.className = "turn-detail-row";
+              const detailCell = document.createElement("td");
+              detailCell.colSpan = columns.length + 1;
+              const details = document.createElement("details");
+              const summary = document.createElement("summary");
+              summary.textContent = `Turns (${arm.turnDetail.length}) — per-turn tokens, files, JEV routing`;
+              details.append(summary);
+              details.append(createTurnTable(arm.turnDetail));
+              detailCell.append(details);
+              detailRow.append(detailCell);
+              body.append(detailRow);
+            }
           }
         }
         table.append(body);
         wrapper.append(table);
         return wrapper;
       }
+
 
       function createRunCard(candidate, index) {
         const run = candidate && typeof candidate === "object" ? candidate : {};
@@ -849,6 +938,24 @@
         badges.className = "badges";
         appendBadge(badges, formatStatus(run.status), run.status);
         appendBadge(badges, run.kind);
+        // Per-arm verdict badges in the header: "JEV 8/8" green on perfect,
+        // amber otherwise; failed arms red. Full check digits stay in the
+        // arm table + tooltip.
+        if (Array.isArray(run.arms)) {
+          for (const candidate of run.arms) {
+            const arm = candidate && typeof candidate === "object" ? candidate : {};
+            if (!isPresent(arm.verificationPassed) || !isPresent(arm.verificationTotal)) continue;
+            const passed = Number(arm.verificationPassed);
+            const total = Number(arm.verificationTotal);
+            const short = String(arm.name ?? "").replace("jev_single", "JEV").replace("apm_discovery", "Discovery").replace("load_all_single", "Load-all").replace(/_/g, " ");
+            const badge = appendTextElement(badges, "span", `${short} ${passed}/${total}`, "badge");
+            const armFailed = String(arm.status ?? "") === "failed";
+            badge.dataset.state = armFailed ? "failed" : passed === total ? "verdict-pass" : "verdict-partial";
+            if (Array.isArray(arm.verificationDetail) && arm.verificationDetail.length > 0) {
+              badge.title = arm.verificationDetail.join("; ");
+            }
+          }
+        }
         header.append(badges);
 
         const metadata = document.createElement("dl");

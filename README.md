@@ -127,25 +127,43 @@ Primary artifacts: `evals/progressive-context/results/probe-2026-09-22T17-31-31-
   (3 rules), 4-phase journey 12 checks (4 rules). A perfect score means the
   agent built the feature, obeyed the rules, and proved it with tests.
 
-  What varies across runs — and why: the overlay *stability* fix (unchanged
+  What changed across runs — and why: the overlay *stability* fix (unchanged
   sets send silence, not a "fresh" block), the *continuity* note
   (`still-active` ids survive phase transitions), the JEV-owned *test-gate*
-  Noul (test permission fires at phase boundaries, not every turn), and the
-  `lib/`-first verifier path. Each was a response to an observed failure
-  mode (phase-transition amnesia, test compulsion, root-scaffolding), not
-  tuning on held-out gold.
+  Noul (test permission fires at phase boundaries, not every turn), the
+  `lib/`-first verifier path, *per-turn routing* (the runner steps the JEV
+  session on every observed turn outcome instead of seeding once), and the
+  *probation fuse* (chatter-activated rules get 2 turns to show file
+  evidence, else `probation_expired` dematerializes them; task-lifetime
+  rules exempt). Each was a response to an observed failure mode
+  (phase-transition amnesia, test compulsion, root-scaffolding, seed-only
+  staleness, talk→bloat loop), not tuning on held-out gold.
 
   Two-phase engineering journey (refunds → notifications, 20 turns, 8 checks):
 
-  | run | model | order | JEV | discovery |
-  |---|---|---|---|---|
-  | build-2026-09-23T09-49 (final) | opencode-go Spark 1.3 | JEV-first | **8/8**, 1.62M tok, gate 3 fires @ boundary | 7/8 (refund-route), 1.35M tok |
-  | build-2026-09-23T10-19/10-43 (openrouter) | OpenRouter Spark 1.3 | discovery-first + JEV retry | 6/8 (root-scaffold, thin Phase 2) | 5/8 (Phase 1 gaps) |
-  | build-2026-09-23T11-23 (luna) | OpenRouter gpt-6-luna-pro | JEV-first | **8/8**, 1.81M tok, clean tree, 4 test passes | 4/8, 2.28M tok, zero files changed |
+  | run | model | order | routing | JEV | discovery |
+  |---|---|---|---|---|---|
+  | build-2026-09-23T09-49 (final) | opencode-go Spark 1.3 | JEV-first | seed-only | **8/8**, 1.62M tok | 7/8 (refund-route), 1.35M tok |
+  | build-2026-09-23T10-19/10-43 (openrouter) | OpenRouter Spark 1.3 | discovery-first + JEV retry | seed-only | 6/8 (root-scaffold, thin Phase 2) | 5/8 (Phase 1 gaps) |
+  | build-2026-09-23T11-23 (luna) | OpenRouter gpt-6-luna-pro | JEV-first | seed-only | **8/8**, 1.81M tok, clean tree, 4 test passes | 4/8, 2.28M tok, zero files changed |
+  | build-2026-09-23T16-01 (luna, per-turn, no fuse) | OpenRouter gpt-6-luna-pro | JEV-only | per-turn | 4/8 (talk→bloat: set grew 7→11, Phase 1 never built) | — |
+  | build-2026-09-23T16-48 (luna, probation) | OpenRouter gpt-6-luna-pro | JEV-only | per-turn + fuse | **8/8** in 17 turns, 2.70M tok (t1 −5 expiry, t2 +5 confirm) | — |
+  | build-2026-09-23T17-25 (luna, paired probation) | OpenRouter gpt-6-luna-pro | discovery-first | per-turn + fuse | **8/8**, 2.29M tok (−26% vs discovery) | **8/8**, 3.10M tok |
+  | build-2026-09-23T19-33 (spark, paired probation) | OpenRouter Spark 1.3 | discovery-first | per-turn + fuse | **8/8**, 2.08M tok, 3 test passes | 6/8 (no notify, 0 passes), 1.44M tok |
 
-  JEV holds 8/8 on two different model families; the advantage grows with
-  model strength (tie → +1 → +4). Discovery collapses on luna-pro (20 turns,
-  no implementation) while JEV ships a verified build on the same model.
+  JEV never loses a paired trial (margins +1, +1, +4, 0, +2). The 8/8-vs-8/8
+  tie is the PoC's success criterion firing exactly: equal task correctness
+  at −26% tokens with a breathing overlay (probation expiry → confirmation
+  → stable → phase expansion) instead of a static dump. Probation lifted
+  Spark from its 5–6/8 band to perfect; the 4/8 per-turn collapse without
+  the fuse is kept as the ablation that justifies it.
+
+  4-phase journey (refunds → notify → privacy → release, 30 turns, 12 checks):
+  seed-only luna reached 9/12 (Phases 1–2 perfect, privacy never started);
+  per-turn luna held 9/12 with genuine routing (6→14 resources, 3 real
+  dematerializations, release fixed, sms-fallback lost to mid-phase churn).
+  Phase-commitment (freeze a phase's set once its tests go green) is the
+  open next fix.
 
   ```mermaid
   flowchart TB

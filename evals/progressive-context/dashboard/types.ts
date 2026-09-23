@@ -21,6 +21,7 @@ export interface ArmView {
   verificationPassed: number | null;
   verificationTotal: number | null;
   verificationDetail: string[] | null;
+  turnDetail: TurnView[] | null;
   eligible: boolean | null;
   eligibilityReasons: string[] | null;
   unloadMode: string | null;
@@ -37,6 +38,18 @@ export interface ArmView {
   staleRatio: number | null;
   evictionFidelity: number | null;
   selfReportAccuracy: number | null;
+}
+
+export interface TurnView {
+  turn: number;
+  files: string[] | null;
+  inputTokens: number | null;
+  outputTokens: number | null;
+  totalTokens: number | null;
+  added: string[] | null;
+  removed: string[] | null;
+  materialized: string[] | null;
+  testGate: string | null;
 }
 
 export interface RunView {
