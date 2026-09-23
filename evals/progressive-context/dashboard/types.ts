@@ -1,4 +1,4 @@
-export type RunKind = "live-paired" | "scripted-four-arm" | "single-session" | "probe-eval" | "probe-multi";
+export type RunKind = "live-paired" | "scripted-four-arm" | "single-session" | "probe-eval" | "probe-multi" | "build-slice";
 export type RunStatus = "running" | "completed" | "dry-run" | "failed" | "skipped";
 
 export interface ArmView {
@@ -20,6 +20,7 @@ export interface ArmView {
   totalTokens: number | null;
   verificationPassed: number | null;
   verificationTotal: number | null;
+  verificationDetail: string[] | null;
   eligible: boolean | null;
   eligibilityReasons: string[] | null;
   unloadMode: string | null;

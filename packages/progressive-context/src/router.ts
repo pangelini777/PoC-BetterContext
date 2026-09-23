@@ -57,6 +57,9 @@ export interface BackendResult {
   outputTokens: number;
   latencyMs: number;
   calls: number;
+  /** Sustained-construction vs discrete-Q&A gate (pass-1 Noul, threshold 0.5). */
+  buildMode: boolean;
+  buildModeScore: number | null;
 }
 
 /** Score backend: provider-backed System One, deterministic heuristic fallback, oracle, or canned mock. */
@@ -147,7 +150,14 @@ export class SystemOneBackend implements ScoreBackend {
       type: "noul",
       instructions: "Would a short prose answer suffice with no procedure, file change, or checklist?",
     };
-
+    questions["sustained_construction"] = {
+      type: "noul",
+      instructions: "Is the immediate next action sustained construction (multi-turn building/editing toward a goal: implement, wire, migrate, fix across files) as opposed to discrete Q&A (answer from loaded context with no file changes)?",
+      criteria: {
+        true: "The next action builds, edits, or migrates files across turns toward a goal.",
+        false: "The next action answers from context with no file changes.",
+      },
+    };
     const pass1 = await systemOne(compact, questions as never, {
       apiKey: this.apiKey,
       model: this.model,
@@ -171,9 +181,13 @@ export class SystemOneBackend implements ScoreBackend {
     const g1 = pass1.answers["acts_on_repo_or_system"];
     const g2 = pass1.answers["specialized_procedure_helpful"];
     const g3 = pass1.answers["prose_only_suffices"];
+    const gBuild = pass1.answers["sustained_construction"];
     if (!g1 || g1.type !== "noul" || !g2 || g2.type !== "noul" || !g3 || g3.type !== "noul") {
       throw new Error("missing gate answers");
     }
+    // Build mode: sustained construction vs discrete Q&A. Fail-open true on
+    // missing/legacy answers (older recorders never asked); threshold 0.5.
+    const buildMode = gBuild !== undefined && gBuild.type === "noul" ? gBuild.noul >= 0.5 : true;
     const gateScore = (g1.noul + g2.noul + (1 - g3.noul)) / 3;
     const gatedOut = gateScore < opts.gateThreshold;
     const ranked = Object.entries((choice as ChoiceAnswer).probabilities).sort(([, a], [, b]) => b - a);
@@ -259,6 +273,8 @@ export class SystemOneBackend implements ScoreBackend {
       outputTokens,
       latencyMs,
       calls,
+      buildMode,
+      buildModeScore: gBuild !== undefined && gBuild.type === "noul" ? gBuild.noul : null,
     };
   }
 }
@@ -367,6 +383,10 @@ export class HeuristicBackend implements ScoreBackend {
       outputTokens: 0,
       latencyMs: 0,
       calls: 0,
+      // Heuristic fallback cannot judge construction mode: assume build
+      // (sticky) so fail-open runs don't thrash overlays mid-build.
+      buildMode: true,
+      buildModeScore: null,
     };
   }
 }
@@ -399,6 +419,8 @@ export class MockBackend implements ScoreBackend {
       outputTokens: 0,
       latencyMs: 0,
       calls: 0,
+      buildMode: false,
+      buildModeScore: null,
     };
   }
 }

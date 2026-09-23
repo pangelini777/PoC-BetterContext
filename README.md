@@ -63,6 +63,38 @@ Primary artifacts: `evals/progressive-context/results/probe-2026-09-22T17-31-31-
   | probe-2026-09-22T20-04 (stability 3/3) | single, JEV-only | — | — | 10/10, 4,145 ctx, 233k tok | −91.13%* | — |
   | probe-multi-2026-09-22T19-12 | **multi (fresh/probe)** | 10/10, 46,736 ctx, 580k tok | 10/10, 1.60M tok | 10/10, 1,324 ctx, 133k tok | −97.17% | −77.1% |
 
+  Two-phase engineering journey (refunds → notifications, 20 turns, 8 checks):
+
+  | run | model | order | JEV | discovery |
+  |---|---|---|---|---|
+  | build-2026-09-23T09-49 (final) | opencode-go Spark 1.3 | JEV-first | **8/8**, 1.62M tok, gate 3 fires @ boundary | 7/8 (refund-route), 1.35M tok |
+  | build-2026-09-23T10-19/10-43 (openrouter) | OpenRouter Spark 1.3 | discovery-first + JEV retry | 6/8 (root-scaffold, thin Phase 2) | 5/8 (Phase 1 gaps) |
+  | build-2026-09-23T11-23 (luna) | OpenRouter gpt-6-luna-pro | JEV-first | **8/8**, 1.81M tok, clean tree, 4 test passes | 4/8, 2.28M tok, zero files changed |
+
+  JEV holds 8/8 on two different model families; the advantage grows with
+  model strength (tie → +1 → +4). Discovery collapses on luna-pro (20 turns,
+  no implementation) while JEV ships a verified build on the same model.
+
+  ## Model selection
+
+  Agent models are opencode `--model` ids, swappable per run (`--model=`).
+  Routing/grading always uses provider-backed JEV (`jev-latest`), never the
+  agent model. Why these three:
+
+  - `opencode-go/muse-spark-1.3-contributor` — default workhorse. Fast,
+    cheap, contributor-tier; all probe tuning (v1–v4) and the refund slice
+    ran on it. Baseline for every comparison.
+  - `openrouter/meta/muse-spark-1.3-contributor` — same weights, different
+    provider path. Tests whether results survive routing changes: both arms
+    degraded (JEV 8/8→6/8, discovery 7/8→5/8), JEV still ahead. Provider
+    path matters; report it, don't average over it.
+  - `openrouter/openai/gpt-6-luna-pro` — capability probe. A stronger model
+    widens the gap instead of closing it: JEV 8/8 with a clean tree while
+    discovery produces nothing. Progressive context is load-bearing for
+    capable agents, not training wheels for weak ones.
+
+   Per-request context always favors JEV (15× less here). Session totals favor
+
   `ctx avg −` = 1 − JEV/load-all per-probe context sums. `sess tok −` = 1 −
   JEV/load-all whole-session billing totals (input+output+reasoning, history
   included). \*Stability rows have no same-run baseline; ctx measured against

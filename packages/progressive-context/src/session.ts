@@ -51,7 +51,10 @@ export class ProgressiveSession {
   private harness = new ExplicitHarness(KERNEL);
   private seq = 0;
   private recent: SemanticEvent[] = [];
-
+  // Build mode: classified once on turn 0 from the task goal, then locked
+  // for the session (per-event flips would thrash lifetimes mid-build).
+  private buildMode: boolean | null = null;
+  private buildModeScore: number | null = null;
   constructor(
     private readonly opts: {
       runId: string;
@@ -133,6 +136,11 @@ export class ProgressiveSession {
       outTokens = routed.outputTokens;
       latencyMs = routed.latencyMs;
       calls = routed.calls;
+      // Lock build mode on the first routed event; later events reuse it.
+      if (this.buildMode === null) {
+        this.buildMode = routed.buildMode;
+        this.buildModeScore = routed.buildModeScore;
+      }
     }
 
     let transitions: ResourceTransition[];
@@ -162,7 +170,9 @@ export class ProgressiveSession {
       retained = [];
       removed = retired.filter((t) => t.to === "retired" && t.from === "materialized").map((t) => t.resourceId);
     } else {
-      const step = this.resolver.step(event, ruleScores, selectedSkill, skillSource);
+      const step = this.buildMode === true
+        ? this.resolver.stepSticky(event, ruleScores, selectedSkill, skillSource)
+        : this.resolver.step(event, ruleScores, selectedSkill, skillSource);
       transitions = step.transitions;
       activeAfter = step.activeAfter;
       materializedAfter = step.materializedAfter;
@@ -171,7 +181,9 @@ export class ProgressiveSession {
       removed = step.removed;
     }
 
-    const compiled = compileOverlay(materializedAfter, this.opts.bodies, event.id);
+    const sourcePaths = new Map<string, string>();
+    for (const [id, d] of this.opts.byId) sourcePaths.set(id, d.sourcePath);
+    const compiled = compileOverlay(materializedAfter, this.opts.bodies, event.id, sourcePaths);
     compiled.kernel = KERNEL;
     const effective = this.harness.step(event.id, event.text, compiled);
     void effective;

@@ -49,6 +49,7 @@ export function compileOverlay(
   materializedIds: string[],
   bodies: Map<string, string>,
   eventId: string,
+  sourcePaths?: Map<string, string>,
 ): CompiledContext {
   const ids = [...materializedIds].sort();
   const parts: string[] = [];
@@ -59,8 +60,12 @@ export function compileOverlay(
     const kind = id.startsWith("skill.") ? "skill" : "rule";
     const short = id.slice(id.indexOf(".") + 1);
     const kindTag = kind === "skill" ? "[SKILL — procedure, how to do it]" : "[RULE — constraint, what must hold]";
+    // sourcePath grounds the agent: bodies carry what, the path carries where.
+    // The descriptor map is threaded via an optional side table (see below).
+    const where = sourcePaths?.get(id) ?? "";
+    const whereLine = where !== "" ? `\n  [LOCATION ${where}]` : "";
     resourceTokenEstimate += Math.max(1, Math.ceil(body.length / 4));
-    parts.push(`  <${kind} id="${id}" name="${short}" sha256="${sha256Hex(body)}">\n  ${kindTag}\n${body}\n  </${kind}>`);
+    parts.push(`  <${kind} id="${id}" name="${short}" sha256="${sha256Hex(body)}">\n  ${kindTag}${whereLine}\n${body}\n  </${kind}>`);
   }
   const dynamicOverlay =
     ids.length === 0

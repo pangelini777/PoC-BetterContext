@@ -629,7 +629,13 @@
 
       function formatVerification(_value, arm) {
         if (!isPresent(arm.verificationPassed) || !isPresent(arm.verificationTotal)) return EMPTY;
-        return `${formatInteger(arm.verificationPassed)} / ${formatInteger(arm.verificationTotal)}`;
+        const base = `${formatInteger(arm.verificationPassed)} / ${formatInteger(arm.verificationTotal)}`;
+        if (!Array.isArray(arm.verificationDetail) || arm.verificationDetail.length === 0) return base;
+        const digits = arm.verificationDetail.map((entry) => {
+          if (typeof entry !== "string") return "?";
+          return entry.endsWith(":pass") ? "1" : entry.endsWith(":fail") ? "0" : "?";
+        }).join(" ");
+        return `${base} [${digits}]`;
       }
 
       function formatEligibility(value) {
@@ -806,6 +812,9 @@
               }
               if (column.key === "probeDetail" && Array.isArray(arm.probeDetail)) {
                 cell.title = probeDetailTitle(arm.probeDetail);
+              }
+              if (column.key === "verification" && Array.isArray(arm.verificationDetail)) {
+                cell.title = arm.verificationDetail.join("; ");
               }
               if (column.key === "gradesPath" && isPresent(arm.gradesPath)) {
                 cell.title = `Noul grades file: ${arm.gradesPath}`;

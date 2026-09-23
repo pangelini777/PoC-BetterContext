@@ -92,8 +92,9 @@ function runLabel(kind: RunKind, id: string): string {
     : kind === "single-session" ? "Single session"
     : kind === "probe-eval" ? "Probe eval"
     : kind === "probe-multi" ? "Probe multi"
+    : kind === "build-slice" ? "Build slice"
     : "Scripted";
-  const suffix = id.replace(/^(probe-multi|live|scripted|single|probe)-/, "");
+  const suffix = id.replace(/^(probe-multi|build|live|scripted|single|probe)-/, "");
   return `${prefix} · ${suffix}`;
 }
 
@@ -117,6 +118,7 @@ function emptyArm(name: string, label: string, status: RunStatus): ArmView {
     totalTokens: null,
     verificationPassed: null,
     verificationTotal: null,
+    verificationDetail: null,
     eligible: null,
     eligibilityReasons: null,
     unloadMode: null,
@@ -188,17 +190,25 @@ function average(values: number[]): number | null {
   return Math.round(values.reduce((sum, value) => sum + value, 0) / values.length);
 }
 
-function observedVerification(verification: unknown): { passed: number | null; total: number | null } {
-  if (!isObject(verification)) return { passed: null, total: null };
+function observedVerification(verification: unknown): { passed: number | null; total: number | null; detail: string[] | null } {
+  if (!isObject(verification)) return { passed: null, total: null, detail: null };
   const passed = asCount(verification.passed);
   const total = asCount(verification.total);
-  if (passed !== null || total !== null) return { passed, total };
-
   const checks = objects(verification.checks);
-  if (checks === null) return { passed: null, total: null };
+  const detail = checks === null
+    ? null
+    : checks.map((check) => {
+        const name = asString(check.name) ?? "check";
+        const pass = (check as JsonObject).pass === true;
+        return `${name}:${pass ? "pass" : "fail"}`;
+      });
+  if (passed !== null || total !== null) return { passed, total, detail };
+
+  if (checks === null) return { passed: null, total: null, detail: null };
   return {
     passed: checks.filter((check) => check.pass === true).length,
     total: checks.length,
+    detail,
   };
 }
 
@@ -235,9 +245,9 @@ function normalizeLiveTrial(trial: JsonObject, runStatus: RunStatus): ArmView | 
   view.dematerializations = asCount(trial.dematerializations) ?? observedTransitionCount(trial, "removed");
   view.inputTokens = tokens === null ? null : asCount(tokens.input);
   view.outputTokens = tokens === null ? null : asCount(tokens.output);
-  view.totalTokens = tokens === null ? null : asCount(tokens.total);
   view.verificationPassed = verification.passed;
   view.verificationTotal = verification.total;
+  view.verificationDetail = verification.detail;
   view.eligible = eligibility === null ? null : asBoolean(eligibility.eligible);
   view.eligibilityReasons = eligibility === null ? null : asStringArray(eligibility.reasons);
   return view;
@@ -317,9 +327,16 @@ export async function normalizeArtifact(value: unknown): Promise<RunView | null>
   if (value.kind === "live-paired") return normalizeLiveArtifact(value);
   if (value.kind === "scripted-four-arm") return normalizeScriptedArtifact(value);
   if (value.kind === "single-session") return normalizeSingleArtifact(value);
+  if (value.kind === "build-slice") return normalizeBuildSliceArtifact(value);
   if (value.kind === "probe-eval") return normalizeProbeArtifact(value);
   if (value.kind === "probe-multi") return normalizeProbeMultiArtifact(value);
   return null;
+}
+
+function normalizeBuildSliceArtifact(artifact: JsonObject): RunView | null {
+  const view = normalizeSingleArtifact({ ...artifact, kind: "single-session" });
+  if (view === null) return null;
+  return { ...view, label: runLabel("build-slice", view.id), kind: "build-slice" };
 }
 
 async function normalizeProbeArtifact(artifact: JsonObject): Promise<RunView | null> {
@@ -459,6 +476,7 @@ function normalizeSingleTrial(trial: JsonObject, runStatus: RunStatus): ArmView 
   view.totalTokens = tokens === null ? null : asCount(tokens.total);
   view.verificationPassed = verification.passed;
   view.verificationTotal = verification.total;
+  view.verificationDetail = verification.detail;
   view.eligible = eligibility === null ? null : asBoolean(eligibility.eligible);
   view.eligibilityReasons = eligibility === null ? null : asStringArray(eligibility.reasons);
   view.unloadMode = asString(trial.unloadMode);

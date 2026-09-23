@@ -360,10 +360,43 @@ const JevSingleSession = async (input: { directory?: string }): Promise<Record<s
 
         const derivedEvent = deriveRoutingEvent(activity);
         const kernel = typeof decision.kernel === "string" && decision.kernel.length > 0 ? decision.kernel : KERNEL;
-        const freshEntry = `${kernel}\n${buildFreshOverlay(eventId, materialized)}`;
-
+        // Overlay stability: when the materialized set is unchanged since the
+        // last turn, skip the rewrite entirely (no scrub, no push). A "fresh"
+        // identical block every turn reads as "re-plan" to the agent; silence
+        // reads as "continue". Phase-carry note preserves continuity across
+        // genuine changes without resetting the agent's mental model.
+        const sameAsLast = lastMaterializedIds.length === materializedIds.length &&
+          lastMaterializedIds.every((id, i) => id === materializedIds[i]);
+        if (sameAsLast && turn > 1) {
+          const skipLine: TurnLogLine = {
+            turn,
+            eventId,
+            derivedEvent,
+            materializedIds,
+            evictedIds: [],
+            decisionsSource: source,
+            messagesScrubbed: 0,
+            systemScrubbed: 0,
+            unload: { evictedAbsent: true, leakedProbes: [], overlayCount: -1, exactlyOneOverlay: true },
+            at: new Date().toISOString(),
+          };
+          lastMaterializedIds = materializedIds;
+          messagesScrubbed = 0;
+          activity.splice(0, activity.length);
+          const skipLogPath = join(workspaceDir, TURN_LOG_REL_PATH);
+          await mkdir(dirname(skipLogPath), { recursive: true }).catch(() => {});
+          await appendFile(skipLogPath, `${JSON.stringify(skipLine)}\n`, "utf8").catch(() => {});
+          return;
+        }
+        // Phase-carry continuity: on genuine change, name what survived so the
+        // agent continues instead of restarting. Retained ids are still-active
+        // constraints from prior phases; evicted ids are explicitly retired.
+        const retained = lastMaterializedIds.filter((id) => materializedIds.includes(id));
+        const carryNote = retained.length > 0
+          ? `\n  [CONTINUITY still-active: ${retained.join(", ")}]`
+          : "";
+        const freshEntry = `${kernel}\n${buildFreshOverlay(eventId, materialized)}${carryNote}`;
         const systemScrubbed = applySystemOverlayInPlace(out.system, freshEntry);
-
         // Assertion over the emitted system list (the slice this hook owns).
         // Messages-slice scrub count is carried over from the messages hook.
         const unload = assertEmittedUnload(out.system, probes);

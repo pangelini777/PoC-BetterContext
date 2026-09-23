@@ -88,4 +88,47 @@ describe("provider-backed routing plumbing", () => {
       globalThis.fetch = original;
     }
   });
+
+  test("sustained_construction gate classifies build vs probe goals", async () => {
+    const original = globalThis.fetch;
+    // Canned fetch: answer buildMode true for build goals, false for probe goals.
+    globalThis.fetch = (async (_url: unknown, init: unknown) => {
+      const body = JSON.parse(String((init as { body: string }).body));
+      const goal = String(body.state?.goal ?? "");
+      const isBuild = /implement|migrat|wire|fix/i.test(goal);
+      const qids = Object.keys(body.questions);
+      const answers: Record<string, unknown> = {};
+      for (const qid of qids) {
+        if (qid === "sustained_construction") answers[qid] = { type: "noul", noul: isBuild ? 0.9 : 0.1 };
+        else if (body.questions[qid].type === "noul") answers[qid] = { type: "noul", noul: 0.05 };
+        else {
+          const options = Object.keys(body.questions[qid].criteria);
+          const probs: Record<string, number> = {};
+          for (const o of options) probs[o] = 1 / options.length;
+          answers[qid] = { type: "choice", choice: options[0], probabilities: probs, confidence: 0.5 };
+        }
+      }
+      return {
+        ok: true, status: 200,
+        json: async () => ({ model: "jev-test", answers, usage: { input_tokens: 10, output_tokens: 2 } }),
+        text: async () => "",
+      } as unknown as Response;
+    }) as typeof fetch;
+    try {
+      const cat = await loadCatalog("fixtures/apm-package");
+      const backend = new SystemOneBackend("test-key", "jev-test", 5000);
+      const routeOpts = { topK: 3, gateThreshold: 0.55, fitsThreshold: 0.55, shortlistMin: 0.3 };
+      const stateFor = (goal: string) => ({
+        sessionId: "s", goal,
+        currentEvent: { id: "e0", seq: 0, kind: "user_message" as const, text: goal, phase: "build" },
+        recentEvents: [], activeResourceIds: [], changedPaths: [],
+      });
+      const buildOut = await backend.route(stateFor("Implement POST /api/refunds with tests"), cat.rules, cat.skills, cat.bodies, routeOpts);
+      const probeOut = await backend.route(stateFor("Which rules constrain checkout? Name each id"), cat.rules, cat.skills, cat.bodies, routeOpts);
+      expect(buildOut.buildMode).toBe(true);
+      expect(probeOut.buildMode).toBe(false);
+    } finally {
+      globalThis.fetch = original;
+    }
+  });
 });

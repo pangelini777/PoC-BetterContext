@@ -201,6 +201,54 @@ export class LifecycleResolver {
     return { transitions, activeAfter, materializedAfter, added, retained, removed };
   }
 
+  /**
+   * Build-mode stepping: identical to step() except action/turn-lifetime
+   * resources use phase-like hysteresis (streak 2–3 instead of 1), so the
+   * overlay stays stable across sustained construction. Probe (Q&A) mode
+   * keeps fast eviction via step(). The mode is chosen per session by the
+   * sustained_construction gate, locked on turn 0.
+   */
+  stepSticky(
+    event: SemanticEvent,
+    scores: Map<string, ScoreInput>,
+    selectedSkill: string | null,
+    skillSource: ScoreSource,
+  ): ResolverStep {
+    return this.stepWithStreakBoost(event, scores, selectedSkill, skillSource, 2);
+  }
+
+  private stepWithStreakBoost(
+    event: SemanticEvent,
+    scores: Map<string, ScoreInput>,
+    selectedSkill: string | null,
+    skillSource: ScoreSource,
+    extraStreak: number,
+  ): ResolverStep {
+    // Temporarily promote action/turn lifetimes to phase-like behavior by
+    // pre-seeding belowStreak negative credit: an action rule needs
+    // 1 + extraStreak consecutive low scores before removal.
+    const boosted = new Map<string, number>();
+    for (const [id, d] of this.catalog) {
+      if (d.kind !== "rule") continue;
+      if (d.lifetime !== "action" && d.lifetime !== "turn") continue;
+      const e = this.entries.get(id);
+      if (e && (e.status === "materialized" || e.status === "active") && e.belowStreak === 0) {
+        boosted.set(id, e.belowStreak);
+        e.belowStreak = -extraStreak;
+      }
+    }
+    try {
+      return this.step(event, scores, selectedSkill, skillSource);
+    } finally {
+      for (const [id, prev] of boosted) {
+        const e = this.entries.get(id);
+        // step() may have reset to 0 (retain) or incremented (still low);
+        // restore the pre-seed offset relative to the new value.
+        if (e && e.belowStreak > prev) e.belowStreak = e.belowStreak - extraStreak > prev ? e.belowStreak - extraStreak : prev;
+      }
+    }
+  }
+
   snapshot(): Record<string, { status: string; belowStreak: number }> {
     return Object.fromEntries([...this.entries].map(([id, e]) => [id, { status: e.status, belowStreak: e.belowStreak }]));
   }
