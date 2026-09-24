@@ -46,11 +46,28 @@ import { parseOpencodeJson } from "./live/opencode-parser.ts";
 import type { ParsedRun } from "./live/opencode-parser.ts";
 
 export const TASK_PROMPT = `Implement POST /api/refunds with Idempotency-Key handling (scoped replay 200 + Idempotent-Replayed vs 422 on key reuse), trusted server-side totals from the fixture catalog (never client totals), and one focused bun test proving duplicate delivery converges. Do not run validation suites; do not deploy.`;
-export const JOURNEY_TASK_PROMPT = `4-phase engineering journey (up to 30 turns total; advance exactly one coherent phase per turn and end each turn with CONTINUE, or DONE only when all four phases are implemented and verified). Implement new modules at their fixture paths (route.ts, lib/notify.ts, lib/privacy.ts, journey.test.ts, release.sh); do not create root-level duplicates (notify.ts, privacy.ts). Phase 1 (turns 1-7) refunds: implement POST /api/refunds with Idempotency-Key handling (scoped replay 200 + Idempotent-Replayed vs 422 on key reuse) and trusted server-side totals from the fixture catalog (never client totals). Phase 2 (turns 8-14) notifications: implement lib/notify.ts with an email template plus SMS fallback and retry. Phase 3 (turns 15-22) privacy: implement the GDPR deletion endpoint plus audit export in lib/privacy.ts. Phase 4 (turns 23-30) release: write the deploy checklist plus release.sh with migration ordering. Do not run validation suites; do not deploy.`;
+export const JOURNEY_TASK_PROMPT = `4-phase engineering journey (up to 30 turns total; advance exactly one coherent phase per turn and end each turn with CONTINUE, or DONE only when all four phases are implemented and verified). Implement new modules at their fixture paths (route.ts, lib/notify.ts, lib/privacy.ts, journey.test.ts, release.sh); do not create root-level duplicates (notify.ts, privacy.ts). Complete the phases in order: do not start Phase 4 until the Phase 3 files exist with real implementations. Phase 1 (turns 1-7) refunds: implement POST /api/refunds with Idempotency-Key handling (scoped replay 200 + Idempotent-Replayed vs 422 on key reuse) and trusted server-side totals from the fixture catalog (never client totals). Phase 2 (turns 8-14) notifications: implement lib/notify.ts with an email template plus SMS fallback and retry. Phase 3 (turns 15-22) privacy: implement the GDPR deletion endpoint plus audit export in lib/privacy.ts. Phase 4 (turns 23-30) release: write the deploy checklist plus release.sh with migration ordering. Do not run validation suites; do not deploy.`;
 export const JOURNEY2_TASK_PROMPT = `2-phase engineering journey (up to 20 turns total; advance exactly one coherent step per turn and end each turn with CONTINUE, or DONE only when both phases are implemented and verified). Implement new modules at their fixture paths (route.ts, lib/notify.ts, lib/privacy.ts, journey.test.ts); do not create root-level duplicates (notify.ts, privacy.ts). Phase 1 (turns 1-10) refunds: implement POST /api/refunds with Idempotency-Key handling (scoped replay 200 + Idempotent-Replayed vs 422 on key reuse) and trusted server-side totals from the fixture catalog (never client totals), plus a focused bun test proving duplicate delivery converges. Phase 2 (turns 11-20) notifications: implement lib/notify.ts with an email template plus SMS fallback and retry, plus a focused bun test proving fallback converges. Do not run validation suites; do not deploy.`;
 
-export type VerifierKind = "refund" | "journey" | "journey2";
+/** Phase gate: observable file-existence + non-stub check. No gold labels —
+ * the controller reads workspace files only, same class as the test-gate. */
+export interface PhaseGate {
+  phase: number;
+  files: string[];
+}
+export const JOURNEY_GATES: PhaseGate[] = [
+  { phase: 1, files: ["route.ts"] },
+  { phase: 2, files: ["lib/notify.ts"] },
+  { phase: 3, files: ["lib/privacy.ts"] },
+  { phase: 4, files: ["release.sh"] },
+];
+export const JOURNEY2_GATES: PhaseGate[] = [
+  { phase: 1, files: ["route.ts"] },
+  { phase: 2, files: ["lib/notify.ts"] },
+];
 
+
+export type VerifierKind = "refund" | "journey" | "journey2";
 export const DEFAULT_FIXTURE = "refund-slice";
 export const DEFAULT_TASK_ID = "refund-slice";
 export const DEFAULT_VERIFIER: VerifierKind = "refund";
@@ -515,10 +532,46 @@ async function runBuildArm(opts: {
     const validationLine = allowTestsThisTurn
       ? "You may run `bun test <file>` once this turn to check your work, then continue building."
       : SKIP_VALIDATION_LINE;
+    // Phase gate (all arms, controller-owned): the earliest phase whose
+    // files are missing-or-stub is the phase the agent must work on. Past
+    // the phase's turn window with files still missing, the controller
+    // prompt escalates to that phase explicitly. Observable harness state
+    // only (file existence + NOT_IMPLEMENTED scan) — no gold labels.
+    const gates = opts.verifier === "journey" ? JOURNEY_GATES : opts.verifier === "journey2" ? JOURNEY2_GATES : [];
+    let gateDirective = "";
+    let gateState: { phase: number; missing: string[]; escalated: boolean } | null = null;
+    if (gates.length > 0) {
+      const { readFile: readGateFile } = await import("node:fs/promises");
+      for (const gate of gates) {
+        const missing: string[] = [];
+        for (const file of gate.files) {
+          let body = "";
+          try {
+            body = await readGateFile(join(ws, file), "utf8");
+          } catch {
+            body = "";
+          }
+          if (body.trim().length < 50 || /NOT_IMPLEMENTED/.test(body)) missing.push(file);
+        }
+        if (missing.length > 0) {
+          // Turn windows mirror the task prompt phase ranges (4-phase:
+          // 1-7/8-14/15-22/23-30; 2-phase: 1-10/11-20). Escalate once the
+          // window for this phase has passed without its files.
+          const windowEnd = gates.length === 4 ? [7, 14, 22, 30][gate.phase - 1]! : [10, 20][gate.phase - 1]!;
+          const escalated = turn >= windowEnd;
+          gateState = { phase: gate.phase, missing, escalated };
+          gateDirective = escalated
+            ? `Phase ${gate.phase} is still missing its implementation (${missing.join(", ")}). Work on Phase ${gate.phase} ONLY this turn: implement the missing files before any other work.`
+            : `Current earliest incomplete phase: Phase ${gate.phase} (${missing.join(", ")} missing). Prefer advancing it.`;
+          break;
+        }
+      }
+    }
     const controllerPrompt = `<controller-turn index="${turn + 1}" max="${MAX_TURNS}">
 Work on exactly one coherent next phase of the task, using at most ${MAX_TOOL_CALLS_PER_TURN} tool calls.
 Inspect the current workspace first so you continue prior work rather than restart it.
 Do not merely describe planned work: make concrete progress in this phase.
+${gateDirective}
 End your response with a line containing exactly CONTINUE if work remains, or exactly DONE only when the entire task is implemented and verified.
 </controller-turn>`;
     let agentPrompt: string;
@@ -581,6 +634,7 @@ End your response with a line containing exactly CONTINUE if work remains, or ex
       timedOut: tres.timedOut,
       budgetReached: tres.budgetReached,
       done: tres.run.done,
+      phaseGate: gateState,
     });
     // Per-turn routing (JEV arm only): step the runner-owned session on the
     // observed turn outcome and rewrite the decisions file the plugin reads

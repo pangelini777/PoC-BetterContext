@@ -5,10 +5,13 @@
   Probation moved Spark from 5–6/8 to 8/8; the 8/8-vs-8/8 run used about
   26% fewer session tokens on the JEV arm (2.29M vs 3.10M). The 4/8
   per-turn run without the fuse is kept as the ablation (the set grew 7→11
-  and Phase 1 was never built). The 4-phase run with the fuse reached 10/12
-  (`build-2026-09-24T05-41-17`: sms-fallback and release hold, privacy checks
-  fail although privacy rules materialized at t15/t22 — initiation gap, not
-  routing). The open work is phase-commitment from the agent's
+  and Phase 1 was never built). The 4-phase run with the fuse plus a
+  one-line ordering precondition reached 11/12
+  (`build-2026-09-24T13-10-32`: privacy implemented for the first time,
+  sms-fallback and release hold; the miss is a vacuous agent test suite).
+  Repeated escalation was ignored; the precondition was followed — the
+  privacy gap was ordering, not routing. The open work is phase-commitment
+  from the agent's
   own green tests. Artifacts `results/build-*.json`; table in the README
   section on the live engineering exercise.
 

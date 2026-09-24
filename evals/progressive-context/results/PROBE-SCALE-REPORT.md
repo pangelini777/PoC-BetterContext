@@ -86,11 +86,11 @@ Sixteen build arms across ten runs (Spark + luna-pro, seed-only → per-turn
 (+1, +1, +4, 0, +2), probation moved Spark 5–6/8 → 8/8, and the 8/8-vs-8/8
 run used about 26% fewer session tokens on the JEV arm. The 4/8 per-turn
 run without the fuse is kept as the ablation. Remaining build gaps:
-4-phase privacy work never starts (9/12 ceiling twice without the fuse,
-10/12 with it — privacy rules materialize at t15/t22 but `lib/privacy.ts`
-is never written, so initiation rather than routing);
-per-turn routing can destabilize mid-phase work (sms-fallback regressed on
-the 4-phase per-turn run without the fuse; it holds with the fuse);
+4-phase privacy work never started across three routings (9/12, 9/12,
+10/12) until a one-line ordering precondition entered the shared prompt —
+11/12 (`build-2026-09-24T13-10-32`) with privacy implemented, sms-fallback
+and release holding; the miss is a vacuous agent suite (exit 0, 0 passes —
+no `bun test` invocation in any of 30 turns, only git inspection).
 single-session scrubs are behavioral-only
 (`systemScrubbed` 0/182 — fresh processes carry history outside the hooks'
 view). Open work: phase-commitment from the agent's own green tests. Full

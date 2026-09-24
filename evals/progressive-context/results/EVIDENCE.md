@@ -148,13 +148,22 @@ incumbent). Prior fail-open artifact
   (Phases 1–2 passed, privacy work never started); per-turn luna-pro without
   the fuse also reached 9/12 with genuine routing (6→14 resources, 3
   dematerializations, release fixed, sms-fallback lost to mid-phase churn);
-  per-turn luna-pro with the fuse reached 10/12 (`build-2026-09-24T05-41-17`,
-  3.48M tokens, 10 test passes — sms-fallback and release hold, privacy
-  checks still fail). Privacy rules materialized at the phase transitions
-  (t15 +5, t22 +3) but `lib/privacy.ts` was never written, so the remaining
-  gap looks like initiation rather than routing. Open work:
-  phase-commitment, freezing a phase's set once its tests go green, using
-  the agent's own tests as the signal (no gold labels).
+  per-turn luna-pro with the fuse reached 10/12 (sms-fallback and release
+  hold, privacy checks still fail although privacy rules materialized at
+  t15/t22); per-turn luna-pro with the fuse plus a one-line phase-ordering
+  precondition in the shared task prompt reached 11/12
+  (`build-2026-09-24T13-10-32`, 3.94M tokens — `lib/privacy.ts` implemented
+  for the first time, gdpr + audit checks pass, routing 8→15 with phase
+  expansions at t5–t8 and t19–t21, gate trace P1→P2→P3→P4 in order). The
+  single miss is `agent-test` (exit 0, 0 passes — the suite runs clean but
+  asserts nothing). Repeated per-turn escalation was ignored for 8 turns;
+  the precondition was followed. The privacy gap was ordering, not routing
+  or capability. Open work, specified but unbuilt: phase-commitment —
+  freezing a phase's set once its tests go green, using the agent's own
+  tests as the signal (no gold labels). The 11/12
+  run motivates it directly: no `bun test` invocation in any of 30 turns
+  (only git inspection), so no phase ever committed and the agent re-read
+  instead of verifying.
 
   Caveats: per-turn routing can destabilize as well as advance (sms-fallback
   regressed on the 4-phase per-turn run); single-session plugin scrubs are
