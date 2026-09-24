@@ -1,309 +1,104 @@
-# JEV × APM Progressive Context
+# BetterContext
 
-Give your agent exactly the context each task phase needs — nothing more.
-TypeSafe/JEV System One progressively materializes and dematerializes APM
-rules/skills as work evolves, replacing the all-or-nothing context dump.
+**Progressive context for coding agents using TypeSafe/JEV System One and Microsoft APM.**
 
-## Same answers. A tenth of the context.
+BetterContext is a proof of concept for giving an agent the rules and skills it needs for its current work. A controller selects resources from an APM catalog, adds their bodies to the agent's context, and removes them when they are no longer relevant. The goal is to reduce context pressure while preserving task correctness.
 
-Fresh 10-probe held-out set · 94-resource / ~46.7k-token catalog · Spark ·
-provider-backed JEV · contamination-clean workspaces:
+## Why it exists
 
-| arm | retrieval | recall | misses | avg context | tokens |
-|---|---|---|---|---|---|
-| load-all (everything, always) | 10/10 | 1.0 | 0 | 46,736 | 633k |
-| native APM discovery | 10/10 | 1.0 | 0 | traced* | 1.37M |
-| **JEV progressive (isolated)** | **10/10** | **1.0** | **0** | **3,906** | **257k** |
+Agent projects accumulate instructions, rules, and skills. Loading the entire catalog ensures availability, but spends context on resources unrelated to the current task. BetterContext manages context over time: it **materializes** relevant resources into the next prompt and **dematerializes** resources that should no longer be sent.
 
-**10/10 on unseen probes with 8% of the context and ~40% of the tokens.**
-Noul comprehension 0.6–0.95; distractors correctly dismissed; eviction
-fidelity 0.9997 — evicted rules stay evicted. Replicated on a second seed.
+The controller owns the catalog. In isolated JEV evaluations, the agent workspace has no `apm.yml`, `.apm/`, `.agents/rules/`, or `.agents/skills/`; the agent receives only selected resource bodies.
 
-The JEV workspace contains zero non-materialized APM surface — no `apm.yml`,
-no `.apm/`, no `.agents/rules/`, no `.agents/skills/`. Only JEV-selected
-bodies reach the prompt. That's not a smaller dump. It's a different
-mechanism.
+## Headline result
 
-\* Discovery context measured from files opened + input tokens.
+The primary held-out comparison uses 10 unseen probes, a 94-resource catalog of approximately 46.7k tokens, the same agent model across arms, provider-backed JEV routing, and isolated workspaces.
 
-Primary artifacts: `evals/progressive-context/results/probe-2026-09-22T17-31-31-8wmokx.json`
-(+ `.grades.json`), replication `probe-2026-09-22T19-35-27-9ufpxd.json`
-(+ `.grades.json`). Definitions embedded with hashes.
+| Context strategy | Retrieval | Recall | Critical misses | Average supplied context | Session tokens |
+|---|---:|---:|---:|---:|---:|
+| Load everything | 10/10 | 1.0 | 0 | 46,736 | 633k |
+| Native APM discovery | 10/10 | 1.0 | 0 | traced¹ | 1.37M |
+| **JEV progressive context** | **10/10** | **1.0** | **0** | **3,906** | **257k** |
 
-## Two guarantees, two layers
+In this run, progressive context matched both baselines on retrieval while supplying about **8% of the full catalog context** on average. Whole-session token usage was approximately **59% lower than load-all**. A second paired run also reached 10/10 retrieval, with 4,367 average context tokens.
 
-- **Routing + isolation** (this benchmark): the right rules, nothing else,
-  physically enforced by workspace isolation — not trust.
-- **Byte-proof unload** (ExplicitHarness + eligible live runs): dematerialized
-  rules provably absent from all future requests.
-  Reference: `live-2026-09-21T21-11-07` (4/4 unload proofs, sentinel-zero).
+¹ Native discovery is traced through opened files and input tokens; it does not have a fixed injected-context size.
 
-  ## All benchmarks
+See the [primary result](evals/progressive-context/results/probe-2026-09-22T17-31-31-8wmokx.json), its [grades](evals/progressive-context/results/probe-2026-09-22T17-31-31-8wmokx.json.grades.json), and the [replication](evals/progressive-context/results/probe-2026-09-22T19-35-27-9ufpxd.json). The [evidence record](evals/progressive-context/results/EVIDENCE.md) explains the metrics and other runs.
 
-  Agent model throughout: `opencode-go/muse-spark-1.3-contributor`
-  (provider-backed JEV `jev-latest` for routing/grading).
+## How it works
 
-  Tuning trajectory (v1+v2+v3, 48 probes/arm) — how naming and lifetime fixes
-  converged all arms to perfect retrieval:
+Each agent turn follows a loop:
 
-  | run | load-all | discovery | JEV | JEV avg ctx |
-  |---|---|---|---|---|
-  | probe-2026-09-22T11-09 (renamed catalog) | 48/48, 3.60M tok | 48/48, 3.67M tok | 48/48, 2.72M tok | 5,228 |
-  | probe-2026-09-22T12-39 (JEV lifetime tuning) | — | — | 47/48, 1.79M tok | 3,901 |
-  | probe-2026-09-22T16-08 (discovery tracing) | — | 48/48, 50 files / 24k tok read | — | — |
+1. **Observe:** collect the goal, phase, current event, recent activity, changed paths, and active resources.
+2. **Route:** send one batched System One request to score rules and shortlist skills for the current state.
+3. **Resolve:** use deterministic thresholds, hysteresis, dependencies, lifetimes, and probation to activate, retain, or dematerialize resources.
+4. **Compile:** put only the currently selected bodies in a single `<jev-apm-context>` overlay.
+5. **Act:** give the agent the updated context; its actions inform the next routing decision.
 
-  ## How a probe run works
+```mermaid
+flowchart TD
+    A["Task and activity"] --> B["JEV relevance scores"]
+    B --> C["Lifecycle resolver"]
+    C --> D["Selected context overlay"]
+    D --> E["Agent action"]
+    E --> A
+```
 
-  One continued `opencode run --session` chain per arm (fresh sessions per
-  probe in multi-session mode). Each turn asks the **agent model** one frozen
-  probe question; the **JEV model** (System One) scores routing in parallel.
-  The two models never see each other's outputs — the runner mediates.
+A resource can become relevant, remain active across turns, and later leave the context. The resolver also requires weakly supported activations to gain confirmation from file or tool activity; otherwise their probation expires.
 
-  Per turn: (1) runner → JEV: one batched `POST /v1/systemone` with trajectory
-  state (`goal`, `phase`, current event, last 3 events, active ids, changed
-  paths) and ~100 questions — one Noul per rule, a Choice over skill
-  summaries, gating Nouls, then a second-pass Choice + fit-Nouls over the
-  top-3 shortlist; (2) runner → deterministic resolver (thresholds,
-  hysteresis, dependencies, lifetimes) + compiler, which injects exactly the
-  materialized bodies into one `<jev-apm-context>` overlay; (3) runner →
-  agent: probe question + `Rules:`/`Answer:`/`Quote:` template + overlay over
-  stdin to `opencode run`; (4) agent → runner: answer + tool calls + tokens.
+The [router](packages/progressive-context/src/router.ts), [resolver](packages/progressive-context/src/resolver.ts), and [compiler](packages/progressive-context/src/compiler.ts) implement these stages.
 
-  **Agent answers** are graded deterministically: the `Rules:` line must
-  endorse every `mustCite` id, none of `mustNotCite`, and quote any-of
-  `mustQuote`. Distractors (`pq-ios`, `pq-ml`) expect `Rules: none` plus a
-  non-applicability statement; recall probes re-list still-active ids from
-  the overlay, not memory.
+## What the evaluations measure
 
-  **JEV answers** are graded by JEV itself: comprehension Nouls per expected
-  rule (P(answer complies) — e.g. 0.94 on the payments probe), a disposition
-  Choice on distractors (`correctly-dismissed`), and an eviction Choice per
-  evicted id → fidelity = mean(1 − P(relies)).
+**Routing and isolation.** The held-out probes check whether the agent receives and cites the relevant resources while non-selected APM resources remain unavailable in its workspace. This is the headline benchmark above.
 
-  Worked example — `pq-payments-boundary` (phase `checkout-api`, JEV arm):
-  overlay carries 3 rules (780 ctx tokens); agent answers
-  `Rules: rule.payments-card-data` + one sentence + a verbatim quote
-  ("...must never receive, persist, log, or test with raw card numbers...")
-  → retrieval PASS, Noul 0.94. Distractor `pq-ios` with 11 unrelated rules
-  in context → `Rules: none` → PASS, `correctly-dismissed`.
-  Full detail: `evals/progressive-context/PROBE-RUN.md`.
+**Future-request unload.** Removing a resource from an active list does not establish that its text has left a continued conversation. The separate `ExplicitHarness` path rebuilds provider requests and checks that dematerialized bodies are absent from future requests. Reference run `live-2026-09-21T21-11-07` passed 4/4 unload proofs with zero sentinel leakage. This is a separate guarantee from the primary probe result.
 
-   v4 held-out runs (10 probes, Spark) — five single-session, one multi-session:
-  | run | mode | load-all | discovery | JEV | ctx avg − | sess tok − |
-  |---|---|---|---|---|---|---|
-  | probe-2026-09-22T17-31 (headline) | single | 10/10, 46,736 ctx, 633k tok | 10/10, 1.37M tok | 10/10, 3,906 ctx, 257k tok | −91.64% | −59.4% |
-  | probe-2026-09-22T19-35 (replication, JEV-first) | single | 10/10, 46,736 ctx, 684k tok | 10/10, 907k tok | 10/10, 4,367 ctx, 235k tok | −90.66% | −65.7% |
-  | probe-2026-09-22T19-51 (stability 1/3) | single, JEV-only | — | — | 10/10, 4,041 ctx, 381k tok | −91.35%* | — |
-  | probe-2026-09-22T19-58 (stability 2/3) | single, JEV-only | — | — | 10/10, 3,980 ctx, 219k tok | −91.48%* | — |
-  | probe-2026-09-22T20-04 (stability 3/3) | single, JEV-only | — | — | 10/10, 4,145 ctx, 233k tok | −91.13%* | — |
-  | probe-multi-2026-09-22T19-12 | **multi (fresh/probe)** | 10/10, 46,736 ctx, 580k tok | 10/10, 1.60M tok | 10/10, 1,324 ctx, 133k tok | −97.17% | −77.1% |
+**Coding-task correctness.** Live exercises test whether the agent builds working features while following the selected rules. In a paired two-phase refunds → notifications run, both JEV progressive context and native discovery passed 8/8 checks. JEV used 2.29M session tokens versus 3.10M for discovery, approximately **26% fewer** in that run. The checks cover feature behavior, payment boundaries, sensitive data, secret handling, notification fallback and retry, and tests.
 
-  ## The live engineering exercise (build-slice runs)
+Earlier runs include failures. One per-turn version let conversational activity activate more rules without corresponding implementation evidence. The context set grew and the agent did not finish the first phase. Probation was added in response. The four-phase exercise still shows context churn around phase transitions; stabilizing the set after a verified phase is an open area of work. See [analysis](evals/progressive-context/results/ANALYSIS.md) for the runs and limitations.
 
-  Probes test whether the agent *cites the right rules*. Builds test whether
-  it *ships working code under those rules* — the PoC's correctness leg.
-  Each run is a paired head-to-head: same fixture, same model, same task
-  prompt, same 20-turn budget. Only the APM context policy differs
-  (progressive JEV overlay vs native discovery), and the agent never knows
-  which arm it is running.
+## Scope and limitations
 
-  The 2-phase journey: **Phase 1 — refunds** (POST `/api/refunds` with
-  `Idempotency-Key` handling: scoped replay `200` + `Idempotent-Replayed`
-  vs `422` on key reuse; trusted server-side totals from the fixture catalog,
-  never client totals; a focused `bun` test proving duplicate delivery
-  converges). **Phase 2 — notifications** (`lib/notify.ts` with an email
-  template plus SMS fallback and retry, plus a test proving fallback
-  converges). The fixture ships stubs (`NOT_IMPLEMENTED`, 501s); the agent
-  must replace them with real implementations.
+The evidence supports a bounded claim: **in the scenarios tested, JEV can select and retire APM resources while preserving task-relevant context and reducing the context supplied to the agent.**
 
-  What the hidden checks measure (evaluator-only, never shown to JEV or
-  the agent): capability checks (refund route with trusted totals,
-  idempotency handling, both notify channels, fallback + retry), *rule
-  compliance* checks — normative requirements straight from the rule bodies
-  (no raw card data, no personal-data logging, no hardcoded secrets; the
-  4-phase variant adds webhook signature discipline), and a *convergence*
-  check (the agent's own `bun test` exits 0 with ≥2 passes). Counts per
-  verifier: refund slice 5 checks (1 rule), 2-phase journey 8 checks
-  (3 rules), 4-phase journey 12 checks (4 rules). A perfect score means the
-  agent built the feature, obeyed the rules, and proved it with tests.
+This is a proof of concept with a synthetic catalog, small held-out sets, limited agent models and provider configurations, stochastic routing, and policies shaped by these benchmarks. Successful retrieval does not establish better performance on every coding workload. Longer, dynamic engineering tasks need more testing.
 
-  What changed across runs — and why: the overlay *stability* fix (unchanged
-  sets send silence, not a "fresh" block), the *continuity* note
-  (`still-active` ids survive phase transitions), the JEV-owned *test-gate*
-  Noul (test permission fires at phase boundaries, not every turn), the
-  `lib/`-first verifier path, *per-turn routing* (the runner steps the JEV
-  session on every observed turn outcome instead of seeding once), and the
-  *probation fuse* (chatter-activated rules get 2 turns to show file
-  evidence, else `probation_expired` dematerializes them; task-lifetime
-  rules exempt). Each was a response to an observed failure mode
-  (phase-transition amnesia, test compulsion, root-scaffolding, seed-only
-  staleness, talk→bloat loop), not tuning on held-out gold.
+The [experiment contract](EXPERIMENT_CONTRACT.md) describes the comparison controls and the claims the results can support. Paired arms hold the task, repository state, agent model, permissions, limits, environment, and verifier fixed while changing the APM context policy. Gold labels stay with the evaluator.
 
-  Two-phase engineering journey (refunds → notifications, 20 turns, 8 checks):
+## Run it
 
-  | run | model | order | routing | JEV | discovery |
-  |---|---|---|---|---|---|
-  | build-2026-09-23T09-49 (final) | opencode-go Spark 1.3 | JEV-first | seed-only | **8/8**, 1.62M tok | 7/8 (refund-route), 1.35M tok |
-  | build-2026-09-23T10-19/10-43 (openrouter) | OpenRouter Spark 1.3 | discovery-first + JEV retry | seed-only | 6/8 (root-scaffold, thin Phase 2) | 5/8 (Phase 1 gaps) |
-  | build-2026-09-23T11-23 (luna) | OpenRouter gpt-6-luna-pro | JEV-first | seed-only | **8/8**, 1.81M tok, clean tree, 4 test passes | 4/8, 2.28M tok, zero files changed |
-  | build-2026-09-23T16-01 (luna, per-turn, no fuse) | OpenRouter gpt-6-luna-pro | JEV-only | per-turn | 4/8 (talk→bloat: set grew 7→11, Phase 1 never built) | — |
-  | build-2026-09-23T16-48 (luna, probation) | OpenRouter gpt-6-luna-pro | JEV-only | per-turn + fuse | **8/8** in 17 turns, 2.70M tok (t1 −5 expiry, t2 +5 confirm) | — |
-  | build-2026-09-23T17-25 (luna, paired probation) | OpenRouter gpt-6-luna-pro | discovery-first | per-turn + fuse | **8/8**, 2.29M tok (−26% vs discovery) | **8/8**, 3.10M tok |
-  | build-2026-09-23T19-33 (spark, paired probation) | OpenRouter Spark 1.3 | discovery-first | per-turn + fuse | **8/8**, 2.08M tok, 3 test passes | 6/8 (no notify, 0 passes), 1.44M tok |
-
-  JEV never loses a paired trial (margins +1, +1, +4, 0, +2). The 8/8-vs-8/8
-  tie is the PoC's success criterion firing exactly: equal task correctness
-  at −26% tokens with a breathing overlay (probation expiry → confirmation
-  → stable → phase expansion) instead of a static dump. Probation lifted
-  Spark from its 5–6/8 band to perfect; the 4/8 per-turn collapse without
-  the fuse is kept as the ablation that justifies it.
-
-  4-phase journey (refunds → notify → privacy → release, 30 turns, 12 checks):
-  seed-only luna reached 9/12 (Phases 1–2 perfect, privacy never started);
-  per-turn luna held 9/12 with genuine routing (6→14 resources, 3 real
-  dematerializations, release fixed, sms-fallback lost to mid-phase churn).
-  Phase-commitment (freeze a phase's set once its tests go green) is the
-  open next fix.
-
-  ```mermaid
-  flowchart TB
-      subgraph CTRL["Controller — owns the 94-resource APM store"]
-          OBS["Observe: phase + tool/file activity"]
-          JEV["JEV router: score every rule/skill"]
-          RES["Resolver: activate / retain / DEMATERIALIZE"]
-          CMP["Compiler: inject selected bodies only"]
-      end
-      subgraph AGT["Agent (sees only the overlay)"]
-          ACT["Act on the task"]
-      end
-      OBS --> JEV
-      JEV --> RES
-      RES -->|"materialized"| CMP
-      RES -->|"dematerialized: never compiled, never sent"| EVICT{"✕ evicted"}
-      CMP --> ACT
-      ACT --> OBS
-  ```
-
-  ## Model selection
-
-  Agent models are opencode `--model` ids, swappable per run (`--model=`).
-  Routing/grading always uses provider-backed JEV (`jev-latest`), never the
-  agent model. Why these three:
-
-  - `opencode-go/muse-spark-1.3-contributor` — default workhorse. Fast,
-    cheap, contributor-tier; all probe tuning (v1–v4) and the refund slice
-    ran on it. Baseline for every comparison.
-  - `openrouter/meta/muse-spark-1.3-contributor` — same weights, different
-    provider path. Tests whether results survive routing changes: both arms
-    degraded (JEV 8/8→6/8, discovery 7/8→5/8), JEV still ahead. Provider
-    path matters; report it, don't average over it.
-  - `openrouter/openai/gpt-6-luna-pro` — capability probe. A stronger model
-    widens the gap instead of closing it: JEV 8/8 with a clean tree while
-    discovery produces nothing. Progressive context is load-bearing for
-    capable agents, not training wheels for weak ones.
-
-   Per-request context always favors JEV (15× less here). Session totals favor
-
-  `ctx avg −` = 1 − JEV/load-all per-probe context sums. `sess tok −` = 1 −
-  JEV/load-all whole-session billing totals (input+output+reasoning, history
-  included). \*Stability rows have no same-run baseline; ctx measured against
-  the 46,736 flat catalog size, session reduction not computable.
-
-  Rules act in two places. **At routing time**, JEV scores every rule against
-  the current phase and the resolver activates, retains, or dematerializes —
-  dematerialized rules are never compiled and never reach any prompt. **At
-  prompt time**, the compiler injects exactly the materialized bodies (plus a
-  `[RULE]/[SKILL]` kind tag) into a single overlay block. Two session shapes
-  use this loop: *single-session* keeps one continued agent session with a
-  workspace plugin that scrubs stale overlays per turn (behavioral unload);
-  *multi-session* (factories) routes each probe in isolation with a
-  harness-assembled prompt and zero history (byte-proof by construction).
-
-  ## Example System One call
-
-  Routing sends one batched request per event — a Noul per rule, a Choice over
-  skill summaries, and gating Nouls — with the trajectory state:
-
-  ```json
-  // POST {baseURL}/v1/systemone { state, model, questions }
-  {
-    "state": {
-      "goal": "Answer probe questions about APM-managed rules and skills.",
-      "phase": "tax-exempt",
-      "currentEvent": "Are exempt lines excluded from...",
-      "eventKind": "user_message",
-      "changedPaths": [],
-      "recentEvidence": ["...previous event text..."],
-      "currentlyActive": ["rule.logging-sensitive-data"]
-    },
-    "model": "jev-latest",
-    "questions": {
-      "rule::rule.tax-calculation": {
-        "type": "noul",
-        "instructions": "Is this rule needed now to constrain or guide correct execution of the current phase or immediate next action? Rule summary: ...",
-        "criteria": {
-          "true": "The rule constrains or guides the current phase or immediate next action.",
-          "false": "The rule is irrelevant to the current phase or would add only stale context."
-        }
-      },
-      "which_skill": {
-        "type": "choice",
-        "instructions": "Which single skill procedure, if any, best fits the current phase or immediate next action?",
-        "criteria": { "skill.calculate-tax": "...", "...": "..." }
-      }
-    }
-  }
-  ```
-
-  Response (validated strictly — probabilities sum to ~1, winner holds max):
-
-  ```json
-  {
-    "model": "jev-latest",
-    "answers": {
-      "rule::rule.tax-calculation": { "type": "noul", "noul": 0.91 },
-      "rule::rule.ml-model-governance": { "type": "noul", "noul": 0.04 },
-      "which_skill": {
-        "type": "choice",
-        "choice": "skill.calculate-tax",
-        "probabilities": { "skill.calculate-tax": 0.72, "...": "..." },
-        "confidence": 0.81
-      }
-    },
-    "usage": { "input_tokens": 42514, "output_tokens": 8758 }
-  }
-  ```
-
-  The resolver turns scores into lifecycle transitions (activate/retain/unload
-  with hysteresis, dependencies, lifetimes); the compiler injects exactly the
-  materialized bodies. Grading reuses the same API: per-rule compliance Nouls
-  plus eviction Choices (`relies-on-evicted` / `consistent-but-independent` /
-  `unrelated`).
-
-## Try it
+You need [Bun](https://bun.sh/), the Microsoft APM CLI, a TypeSafe/JEV API key, and OpenCode for agent evaluations.
 
 ```bash
 bun install
 bun run check
-source .env   # TYPESAFE_API_KEY + APM 0.31 at /home/linuxbrew/.linuxbrew/bin/apm
-bun run evals/progressive-context/run-probe.ts --arms=load_all_single,apm_discovery,jev_single --model=opencode-go/muse-spark-1.3-contributor --probe-set=v4
-bun run evals/progressive-context/probe/grade-run.ts evals/progressive-context/results/<artifact>.json
-bun run dashboard   # http://127.0.0.1:4317, live 2s refresh
+cp .env.example .env
+# Set TYPESAFE_API_KEY in .env, then load it into your shell.
+set -a; source .env; set +a
 ```
 
-## More evidence
+Run and grade the three-arm held-out comparison:
 
-- `evals/progressive-context/results/EVIDENCE.md` — full evidence record.
-- `evals/progressive-context/results/PROBE-SCALE-REPORT.md` — tuning history
-  and factory runs.
-- `evals/progressive-context/results/ANALYSIS.md` — skeptical-reviewer analysis.
+```bash
+bun run evals/progressive-context/run-probe.ts \
+  --arms=load_all_single,apm_discovery,jev_single \
+  --model=opencode-go/muse-spark-1.3-contributor \
+  --probe-set=v4
 
-## How it works
+bun run evals/progressive-context/probe/grade-run.ts \
+  evals/progressive-context/results/<artifact>.json
+```
 
-- Controller-only APM store + per-probe contamination gates for JEV arms;
-  full in-workspace install for discovery; direct injection for load-all.
-- 58 action-named skills so kind reads from name shape; `[RULE]/[SKILL]`
-  overlay tags; verbatim `rule./skill.` ids in answers.
-- Phase-diagnostic rules evict after one low score; cross-cutting rules
-  persist; privacy rules span the task.
-- Thresholds frozen; all gains architectural, never tuned on held-out gold.
+The optional dashboard starts with `bun run dashboard` at `http://127.0.0.1:4317`.
+
+## Read further
+
+- [Experiment contract](EXPERIMENT_CONTRACT.md) — comparison design and claim boundaries
+- [Probe methodology](evals/progressive-context/PROBE-RUN.md) — probe setup and grading
+- [Evidence record](evals/progressive-context/results/EVIDENCE.md) — results and provenance
+- [Analysis](evals/progressive-context/results/ANALYSIS.md) — failures and interpretation
+- [Scale report](evals/progressive-context/results/PROBE-SCALE-REPORT.md) — tuning history and scaling
+
+BetterContext's central idea is to keep the agent's context aligned with its current work, including when that means removing resources that were useful earlier.
