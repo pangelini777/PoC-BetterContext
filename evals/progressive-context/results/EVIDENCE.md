@@ -103,52 +103,63 @@ incumbent). Prior fail-open artifact
   sentinel-zero + eligible classification. Later work moved to Spark probe
   evals; these runs stand as historical mechanism evidence, not the headline.
 
-  ## 7b. Build-slice engineering journeys (2026-09-22/23, current correctness leg)
+  ## 7b. Build-slice engineering journeys (2026-09-22/23)
 
-  Probes test whether the agent *cites the right rules*. Builds test whether
-  it *ships working code under those rules*. Each run is a paired head-to-head:
-  same fixture, same model, same task prompt, same turn budget. Only the APM
-  context policy differs; the agent never knows its arm. Hidden verifiers
-  (evaluator-only, never shown to JEV or the agent): refund slice 5 checks
-  (1 rule), 2-phase journey 8 checks (3 rules: card-data, sensitive-logging,
-  secrets), 4-phase journey 12 checks (4 rules: + webhook-idempotency).
-  A perfect score means the agent built the feature, obeyed the rules, and
-  proved it with its own converging `bun test`.
+  Probes check whether the agent cites the relevant rules. Builds check
+  whether it completes working features while following them. Each run is a
+  paired head-to-head: same fixture, model, task prompt, and turn budget.
+  Only the APM context policy differs, and the agent is not told its arm.
+  Verifiers are evaluator-only and hidden from JEV and the agent: the refund
+  slice has 5 checks (1 rule), the 2-phase journey 8 checks (3 rules: card
+  data, sensitive-data logging, secrets), and the 4-phase journey 12 checks
+  (4 rules, adding webhook signature handling). A perfect score means the
+  feature works, the rule checks pass, and the agent's own `bun test`
+  converges.
 
   2-phase journey (refunds → notifications, 20 turns):
 
   | run | model | order | routing | JEV | discovery |
   |---|---|---|---|---|---|
-  | build-2026-09-23T09-49 | og Spark | JEV-first | seed-only | **8/8**, 1.62M | 7/8, 1.35M |
-  | build-2026-09-23T10-19/10-43 | OR Spark | discovery-first + retry | seed-only | 6/8 | 5/8 |
-  | build-2026-09-23T11-23 | luna-pro | JEV-first | seed-only | **8/8**, 1.81M | 4/8, 2.28M, zero files |
-  | build-2026-09-23T16-01 | luna-pro | JEV-only | per-turn, no fuse | 4/8 (talk→bloat 7→11) | — |
-  | build-2026-09-23T16-48 | luna-pro | JEV-only | per-turn + fuse | **8/8** in 17 turns, 2.70M | — |
-  | build-2026-09-23T17-25 | luna-pro | discovery-first | per-turn + fuse | **8/8**, 2.29M (−26%) | **8/8**, 3.10M |
-  | build-2026-09-23T19-33 | OR Spark | discovery-first | per-turn + fuse | **8/8**, 2.08M | 6/8, 1.44M |
+  | build-2026-09-23T09-49 | opencode-go/muse-spark-1.3-contributor | JEV-first | seed-only | **8/8**, 1.62M | 7/8, 1.35M |
+  | build-2026-09-23T10-19/10-43 | openrouter/meta/muse-spark-1.3-contributor | discovery-first + retry | seed-only | 6/8 | 5/8 |
+  | build-2026-09-23T11-23 | openrouter/openai/gpt-6-luna-pro | JEV-first | seed-only | **8/8**, 1.81M | 4/8, 2.28M, no files changed |
+  | build-2026-09-23T16-01 | openrouter/openai/gpt-6-luna-pro | JEV-only | per-turn, no fuse | 4/8 (set grew 7→11, Phase 1 unbuilt) | — |
+  | build-2026-09-23T16-48 | openrouter/openai/gpt-6-luna-pro | JEV-only | per-turn + fuse | **8/8** in 17 turns, 2.70M | — |
+  | build-2026-09-23T17-25 | openrouter/openai/gpt-6-luna-pro | discovery-first | per-turn + fuse | **8/8**, 2.29M | **8/8**, 3.10M |
+  | build-2026-09-23T19-33 | openrouter/meta/muse-spark-1.3-contributor | discovery-first | per-turn + fuse | **8/8**, 2.08M | 6/8, 1.44M |
 
-  JEV never loses a paired trial (+1, +1, +4, 0, +2). The 8/8-vs-8/8 tie is
-  the PoC success criterion firing exactly: equal correctness at −26% tokens
-  with a breathing overlay instead of a static dump. Mechanism chain, each a
-  response to an observed failure (never gold-tuned): build-mode gate +
-  sticky lifetimes (churn) → overlay stability + continuity note (phase
-  amnesia) → JEV test-gate Noul (test compulsion) → `lib/`-first verifier
-  (harness bug, not agent fault) → per-turn routing (seed staleness) →
-  probation fuse (talk→bloat; the 4/8 ablation justifies it).
+  Across the five paired trials the JEV arm scored equal or higher each time
+  (margins +1, +1, +4, 0, +2). In the 8/8-vs-8/8 run both arms passed all
+  checks; JEV used 2.29M session tokens versus 3.10M for discovery, about
+  26% fewer in that run. The per-turn run without the fuse (4/8) is kept as
+  the ablation: conversational activity activated rules without matching
+  implementation, the set grew, and the agent did not finish Phase 1.
 
-  4-phase journey (30 turns, 12 checks): seed-only luna 9/12 (privacy never
-  started); per-turn luna 9/12 with genuine routing (6→14 resources, 3 real
-  dematerializations, release fixed, sms-fallback lost to mid-phase churn).
-  Open next fix: phase-commitment (freeze a phase's set once its tests go
-  green — no gold labels, the agent's own tests are the signal).
+  Mechanism changes during this series, each responding to an observed
+  failure: build-mode gate with sticky lifetimes (overlay churn), overlay
+  stability with continuity note (re-planning on identical sets), JEV
+  test-gate Noul (test time spent mid-phase instead of at boundaries),
+  `lib/`-first verifier paths (the verifier read a stub the agent was told
+  not to touch), per-turn routing (seed-only staleness), probation fuse
+  (unconfirmed activations accumulating). Thresholds were not tuned on
+  held-out gold.
 
-  Honest caveats: per-turn routing can destabilize as well as advance (sms
-  regressed 8/8→fail on the 4-phase per-turn run); single-session plugin
-  scrubs are behavioral only (`systemScrubbed` 0 across 182 invocations —
-  fresh processes carry history outside the hooks' view); byte-proof unload
-  stays with ExplicitHarness + sentinel test. Disk incident 2026-09-23:
-  `build-2026-09-23T13-55-38` died of tmpfs ENOSPC (truncated decisions JSON,
+  4-phase journey (30 turns, 12 checks): seed-only luna-pro reached 9/12
+  (Phases 1–2 passed, privacy work never started); per-turn luna-pro also
+  reached 9/12 with genuine routing (6→14 resources, 3 dematerializations,
+  release fixed, sms-fallback lost to mid-phase churn). Open work:
+  phase-commitment, freezing a phase's set once its tests go green, using
+  the agent's own tests as the signal (no gold labels).
+
+  Caveats: per-turn routing can destabilize as well as advance (sms-fallback
+  regressed on the 4-phase per-turn run); single-session plugin scrubs are
+  behavioral only (`systemScrubbed` 0 across 182 invocations — fresh
+  processes carry history outside the hooks' view), so byte-proof unload
+  stays with ExplicitHarness and the sentinel test. Run
+  `build-2026-09-23T13-55-38` died of tmpfs ENOSPC (truncated decisions file,
   empty logs) and is excluded, not regraded.
+
+  ## 8. Reproduction
 
   ```bash
   bun install
@@ -160,7 +171,6 @@ incumbent). Prior fail-open artifact
   source .env
   bun run evals/progressive-context/run-probe.ts --arms=load_all_single,apm_discovery,jev_single --model=opencode-go/muse-spark-1.3-contributor --probe-set=v4
   bun run evals/progressive-context/probe/grade-run.ts evals/progressive-context/results/<artifact>.json
-  ```
 
   ## 9. Answers to the plan's evidence questions
 

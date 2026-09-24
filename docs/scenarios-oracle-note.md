@@ -4,9 +4,9 @@ These files are the evaluation oracle, not instructions shown to JEV. The router
 
 `checkout-progressive.json` is the primary lifecycle proof. It should demonstrate at least three loads and two unloads/dematerializations, including look-alike skill switches (`stripe-checkout-session` → `postgres-schema-migration` → `stripe-webhook-handler`).
 
-Build-slice verifiers are a separate oracle family (not scenario gold):
+Build-slice verifiers are a separate oracle family from scenario gold:
 `independent/verify-refund.ts` (5 checks, 1 rule), `verify-journey2.ts`
-(8 checks, 3 rules), `verify-journey.ts` (12 checks, 4 rules). Same
-discipline — evaluator-only, never shown to JEV or the agent — applied to
-shipped code instead of cited ids. Counts and results: README §live
-engineering exercise, EVIDENCE §7b.
+(8 checks, 3 rules), `verify-journey.ts` (12 checks, 4 rules). The same
+discipline applies — evaluator-only, never shown to JEV or the agent —
+but to shipped code rather than cited ids. Counts and results: README
+section on the live engineering exercise, EVIDENCE §7b.

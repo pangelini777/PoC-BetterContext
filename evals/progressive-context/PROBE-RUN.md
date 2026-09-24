@@ -1,8 +1,8 @@
 # How the probe run works
 
-Agent model for probes: `opencode-go/muse-spark-1.3-contributor` only.
-Builds (not covered here) run Spark plus `openrouter/openai/gpt-6-luna-pro`
-across two provider paths — see README §live engineering exercise.
+Probe agent model: `opencode-go/muse-spark-1.3-contributor`. Build exercises
+use Spark plus `openrouter/openai/gpt-6-luna-pro` across two provider paths;
+see the README section on the live engineering exercise.
 
 ## Per turn
 
@@ -48,15 +48,17 @@ across two provider paths — see README §live engineering exercise.
 - Distractor disposition Choice: follows / contradicts / correctly-dismissed.
 ## Probation fuse (build runs, resolver-owned)
 
-Talk opens the door, work keeps it open. A rule activated on chatter alone
-(announcement without file evidence in `changedPaths`) materializes on a
-2-turn fuse: file evidence graduates it to full membership
-(`probation_confirmed`), silence dematerializes it (`probation_expired`)
-regardless of score. File-evidenced activations skip probation; task/session
-lifetime rules are exempt (their lifetime is the commitment). Provenance:
-the 4/8 per-turn collapse without the fuse (set bloated 7→11, Phase 1 never
-built) vs 8/8 with it (t1 −5 expiry, t2 +5 confirm, then flat). Deterministic
-code owns the fuse; JEV only scores.
+The resolver requires weakly supported activations to gain confirmation
+from file or tool activity. A rule activated on conversational activity
+alone materializes on a 2-turn fuse: file evidence in `changedPaths`
+graduates it to full membership (`probation_confirmed`), while silence
+dematerializes it (`probation_expired`) regardless of score.
+File-evidenced activations skip probation; task/session lifetime rules are
+exempt because their lifetime is the commitment mechanism. The per-turn run
+without the fuse scored 4/8 (the set grew 7→11 and Phase 1 was never
+built); with the fuse the same setup scored 8/8 (five expiries on turn 1,
+five confirmations on turn 2, then a stable set). Deterministic code owns
+the fuse; JEV only scores.
 
 ## Reading the grades
 

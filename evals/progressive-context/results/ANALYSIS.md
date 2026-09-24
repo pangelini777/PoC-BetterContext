@@ -1,18 +1,19 @@
   # Analysis — build-slice verdict (current) + isolated v4 headline + history
 
-  Build-slice (2026-09-22/23, sixteen arms, Spark + luna-pro): JEV never
-  loses a paired trial (+1, +1, +4, 0, +2). Probation lifted Spark 5–6/8 →
-  8/8; the 8/8-vs-8/8 tie holds at −26% tokens — the PoC success criterion
-  (equal correctness, healthier context) firing exactly. The 4/8 per-turn
-  collapse without the fuse is the justifying ablation (talk→bloat 7→11).
-  4-phase ceiling 9/12 twice (privacy never starts); next fix
-  phase-commitment from the agent's own green tests. Artifacts
-  `results/build-*.json`; table README §live engineering exercise.
+  Build-slice (2026-09-22/23, sixteen arms, Spark + luna-pro): the JEV arm
+  scored equal or higher in all five paired trials (+1, +1, +4, 0, +2).
+  Probation moved Spark from 5–6/8 to 8/8; the 8/8-vs-8/8 run used about
+  26% fewer session tokens on the JEV arm (2.29M vs 3.10M). The 4/8
+  per-turn run without the fuse is kept as the ablation (the set grew 7→11
+  and Phase 1 was never built). The 4-phase ceiling is 9/12 twice (privacy
+  work never started); the open work is phase-commitment from the agent's
+  own green tests. Artifacts `results/build-*.json`; table in the README
+  section on the live engineering exercise.
 
-  Unload scope, honestly: per-turn routing dematerializes for real (3 events
-  on the 4-phase per-turn run, probation expiries throughout), but
-  single-session plugin scrubs are behavioral-only — byte-proof stays with
-  ExplicitHarness + sentinel + eligible live run below.
+  Unload scope: per-turn routing dematerializes for real (3 events on the
+  4-phase per-turn run, probation expiries throughout), but single-session
+  plugin scrubs are behavioral only — byte-proof unload stays with
+  ExplicitHarness, the sentinel test, and the eligible live run below.
 
   ---
 
