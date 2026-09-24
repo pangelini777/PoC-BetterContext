@@ -68,7 +68,7 @@ Noul comprehension 0.6–0.95 on all arms wherever graded; distractors
    vs "return 400/500 appropriately"). Reworded to accept reject/verify
    language; previously-failing correct answers now pass.
 
-## 4. Honest gaps
+## 4. Honest gaps (probe era; build-slice update follows)
 
 - Multi-session JEV (23/48) vs multi load-all (24/26 content): cold-start
   quality is close; JEV's edge there is cost, not correctness.
@@ -79,7 +79,21 @@ Noul comprehension 0.6–0.95 on all arms wherever graded; distractors
 - 46.7k catalog, not 60k: new bodies averaged ~500 tokens vs 650 target.
   Same order of magnitude; routing behavior (12/94 materialized) already sharp.
 
-  ## 5. Artifacts (all committed)
+## 5. Build-slice era update (2026-09-22/23, supersedes the "fatty builds" gap)
+
+Sixteen build arms across ten runs (Spark + luna-pro, seed-only → per-turn
++ probation): JEV never loses a paired trial (+1, +1, +4, 0, +2), probation
+lifted Spark 5–6/8 → 8/8, and the 8/8-vs-8/8 tie holds at −26% tokens. The
+4/8 per-turn collapse without the fuse is kept as the justifying ablation.
+Remaining build gaps: 4-phase privacy never starts under any routing (9/12
+ceiling twice); per-turn routing can destabilize mid-phase work
+(sms-fallback regressed on the 4-phase per-turn run); single-session scrubs
+are behavioral-only (`systemScrubbed` 0/182 — fresh processes carry history
+outside the hooks' view). Next fix: phase-commitment from the agent's own
+green tests. Full table: README §live engineering exercise, artifacts
+  `results/build-*.json`, evidence EVIDENCE §7b.
+
+  ## 6. Artifacts (all committed)
 
   - Probes: `probe-2026-09-22T11-09-56-o7n3fy.json[.grades.json]` (single,
     3-arm), `probe-2026-09-22T12-39-24-x48mdy.json[.grades.json]` (JEV tuned),

@@ -1,9 +1,8 @@
 # How the probe run works
 
-One continued `opencode run --session` chain per arm (or fresh sessions per
-probe in multi-session mode). Each turn asks the **agent model** one frozen
-probe question; the **JEV model** (System One) scores routing in parallel.
-The two models never see each other's outputs — the runner mediates.
+Agent model for probes: `opencode-go/muse-spark-1.3-contributor` only.
+Builds (not covered here) run Spark plus `openrouter/openai/gpt-6-luna-pro`
+across two provider paths — see README §live engineering exercise.
 
 ## Per turn
 
@@ -14,12 +13,14 @@ The two models never see each other's outputs — the runner mediates.
    (`acts_on_repo`, `procedure_helpful`, `prose_suffices`,
    `sustained_construction`), then a second-pass Choice + fit-Nouls over the
    top-3 shortlist. Answers are strict-validated (probabilities sum to ~1,
-   winner holds max). Usage/latency/model recorded per call.
+   winner holds max). Usage/latency/model recorded per call. The
+   `sustained_construction` gate locks the session into build mode
+   (sticky lifetimes via `stepSticky`) or fast-eviction probe mode on turn 0.
 2. **Runner → resolver + compiler.** Rule probabilities feed the deterministic
    lifecycle resolver (thresholds, hysteresis streaks, dependencies,
-   lifetimes, build-mode stickiness). The compiler injects exactly the
-   materialized bodies — each tagged `[RULE]`/`[SKILL]` with a `[LOCATION
-   path]` line — into one `<jev-apm-context>` overlay block.
+   lifetimes, build-mode stickiness, probation fuse). The compiler injects
+   exactly the materialized bodies — each tagged `[RULE]`/`[SKILL]` with a
+   `[LOCATION path]` line — into one `<jev-apm-context>` overlay block.
 3. **Runner → agent model.** The probe question + answer template
    (`Rules:` / `Answer:` / `Quote:`) + current overlay go over stdin to
    `opencode run` (`--auto --format json`). NDJSON events parsed for text,
@@ -45,9 +46,17 @@ The two models never see each other's outputs — the runner mediates.
 
 - Comprehension Nouls per expected rule: P(answer complies with the rule).
 - Distractor disposition Choice: follows / contradicts / correctly-dismissed.
-- Eviction Choice per evicted id: relies-on-evicted /
-  consistent-but-independent / unrelated → fidelity = mean(1 − P(relies)).
-- Self-report scoring on recall probes vs expected and runner-owned sets.
+## Probation fuse (build runs, resolver-owned)
+
+Talk opens the door, work keeps it open. A rule activated on chatter alone
+(announcement without file evidence in `changedPaths`) materializes on a
+2-turn fuse: file evidence graduates it to full membership
+(`probation_confirmed`), silence dematerializes it (`probation_expired`)
+regardless of score. File-evidenced activations skip probation; task/session
+lifetime rules are exempt (their lifetime is the commitment). Provenance:
+the 4/8 per-turn collapse without the fuse (set bloated 7→11, Phase 1 never
+built) vs 8/8 with it (t1 −5 expiry, t2 +5 confirm, then flat). Deterministic
+code owns the fuse; JEV only scores.
 
 ## Reading the grades
 

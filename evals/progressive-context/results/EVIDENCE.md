@@ -103,11 +103,56 @@ incumbent). Prior fail-open artifact
   sentinel-zero + eligible classification. Later work moved to Spark probe
   evals; these runs stand as historical mechanism evidence, not the headline.
 
-  ## 8. Reproduction
+  ## 7b. Build-slice engineering journeys (2026-09-22/23, current correctness leg)
+
+  Probes test whether the agent *cites the right rules*. Builds test whether
+  it *ships working code under those rules*. Each run is a paired head-to-head:
+  same fixture, same model, same task prompt, same turn budget. Only the APM
+  context policy differs; the agent never knows its arm. Hidden verifiers
+  (evaluator-only, never shown to JEV or the agent): refund slice 5 checks
+  (1 rule), 2-phase journey 8 checks (3 rules: card-data, sensitive-logging,
+  secrets), 4-phase journey 12 checks (4 rules: + webhook-idempotency).
+  A perfect score means the agent built the feature, obeyed the rules, and
+  proved it with its own converging `bun test`.
+
+  2-phase journey (refunds → notifications, 20 turns):
+
+  | run | model | order | routing | JEV | discovery |
+  |---|---|---|---|---|---|
+  | build-2026-09-23T09-49 | og Spark | JEV-first | seed-only | **8/8**, 1.62M | 7/8, 1.35M |
+  | build-2026-09-23T10-19/10-43 | OR Spark | discovery-first + retry | seed-only | 6/8 | 5/8 |
+  | build-2026-09-23T11-23 | luna-pro | JEV-first | seed-only | **8/8**, 1.81M | 4/8, 2.28M, zero files |
+  | build-2026-09-23T16-01 | luna-pro | JEV-only | per-turn, no fuse | 4/8 (talk→bloat 7→11) | — |
+  | build-2026-09-23T16-48 | luna-pro | JEV-only | per-turn + fuse | **8/8** in 17 turns, 2.70M | — |
+  | build-2026-09-23T17-25 | luna-pro | discovery-first | per-turn + fuse | **8/8**, 2.29M (−26%) | **8/8**, 3.10M |
+  | build-2026-09-23T19-33 | OR Spark | discovery-first | per-turn + fuse | **8/8**, 2.08M | 6/8, 1.44M |
+
+  JEV never loses a paired trial (+1, +1, +4, 0, +2). The 8/8-vs-8/8 tie is
+  the PoC success criterion firing exactly: equal correctness at −26% tokens
+  with a breathing overlay instead of a static dump. Mechanism chain, each a
+  response to an observed failure (never gold-tuned): build-mode gate +
+  sticky lifetimes (churn) → overlay stability + continuity note (phase
+  amnesia) → JEV test-gate Noul (test compulsion) → `lib/`-first verifier
+  (harness bug, not agent fault) → per-turn routing (seed staleness) →
+  probation fuse (talk→bloat; the 4/8 ablation justifies it).
+
+  4-phase journey (30 turns, 12 checks): seed-only luna 9/12 (privacy never
+  started); per-turn luna 9/12 with genuine routing (6→14 resources, 3 real
+  dematerializations, release fixed, sms-fallback lost to mid-phase churn).
+  Open next fix: phase-commitment (freeze a phase's set once its tests go
+  green — no gold labels, the agent's own tests are the signal).
+
+  Honest caveats: per-turn routing can destabilize as well as advance (sms
+  regressed 8/8→fail on the 4-phase per-turn run); single-session plugin
+  scrubs are behavioral only (`systemScrubbed` 0 across 182 invocations —
+  fresh processes carry history outside the hooks' view); byte-proof unload
+  stays with ExplicitHarness + sentinel test. Disk incident 2026-09-23:
+  `build-2026-09-23T13-55-38` died of tmpfs ENOSPC (truncated decisions JSON,
+  empty logs) and is excluded, not regraded.
 
   ```bash
   bun install
-  bun run check                                   # typecheck + 42 tests
+  bun run check                                   # typecheck + 43 tests
   bun run evals/progressive-context/apm-isolation.ts
   bun run evals/progressive-context/context-spike.ts
   bun run evals/progressive-context/run-scripted.ts --arms load_all,static_initial,progressive_jev,oracle_dynamic

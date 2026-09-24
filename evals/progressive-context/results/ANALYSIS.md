@@ -1,10 +1,21 @@
-  # Analysis — isolated v4 held-out result (current) + historical record
+  # Analysis — build-slice verdict (current) + isolated v4 headline + history
 
-  Headline: `probe-2026-09-22T17-31-31-8wmokx.json` (Spark, provider-backed
-  JEV, 94 resources / 46,736 tokens, contamination-clean): 10/10 retrieval,
-  recall 1.0, 0 critical misses on all 3 arms; JEV avg ctx 3,906 (8% of
-  46,736 flat), 257k vs 633k/1.37M tokens, eviction fidelity 0.9997.
-  Grading uses embedded probeSet/evaluator v4 definitions (hashes verified).
+  Build-slice (2026-09-22/23, sixteen arms, Spark + luna-pro): JEV never
+  loses a paired trial (+1, +1, +4, 0, +2). Probation lifted Spark 5–6/8 →
+  8/8; the 8/8-vs-8/8 tie holds at −26% tokens — the PoC success criterion
+  (equal correctness, healthier context) firing exactly. The 4/8 per-turn
+  collapse without the fuse is the justifying ablation (talk→bloat 7→11).
+  4-phase ceiling 9/12 twice (privacy never starts); next fix
+  phase-commitment from the agent's own green tests. Artifacts
+  `results/build-*.json`; table README §live engineering exercise.
+
+  Unload scope, honestly: per-turn routing dematerializes for real (3 events
+  on the 4-phase per-turn run, probation expiries throughout), but
+  single-session plugin scrubs are behavioral-only — byte-proof stays with
+  ExplicitHarness + sentinel + eligible live run below.
+
+  ---
+
 
   Unload distinction: v4 = routing/isolation evidence with behavioral fidelity;
   byte-proof future-request dematerialization = ExplicitHarness + eligible live

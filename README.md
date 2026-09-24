@@ -26,7 +26,7 @@ In this run, progressive context matched both baselines on retrieval while suppl
 
 See the [primary result](evals/progressive-context/results/probe-2026-09-22T17-31-31-8wmokx.json), its [grades](evals/progressive-context/results/probe-2026-09-22T17-31-31-8wmokx.json.grades.json), and the [replication](evals/progressive-context/results/probe-2026-09-22T19-35-27-9ufpxd.json). The [evidence record](evals/progressive-context/results/EVIDENCE.md) explains the metrics and other runs.
 
-## How it works
+ @ours
 
 Each agent turn follows a loop:
 
