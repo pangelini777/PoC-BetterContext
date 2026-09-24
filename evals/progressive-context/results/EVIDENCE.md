@@ -145,9 +145,14 @@ incumbent). Prior fail-open artifact
   held-out gold.
 
   4-phase journey (30 turns, 12 checks): seed-only luna-pro reached 9/12
-  (Phases 1–2 passed, privacy work never started); per-turn luna-pro also
-  reached 9/12 with genuine routing (6→14 resources, 3 dematerializations,
-  release fixed, sms-fallback lost to mid-phase churn). Open work:
+  (Phases 1–2 passed, privacy work never started); per-turn luna-pro without
+  the fuse also reached 9/12 with genuine routing (6→14 resources, 3
+  dematerializations, release fixed, sms-fallback lost to mid-phase churn);
+  per-turn luna-pro with the fuse reached 10/12 (`build-2026-09-24T05-41-17`,
+  3.48M tokens, 10 test passes — sms-fallback and release hold, privacy
+  checks still fail). Privacy rules materialized at the phase transitions
+  (t15 +5, t22 +3) but `lib/privacy.ts` was never written, so the remaining
+  gap looks like initiation rather than routing. Open work:
   phase-commitment, freezing a phase's set once its tests go green, using
   the agent's own tests as the signal (no gold labels).
 

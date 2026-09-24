@@ -57,7 +57,7 @@ The [router](packages/progressive-context/src/router.ts), [resolver](packages/pr
 
 **Coding-task correctness.** Live exercises test whether the agent builds working features while following the selected rules. In a paired two-phase refunds → notifications run, both JEV progressive context and native discovery passed 8/8 checks. JEV used 2.29M session tokens versus 3.10M for discovery, approximately **26% fewer** in that run. The checks cover feature behavior, payment boundaries, sensitive data, secret handling, notification fallback and retry, and tests.
 
-Earlier runs include failures. One per-turn version let conversational activity activate more rules without corresponding implementation evidence. The context set grew and the agent did not finish the first phase. Probation was added in response. The four-phase exercise still shows context churn around phase transitions; stabilizing the set after a verified phase is an open area of work. See [analysis](evals/progressive-context/results/ANALYSIS.md) for the runs and limitations.
+Earlier runs include failures. One per-turn version let conversational activity activate more rules without corresponding implementation evidence. The context set grew and the agent did not finish the first phase. Probation was added in response. The four-phase exercise reached 10/12 with probation (sms-fallback and release hold; privacy work never starts even though privacy rules materialize at phase transitions, so the gap looks like initiation rather than routing). Stabilizing the set after a verified phase is an open area of work. See [analysis](evals/progressive-context/results/ANALYSIS.md) for the runs and limitations.
 
 ## Scope and limitations
 
